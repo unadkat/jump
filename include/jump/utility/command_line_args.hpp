@@ -15,7 +15,7 @@ namespace Jump {
     /// \brief Parses and stores information supplied at runtime via
     /// command-line arguments, and enables their extraction.
     class CommandLineArgs {
-        protected:
+        private:
             /// \brief Stores a flag (single character only) and whether this
             /// flag has been extracted by the user.
             struct Flag {

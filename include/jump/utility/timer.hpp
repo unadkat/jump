@@ -6,7 +6,6 @@
 
 #include <chrono>
 #include <format>
-#include <sstream>
 #include <string>
 
 namespace Jump
@@ -14,7 +13,7 @@ namespace Jump
     /// \brief Enables timing of function calls and the calculation of average
     /// and total time taken.
     class Timer {
-        protected:
+        private:
             // \brief Type alias to reduce verbosity.
             using Clock = std::chrono::steady_clock;
 

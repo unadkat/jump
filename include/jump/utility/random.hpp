@@ -14,7 +14,7 @@ namespace Jump {
     template <typename T = double, template <typename> typename Distribution
         = std::uniform_real_distribution>
     class RandomNumbers {
-        protected:
+        private:
             /// \brief The engine that generates the random seed data which is
             /// in turn used to provide numbers from a chosen distribution.
             std::default_random_engine m_engine;

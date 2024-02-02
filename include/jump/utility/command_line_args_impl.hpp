@@ -1,8 +1,7 @@
 // This file forms part of Jump (Jay's Utilities and Mathematical Primitives)
 // Copyright (C) Jay Unadkat 2024. Released under GPL-3.0-or-later (see COPYING)
 
-inline CommandLineArgs::CommandLineArgs(const int& argc,
-        char** const argv) :
+inline CommandLineArgs::CommandLineArgs(const int& argc, char** const argv) :
     m_flags(),
     m_options() {
 

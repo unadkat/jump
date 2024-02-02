@@ -4,6 +4,8 @@
 #ifndef JUMP_JUMP_HPP
 #define JUMP_JUMP_HPP
 
+#include "debug/exception.hpp"
+
 #include "utility/command_line_args.hpp"
 #include "utility/random.hpp"
 #include "utility/timer.hpp"
