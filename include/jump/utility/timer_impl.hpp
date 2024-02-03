@@ -11,8 +11,8 @@ inline std::string Timer::formatted_time(Clock::duration time) const {
     long minutes(0), hours(0);
     double seconds(0.);
 
-    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-            time).count();
+    auto ms {std::chrono::duration_cast<std::chrono::milliseconds>(
+            time).count()};
     hours = ms/(1000*60*60);
     ms %= 1000*60*60;
     minutes = ms/(1000*60);
@@ -58,7 +58,7 @@ inline const long& Timer::lap_count() const {
 }
 
 inline Timer::Clock::duration Timer::running_time() const {
-    auto time = m_delta_t;
+    auto time {m_delta_t};
     if (!m_stopped) {
         time += Clock::now() - m_start;
     }

@@ -1,6 +1,11 @@
 // This file forms part of Jump (Jay's Utilities and Mathematical Primitives)
 // Copyright (C) Jay Unadkat 2024. Released under GPL-3.0-or-later (see COPYING)
 
+/// Note: there is currently an edge case where a valueless option followed
+/// directly by a flag collection will register the flag collection as the value
+/// for the option.
+///
+/// TODO: require all flag collections to appear before all options.
 inline CommandLineArgs::CommandLineArgs(const int& argc, char** const argv) :
     m_flags(),
     m_options() {
@@ -50,7 +55,7 @@ inline CommandLineArgs::CommandLineArgs(const int& argc, char** const argv) :
 /// Query if a specified flag appears in the command-line arguments. If the flag
 /// exists, mark it as having been recognised.
 inline bool CommandLineArgs::get(const char& flag, bool& storage) {
-    if (auto it = std::ranges::find(m_flags, flag, &Flag::flag);
+    if (auto it {std::ranges::find(m_flags, flag, &Flag::flag)};
             it != m_flags.end()) {
         return (storage = it->recognised = true);
     } else {
@@ -63,7 +68,7 @@ inline bool CommandLineArgs::get(const char& flag, bool& storage) {
 /// variable. If an argument is extracted, mark it as having been recognised.
 template <typename T>
 inline bool CommandLineArgs::get(const std::string& option, T& storage) {
-    if (auto it = std::ranges::find(m_options, option, &Option::option);
+    if (auto it {std::ranges::find(m_options, option, &Option::option)};
             it != m_options.end()) {
         // Don't overwrite passed variable yet
         T converted;
@@ -86,7 +91,7 @@ inline bool CommandLineArgs::get(const std::string& option, T& storage) {
 /// as having been recognised.
 template <>
 inline bool CommandLineArgs::get(const std::string& option, bool& storage) {
-    if (auto it = std::ranges::find(m_options, option, &Option::option);
+    if (auto it {std::ranges::find(m_options, option, &Option::option)};
             it != m_options.end()) {
         return (storage = it->recognised = true);
     } else {

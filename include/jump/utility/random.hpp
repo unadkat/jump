@@ -5,7 +5,6 @@
 #define JUMP_RANDOM_HPP
 
 #include <random>
-#include <utility>
 
 namespace Jump {
 

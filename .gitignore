@@ -2,7 +2,7 @@
 build/
 # Test code (early development only, to be replaced with proper testing framework
 tests/
-third_party/
+external/
 
 # CMake support to be added for more general usage at a later stage
 CMakeLists.txt

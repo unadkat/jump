@@ -8,8 +8,8 @@
 #include <format>
 #include <string>
 
-namespace Jump
-{
+namespace Jump {
+
     /// \brief Enables timing of function calls and the calculation of average
     /// and total time taken.
     class Timer {
