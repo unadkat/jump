@@ -6,8 +6,8 @@
 template <typename T, template <typename> typename Distribution>
 template <typename... Args>
 inline RandomNumbers<T, Distribution>::RandomNumbers(Args&&... args) :
-    m_engine(std::random_device()()),
-    m_distribution(std::forward<Args>(args)...) {
+    m_engine {std::random_device{}()},
+    m_distribution {std::forward<Args>(args)...} {
 }
 
 template <typename T, template <typename> typename Distribution>

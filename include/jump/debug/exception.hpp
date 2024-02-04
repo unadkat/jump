@@ -33,14 +33,19 @@ namespace Jump {
         public:
             /// \brief Construct error of specified type with details of the
             /// problem and the source information at that location.
-            RuntimeError(const std::string& info = "",
+            RuntimeError(std::string info = "",
                     std::source_location source =
                     std::source_location::current());
             /// \brief Enable default destructor.
             virtual ~RuntimeError() = default;
 
-            /// \brief Return the full error message (with banner) as a string.
-            const char* what() const noexcept;
+            /// \brief Return the full error message (with banner) as a
+            /// mutable string, in case catching code needs to add context and
+            /// rethrow.
+            std::string& what() noexcept;
+            /// \brief Return source information at location of the raised
+            /// exception.
+            const std::source_location& where() const noexcept;
     };
 
     /// \brief File IO exception class.

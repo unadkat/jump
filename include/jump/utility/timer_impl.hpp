@@ -29,7 +29,7 @@ inline std::string Timer::formatted_time(Clock::duration time) const {
 }
 
 inline Timer::Timer(const std::string& task) :
-    m_task(task) {
+    m_task {task} {
 }
 
 inline void Timer::start() {

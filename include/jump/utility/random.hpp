@@ -27,11 +27,11 @@ namespace Jump {
             RandomNumbers(Args&&... args);
 
             /// \brief Generate a random number of the templated type and
-            /// distribution
+            /// distribution.
             T generate();
     };
 
-#include "random_impl.hpp"
+    #include "random_impl.hpp"
 
 }   // namespace Jump
 

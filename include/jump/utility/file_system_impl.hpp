@@ -2,7 +2,7 @@
 // Copyright (C) Jay Unadkat 2024. Released under GPL-3.0-or-later (see COPYING)
 
 inline FileSystem::FileSystem(const std::string& path) :
-    m_root("./" + path) {
+    m_root {"./" + path} {
 
     if (!std::filesystem::exists(m_root)) {
         if (!std::filesystem::create_directories(m_root)) {

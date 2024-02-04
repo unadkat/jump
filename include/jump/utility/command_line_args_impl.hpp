@@ -7,8 +7,8 @@
 ///
 /// TODO: require all flag collections to appear before all options.
 inline CommandLineArgs::CommandLineArgs(const int& argc, char** const argv) :
-    m_flags(),
-    m_options() {
+    m_flags{},
+    m_options{} {
 
     // Populate list of strings with all supplied command-line arguments
     std::vector<std::string> arguments(argv + 1, argv + argc);
