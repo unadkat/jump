@@ -25,13 +25,13 @@ namespace Jump {
     /// five different options: input, output (truncation), output(append),
     /// input/output (truncation), and input/output (append).
     namespace FileMode {
-        const std::ios_base::openmode in = std::ios_base::in;
-        const std::ios_base::openmode out_trunc = std::ios_base::out
-            | std::ios_base::trunc;
-        const std::ios_base::openmode out_app = std::ios_base::out
-            | std::ios_base::app;
-        const std::ios_base::openmode random_trunc = in | out_trunc;
-        const std::ios_base::openmode random_app = in | out_app;
+        const std::ios_base::openmode in{std::ios_base::in};
+        const std::ios_base::openmode out_trunc{std::ios_base::out
+            | std::ios_base::trunc};
+        const std::ios_base::openmode out_app{std::ios_base::out
+            | std::ios_base::app};
+        const std::ios_base::openmode random_trunc{in | out_trunc};
+        const std::ios_base::openmode random_app{in | out_app};
     }   // namespace FileMode
 
     /// \brief Deals with the storage of input and output file streams, and

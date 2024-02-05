@@ -18,10 +18,10 @@ namespace Jump {
             using Clock = std::chrono::steady_clock;
 
             /// \brief Flag to show if the `Timer` is currently stopped.
-            bool m_stopped {true};
+            bool m_stopped{true};
             /// \brief Counter of the number of start/stop laps, for the
             /// calculation of the average time.
-            long m_counter {0};
+            long m_counter{0};
             /// \brief Start time for the current timing session.
             Clock::time_point m_start;
             /// \brief Storage of the total duration the `Timer` has been
@@ -37,7 +37,7 @@ namespace Jump {
         public:
             /// \brief Construct the `Timer` in a stopped state, with a given
             /// task description, and an elapsed time of zero.
-            Timer(const std::string& task = "");
+            Timer(std::string task = "");
 
             /// \brief Start a new timing session (preserving the stored elapsed
             /// time), if the `Timer` is stopped, otherwise do nothing.

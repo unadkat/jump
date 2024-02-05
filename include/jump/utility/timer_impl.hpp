@@ -8,10 +8,10 @@
 /// Failing both of these, the time is returned in the format ss.sss with a
 /// trailing 's' to denote seconds.
 inline std::string Timer::formatted_time(Clock::duration time) const {
-    long minutes(0), hours(0);
-    double seconds(0.);
+    long minutes{0}, hours{0};
+    double seconds{0.};
 
-    auto ms {std::chrono::duration_cast<std::chrono::milliseconds>(
+    auto ms{std::chrono::duration_cast<std::chrono::milliseconds>(
             time).count()};
     hours = ms/(1000*60*60);
     ms %= 1000*60*60;
@@ -28,8 +28,8 @@ inline std::string Timer::formatted_time(Clock::duration time) const {
     }
 }
 
-inline Timer::Timer(const std::string& task) :
-    m_task {task} {
+inline Timer::Timer(std::string task) :
+    m_task{std::move(task)} {
 }
 
 inline void Timer::start() {
@@ -58,11 +58,10 @@ inline const long& Timer::lap_count() const {
 }
 
 inline Timer::Clock::duration Timer::running_time() const {
-    auto time {m_delta_t};
+    auto time{m_delta_t};
     if (!m_stopped) {
         time += Clock::now() - m_start;
     }
-
     return time;
 }
 
@@ -91,7 +90,6 @@ inline Os& operator<<(Os& out, const Timer& rhs) {
     if (rhs.m_stopped && rhs.m_counter > 1) {
         out << ", average time: " << rhs.formatted_average_time();
     }
-
     return out;
 }
 

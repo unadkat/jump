@@ -6,7 +6,7 @@
 /// for the option.
 ///
 /// TODO: require all flag collections to appear before all options.
-inline CommandLineArgs::CommandLineArgs(const int& argc, char** const argv) :
+inline CommandLineArgs::CommandLineArgs(int argc, char** const argv) :
     m_flags{},
     m_options{} {
 
@@ -14,8 +14,7 @@ inline CommandLineArgs::CommandLineArgs(const int& argc, char** const argv) :
     std::vector<std::string> arguments(argv + 1, argv + argc);
 
     // Loop through all arguments and analyse them
-    for (std::size_t i(0), num_args(argc - 1), length; i < num_args;
-            ++i) {
+    for (std::size_t i{0}, num_args = argc - 1, length; i < num_args; ++i) {
         length = arguments[i].size();
         if (length > 1) {
             // If the length is 1 then it is not valid and is ignored
@@ -55,7 +54,7 @@ inline CommandLineArgs::CommandLineArgs(const int& argc, char** const argv) :
 /// Query if a specified flag appears in the command-line arguments. If the flag
 /// exists, mark it as having been recognised.
 inline bool CommandLineArgs::get(const char& flag, bool& storage) {
-    if (auto it {std::ranges::find(m_flags, flag, &Flag::flag)};
+    if (auto it{std::ranges::find(m_flags, flag, &Flag::flag)};
             it != m_flags.end()) {
         return (storage = it->recognised = true);
     } else {
@@ -68,11 +67,11 @@ inline bool CommandLineArgs::get(const char& flag, bool& storage) {
 /// variable. If an argument is extracted, mark it as having been recognised.
 template <typename T>
 inline bool CommandLineArgs::get(const std::string& option, T& storage) {
-    if (auto it {std::ranges::find(m_options, option, &Option::option)};
+    if (auto it{std::ranges::find(m_options, option, &Option::option)};
             it != m_options.end()) {
         // Don't overwrite passed variable yet
         T converted;
-        std::stringstream ss(it->value);
+        std::stringstream ss{it->value};
         ss >> converted;
         // Check conversion fail/badbit
         if (ss.fail()) {
@@ -91,7 +90,7 @@ inline bool CommandLineArgs::get(const std::string& option, T& storage) {
 /// as having been recognised.
 template <>
 inline bool CommandLineArgs::get(const std::string& option, bool& storage) {
-    if (auto it {std::ranges::find(m_options, option, &Option::option)};
+    if (auto it{std::ranges::find(m_options, option, &Option::option)};
             it != m_options.end()) {
         return (storage = it->recognised = true);
     } else {
@@ -101,7 +100,7 @@ inline bool CommandLineArgs::get(const std::string& option, bool& storage) {
 
 template <typename Os>
 inline Os& operator<<(Os& out, const CommandLineArgs& rhs) {
-    std::string flags_text(""), options_text("");
+    std::string flags_text{""}, options_text{""};
 
     for (const auto& x : rhs.m_flags | std::views::filter([](const auto& x) {
                 return x.recognised; })) {

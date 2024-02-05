@@ -19,16 +19,16 @@ namespace Jump {
             /// \brief Stores a flag (single character only) and whether this
             /// flag has been extracted by the user.
             struct Flag {
-                char flag {0};
-                bool recognised {false};
+                char flag{0};
+                bool recognised{false};
             };
 
             /// \brief Stores an option (both name and value) and whether this
             /// option has been extracted by the user.
             struct Option {
-                std::string option {""};
-                std::string value {""};
-                bool recognised {false};
+                std::string option{""};
+                std::string value{""};
+                bool recognised{false};
             };
 
             /// \brief Collection of flags read from the command line.
@@ -38,7 +38,7 @@ namespace Jump {
 
         public:
             /// \brief Reads command-line arguments at construction.
-            CommandLineArgs(const int& argc, char** const argv);
+            CommandLineArgs(int argc, char** const argv);
 
             /// \brief Attempt extraction of flag and indicate success.
             bool get(const char& flag, bool& storage);

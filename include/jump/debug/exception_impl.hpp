@@ -18,8 +18,8 @@ inline void RuntimeError::construct_message() {
 
 inline RuntimeError::RuntimeError(std::string info,
         std::source_location source) :
-    m_info {std::move(info)},
-    m_source {std::move(source)} {
+    m_info{std::move(info)},
+    m_source{std::move(source)} {
 
     set_type();
     construct_message();

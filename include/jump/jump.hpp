@@ -4,6 +4,8 @@
 #ifndef JUMP_JUMP_HPP
 #define JUMP_JUMP_HPP
 
+#include "jump/data/vector.hpp"
+
 #include "jump/debug/exception.hpp"
 
 #include "jump/utility/command_line_args.hpp"
