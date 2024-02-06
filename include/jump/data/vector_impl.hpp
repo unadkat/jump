@@ -28,9 +28,6 @@ inline Vector<T>::Vector(InputIt first, InputIt last) :
     m_storage(std::move(first), std::move(last)) {
 }
 
-/// \brief Conversion operator to promote a real-valued `Vector` to a
-/// complex-valued one.
-///
 /// Initialises a complex-valued `Vector` of the correct size and loops
 /// through it to convert the real-valued elements in the source `Vector`.
 /// This is not terribly efficient but the only way of achieving the
@@ -156,48 +153,127 @@ inline Vector<T>& Vector<T>::operator*=(const T& rhs) {
 
 template <typename T>
 inline Vector<T>& Vector<T>::operator/=(const T& rhs) {
-    for (auto& x : m_storage) {
-        x /= rhs;
-    }
-    return *this;
+    return *this *= (T{1}/rhs);
 }
 
 template <typename T>
 inline Real Vector<T>::L1_norm() const {
-    Real temp{0.};
-    for (const auto& x : m_storage) {
-        temp += std::abs(x);
-    }
-    return temp;
+    return std::accumulate(m_storage.begin(), m_storage.end(), T{0},
+            [](T acc, const T& x) { return acc + std::abs(x); });
 }
 
 template <typename T>
 inline Real Vector<T>::L2_norm() const {
-    Real temp{0.};
-    for (const auto& x : m_storage) {
-        temp += std::pow(std::abs(x), 2.);
-    }
-    return std::sqrt(temp);
+    return std::sqrt(std::accumulate(m_storage.begin(), m_storage.end(), T{0},
+            [](T acc, const T& x) { return acc + std::pow(std::abs(x), 2.); }));
 }
 
 template <typename T>
 inline Real Vector<T>::Linf_norm() const {
-    Real temp{0.};
-    for (auto&& x : m_storage) {
-        if (temp < std::abs(x)) {
-            temp = std::abs(x);
-        }
+    return std::ranges::max(m_storage, {}, [](const T& x) {
+            return std::abs(x); });
+}
+
+template <typename T>
+inline T* Vector<T>::data() {
+    return m_storage.data();
+}
+
+template <typename T>
+inline const T* Vector<T>::data() const {
+    return m_storage.data();
+}
+
+// ============================================================================
+// Non-member arithmetic operators
+// ============================================================================
+
+/// \relates Vector
+/// \brief Addition of two Vectors.
+///
+/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
+/// return. Also handles the case that lhs is given an rvalue (NRVO).
+template <typename T>
+inline Vector<T> operator+(Vector<T> lhs, const Vector<T>& rhs) {
+    lhs += rhs;
+    return lhs;
+}
+
+/// \relates Vector
+/// \brief Addition of two Vectors.
+///
+/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
+/// reference parameter (NRVO).
+template <typename T>
+inline Vector<T> operator+(const Vector<T>& lhs, Vector<T>&& rhs) {
+    rhs += lhs;
+    return rhs;
+}
+
+/// \relates Vector
+/// \brief Difference of two Vectors.
+///
+/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
+/// return. Also handles the case that lhs is given an rvalue (NRVO).
+template <typename T>
+inline Vector<T> operator-(Vector<T> lhs, const Vector<T>& rhs) {
+    lhs -= rhs;
+    return lhs;
+}
+
+/// \relates Vector
+/// \brief Difference of two Vectors.
+///
+/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
+/// reference parameter (NRVO).
+template <typename T>
+inline Vector<T> operator-(const Vector<T>& lhs, Vector<T>&& rhs) {
+    rhs *= T{-1};
+    rhs += lhs;
+    return rhs;
+}
+
+/// \relates Vector
+/// \brief Left-hand multiplication by scalar.
+template <typename T>
+inline Vector<T> operator*(const T& lhs, Vector<T> rhs) {
+    rhs *= lhs;
+    return rhs;
+}
+
+/// \relates Vector
+/// \brief Right-hand multiplication by scalar.
+template <typename T>
+inline Vector<T> operator*(Vector<T> lhs, const T& rhs) {
+    lhs *= rhs;
+    return lhs;
+}
+
+/// \relates Vector
+/// \brief Inner product of two Vectors.
+template <typename T>
+inline T operator*(const Vector<T>& lhs, const Vector<T>& rhs) {
+    assert(lhs.size() == rhs.size());
+    T dot_product{0};
+    for (std::size_t i{0}, size{lhs.size()}; i < size; ++i) {
+        dot_product += lhs[i]*rhs[i];
     }
-    return temp;
+    return dot_product;
 }
 
+/// \relates Vector
+/// \brief Right-hand division by scalar.
 template <typename T>
-inline T* Vector<T>::data_pointer() {
-    return m_storage.data();
+inline Vector<T> operator/(Vector<T> lhs, const T& rhs) {
+    lhs /= rhs;
+    return lhs;
 }
 
-template <typename T>
-inline const T* Vector<T>::data_pointer() const {
-    return m_storage.data();
-}
+// ============================================================================
+// CBLAS
+// ============================================================================
+
+#ifdef HAS_CBLAS
+// TODO
+#endif  // HAS_CBLAS
 

@@ -7,6 +7,7 @@
 #include <cassert>
 #include <cmath>
 #include <initializer_list>
+#include <numeric>
 #include <vector>
 
 #include "jump/utility/types.hpp"
@@ -94,10 +95,10 @@ namespace Jump {
 
             /// \brief Pointer to underlying data, for use with external
             /// libraries.
-            T* data_pointer();
+            T* data();
             /// \brief Pointer to underlying data, for use with external
             /// libraries.
-            const T* data_pointer() const;
+            const T* data() const;
 
             // TODO: Decide on serialisation/deserialisation scheme
     };
