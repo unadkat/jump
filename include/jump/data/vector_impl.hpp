@@ -5,8 +5,8 @@
 /// Most operations are simply passed through to the underlying `std::vector`
 /// storage, but arithmetic operations are implemented in two forms. Generally,
 /// a simple default version for all basic `Vector` operations is provided, but
-/// in the case of the preprocessor definition `HAS_CBLAS` we will offload to
-/// a local cblas implementation.
+/// in the case of the preprocessor definition `JUMP_HAS_CBLAS` we will offload
+/// to a local cblas implementation.
 
 template <typename T>
 inline Vector<T>::Vector(const std::size_t& size, const T& value) :
@@ -136,7 +136,7 @@ inline Vector<T>& Vector<T>::operator+=(const Vector<T>& rhs) {
 
 template <typename T>
 inline Vector<T>& Vector<T>::operator-=(const Vector<T>& rhs) {
-    assert(rhs.size() != m_storage.size());
+    assert(rhs.size() == m_storage.size());
     for (std::size_t i{0}, size{m_storage.size()}; i < size; ++i) {
         m_storage[i] -= rhs[i];
     }
@@ -273,7 +273,150 @@ inline Vector<T> operator/(Vector<T> lhs, const T& rhs) {
 // CBLAS
 // ============================================================================
 
-#ifdef HAS_CBLAS
-// TODO
-#endif  // HAS_CBLAS
+#ifdef JUMP_HAS_CBLAS
+/// \brief Specialisation of in-place addition of two real Vectors, using CBLAS.
+template <>
+inline Vector<Real>& Vector<Real>::operator+=(const Vector<Real>& rhs) {
+    assert(rhs.size() == m_storage.size());
+
+    // Computes 1.*rhs + *this (with a pointer shift of 1 between elements)
+    cblas_daxpy(m_storage.size(), 1., rhs.m_storage.data(), 1, m_storage.data(),
+            1);
+    return *this;
+}
+
+/// \brief Specialisation of in-place addition of two complex Vectors, using
+/// CBLAS.
+template <>
+inline Vector<Complex>& Vector<Complex>::operator+=(
+        const Vector<Complex>& rhs) {
+    assert(rhs.size() == m_storage.size());
+
+    // Computes 1.*rhs + *this (with a pointer shift of 1 between elements)
+    Complex a {1., 0.};
+    cblas_zaxpy(m_storage.size(), &a, rhs.m_storage.data(), 1, m_storage.data(),
+            1);
+    return *this;
+}
+
+/// \brief Specialisation of in-place subtraction of two real Vectors, using
+/// CBLAS.
+template <>
+inline Vector<Real>& Vector<Real>::operator-=(const Vector<Real>& rhs) {
+    assert(rhs.size() == m_storage.size());
+
+    // Computes -1.*rhs + *this (with a pointer shift of 1 between elements)
+    cblas_daxpy(m_storage.size(), -1., rhs.m_storage.data(), 1,
+            m_storage.data(), 1);
+    return *this;
+}
+
+/// \brief Specialisation of in-place subtraction of two complex Vectors, using
+/// CBLAS.
+template <>
+inline Vector<Complex>& Vector<Complex>::operator-=(
+        const Vector<Complex>& rhs) {
+    assert(rhs.size() == m_storage.size());
+
+    // Computes -1.*rhs + *this (with a pointer shift of 1 between elements)
+    Complex a {-1., 0.};
+    cblas_zaxpy(m_storage.size(), &a, rhs.m_storage.data(), 1, m_storage.data(),
+            1);
+    return *this;
+}
+
+/// \brief Specialisation of in-place multiplication of a real `Vector` by a
+/// real scalar, using CBLAS.
+template <>
+inline Vector<Real>& Vector<Real>::operator*=(const Real& rhs) {
+    // Computes rhs*(*this) (with a pointer shift of 1 between elements)
+    cblas_dscal(m_storage.size(), rhs, m_storage.data(), 1);
+    return *this;
+}
+
+/// \brief Specialisation of in-place multiplication of a complex `Vector` by a
+/// complex scalar, using CBLAS.
+template <>
+inline Vector<Complex>& Vector<Complex>::operator*=(const Complex& rhs) {
+    // Computes rhs*(*this) (with a pointer shift of 1 between elements)
+    cblas_zscal(m_storage.size(), &rhs, m_storage.data(), 1);
+    return *this;
+}
+
+/// \brief Specialisation of the dot product for two real Vectors, using CBLAS.
+inline Real operator*(const Vector<Real>& lhs, const Vector<Real>& rhs) {
+    assert(lhs.size() == rhs.size());
+
+    // Computes dot product lhs*rhs (with a pointer shift of 1 between elements)
+    return cblas_ddot(lhs.size(), lhs.data(), 1, rhs.data(), 1);
+}
+
+/// \brief Specialisation of the dot product for two complex Vectors, using
+/// CBLAS.
+inline Complex operator*(const Vector<Complex>& lhs,
+        const Vector<Complex>& rhs) {
+    assert(lhs.size() == rhs.size());
+
+    // Computes dot product lhs*rhs (with a pointer shift of 1 between elements)
+    Complex result;
+    cblas_zdotu_sub(lhs.size(), lhs.data(), 1, rhs.data(), 1, &result);
+    return result;
+}
+
+/// \brief Specialisation of in-place division of a real `Vector` by a real
+/// scalar, using CBLAS.
+template <>
+inline Vector<Real>& Vector<Real>::operator/=(const Real& rhs) {
+    // Computes (1./rhs)*(*this) (with a pointer shift of 1 between elements)
+    cblas_dscal(m_storage.size(), 1./rhs, m_storage.data(), 1);
+    return *this;
+}
+
+/// \brief Specialisation of in-place division of a complex `Vector` by a
+/// complex scalar using CBLAS.
+template <>
+inline Vector<Complex>& Vector<Complex>::operator/=(const Complex& rhs) {
+    // Computes (1./rhs)*(*this) (with a pointer shift of 1 between elements)
+    Complex a{1./rhs};
+    cblas_zscal(m_storage.size(), &a, m_storage.data(), 1);
+    return *this;
+}
+
+/// \brief Specialisation of the L1-norm calculation for a real `Vector`, using
+/// CBLAS.
+template <>
+inline double Vector<Real>::L1_norm() const {
+    // Computes sum of absolute element values (with a pointer shift of 1
+    // between elements)
+    return cblas_dasum(m_storage.size(), m_storage.data(), 1);
+}
+
+/// \brief Specialisation of the L1-norm calculation for a complex `Vector`,
+/// using CBLAS.
+template <>
+inline double Vector<Complex>::L1_norm() const {
+    // Computes sum of absolute real and imaginary element values (with a
+    // pointer shift of 1 between elements). Note: this is not the same as the
+    // usual definition of this norm
+    return cblas_dzasum(m_storage.size(), m_storage.data(), 1);
+}
+
+/// \brief Specialisation of the L2-norm calculation for a real `Vector`, using
+/// CBLAS.
+template <>
+inline double Vector<Real>::L2_norm() const {
+    // Computes the Euclidean norm of the `Vector` (with a pointer shift of 1
+    // between elements)
+    return cblas_dnrm2(m_storage.size(), m_storage.data(), 1);
+}
+
+/// \brief Specialisation of the L2-norm calculation for a complex `Vector`,
+/// using CBLAS.
+template <>
+inline double Vector<Complex>::L2_norm() const {
+    // Computes the Euclidean norm of the `Vector` (with a pointer shift of 1
+    // between elements)
+    return cblas_dznrm2(m_storage.size(), m_storage.data(), 1);
+}
+#endif  // JUMP_HAS_CBLAS
 
