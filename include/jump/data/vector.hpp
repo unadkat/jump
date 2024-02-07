@@ -4,6 +4,7 @@
 #ifndef JUMP_VECTOR_HPP
 #define JUMP_VECTOR_HPP
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <initializer_list>
