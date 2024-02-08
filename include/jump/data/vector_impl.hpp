@@ -158,20 +158,20 @@ inline Vector<T>& Vector<T>::operator/=(const T& rhs) {
 
 template <typename T>
 inline Real Vector<T>::L1_norm() const {
-    return std::accumulate(m_storage.begin(), m_storage.end(), T{0},
-            [](T acc, const T& x) { return acc + std::abs(x); });
+    auto F = [](T acc, const T& x) { return acc + std::abs(x); };
+    return std::ranges::fold_left(m_storage, T{0}, F);
 }
 
 template <typename T>
 inline Real Vector<T>::L2_norm() const {
-    return std::sqrt(std::accumulate(m_storage.begin(), m_storage.end(), T{0},
-            [](T acc, const T& x) { return acc + std::pow(std::abs(x), 2.); }));
+    auto F = [](T acc, const T& x) { return acc + std::pow(std::abs(x), 2.); };
+    return std::sqrt(std::ranges::fold_left(m_storage, T{0}, F));
 }
 
 template <typename T>
 inline Real Vector<T>::Linf_norm() const {
-    return std::ranges::max(m_storage, {}, [](const T& x) {
-            return std::abs(x); });
+    auto F = [](const T& x) { return std::abs(x); };
+    return std::ranges::max(m_storage, {}, F);
 }
 
 template <typename T>
