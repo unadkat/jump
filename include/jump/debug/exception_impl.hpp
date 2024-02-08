@@ -1,43 +1,52 @@
 // This file forms part of Jump (Jay's Utilities and Mathematical Primitives)
 // Copyright (C) Jay Unadkat 2024. Released under GPL-3.0-or-later (see COPYING)
 
-inline void RuntimeError::set_type() {
-    m_type = "Runtime error";
+inline std::string BasicError::info() const {
+    return details;
 }
 
-inline void RuntimeError::construct_message() {
+inline std::string FileIOError::info() const {
+    return std::format("Resource \"{}\" failed to read/write", resource);
+}
+
+inline std::string InvalidArgumentError::info() const {
+    return std::format("Argument {} had invalid value {}\nExpected: {}",
+            argument, value, expected);
+}
+
+template <typename ErrorData>
+inline void RuntimeError<ErrorData>::construct_message() {
     m_message =
         "\n--------------------------------------------------\n"
-        + std::format("{} in {}\nAt location {}:{}:{}\n",
-                (m_type.empty() ? "Unspecified error" : m_type),
+        + std::format("{} in {}\nAt location {}:{}:{}\n", m_data.type,
                 m_source.function_name(), m_source.file_name(), m_source.line(),
                 m_source.column())
         + "--------------------------------------------------\n"
-        + (m_info.empty() ? "No details provided" : m_info) + '\n';
+        + m_data.info() + '\n';
 }
 
-inline RuntimeError::RuntimeError(std::string info,
+template <typename ErrorData>
+inline RuntimeError<ErrorData>::RuntimeError(ErrorData data,
         std::source_location source) :
-    m_info{std::move(info)},
+    m_data{std::move(data)},
     m_source{std::move(source)} {
 
-    set_type();
     construct_message();
 }
 
-inline std::string& RuntimeError::what() noexcept {
+template <typename ErrorData>
+inline std::string& RuntimeError<ErrorData>::what() noexcept {
     return m_message;
 }
 
-inline const std::source_location& RuntimeError::where() const noexcept {
+template <typename ErrorData>
+inline const char* RuntimeError<ErrorData>::what() const noexcept {
+    return m_message.c_str();
+}
+
+template <typename ErrorData>
+inline const std::source_location& RuntimeError<ErrorData>::where()
+    const noexcept {
     return m_source;
-}
-
-inline void FileIOError::set_type() {
-    m_type = "File IO error";
-}
-
-inline void InvalidArgumentError::set_type() {
-    m_type = "Invalid argument error";
 }
 

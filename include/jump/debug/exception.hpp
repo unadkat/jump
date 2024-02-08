@@ -11,61 +11,64 @@
 
 namespace Jump {
 
+    /// \brief Data for basic RuntimeError.
+    struct BasicError {
+        const std::string type{"Runtime error"};
+        const std::string details{"No details provided"};
+        std::string info() const;
+    };
+
+    /// \brief Data for FileIOError, including file name or directory which
+    /// failed to open/read/write.
+    struct FileIOError {
+        const std::string type{"File IO error"};
+        const std::string resource{""};
+        std::string info() const;
+    };
+
+    /// \brief Data for InvalidArgumentError, should be passed information about
+    /// the invalid argument and what was expected.
+    struct InvalidArgumentError {
+        const std::string type{"Invalid argument error"};
+        const std::string argument{""};
+        const std::string value{""};
+        const std::string expected{""};
+        std::string info() const;
+    };
+
     /// \brief Custom exception class to give information about general runtime
-    /// errors.
+    /// errors. The template parameter is to package specific information about
+    /// the type of error being thrown.
+    template <typename ErrorData>
     class RuntimeError : public std::exception {
-        protected:
-            /// \brief Type of error.
-            std::string m_type;
-            /// \brief Detailed information about the error to aid debugging.
-            std::string m_info;
+        private:
+            /// \brief Package of data for the exception being raised.
+            ErrorData m_data;
             /// \brief Full error message (with banner).
             std::string m_message;
             /// \brief Details about the source location where the error
             /// occurred.
             std::source_location m_source;
 
-            /// \brief Set exception type for the error message.
-            virtual void set_type();
             /// \brief Construct full error message from constituent parts.
             void construct_message();
 
         public:
             /// \brief Construct error of specified type with details of the
             /// problem and the source information at that location.
-            RuntimeError(std::string info = "",
-                    std::source_location source =
+            RuntimeError(ErrorData data, std::source_location source =
                     std::source_location::current());
-            /// \brief Enable default destructor.
-            virtual ~RuntimeError() = default;
 
             /// \brief Return the full error message (with banner) as a
             /// mutable string, in case catching code needs to add context and
             /// rethrow.
             std::string& what() noexcept;
+            /// \brief Overload for std::exception::what for quick output of
+            /// error message on unhandled exception.
+            const char* what() const noexcept;
             /// \brief Return source information at location of the raised
             /// exception.
             const std::source_location& where() const noexcept;
-    };
-
-    /// \brief File IO exception class.
-    class FileIOError : public RuntimeError {
-        protected:
-            /// \brief Set exception type for the error message.
-            virtual void set_type() override;
-
-        public:
-            using RuntimeError::RuntimeError;
-    };
-
-    /// \brief Invalid argument causing unrecoverable error.
-    class InvalidArgumentError : public RuntimeError {
-        protected:
-            /// \brief Set exception type for the error message.
-            virtual void set_type() override;
-
-        public:
-            using RuntimeError::RuntimeError;
     };
 
     #include "exception_impl.hpp"
