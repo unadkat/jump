@@ -5,7 +5,6 @@
 #define JUMP_VECTOR_HPP
 
 #include <algorithm>
-#include <cassert>
 #include <cmath>
 #include <initializer_list>
 #include <numeric>
@@ -18,6 +17,7 @@
     #endif  // __has_include(<cblash.h>)
 #endif  // __has_include
 
+#include "jump/debug/exception.hpp"
 #include "jump/utility/types.hpp"
 
 namespace Jump {

@@ -22,7 +22,7 @@ namespace Jump {
     /// failed to open/read/write.
     struct FileIOError {
         const std::string type{"File IO error"};
-        const std::string resource{""};
+        const std::string resource;
         std::string info() const;
     };
 
@@ -30,9 +30,30 @@ namespace Jump {
     /// the invalid argument and what was expected.
     struct InvalidArgumentError {
         const std::string type{"Invalid argument error"};
-        const std::string argument{""};
-        const std::string value{""};
-        const std::string expected{""};
+        const std::string argument;
+        const std::string value;
+        const std::string expected;
+        std::string info() const;
+    };
+
+    /// \brief Data for Range1DError, including name, access index, and size of
+    /// 1D container.
+    struct Range1DError {
+        const std::string type{"Range (1D) error"};
+        const std::string name{"internal storage"};
+        const std::size_t index{};
+        const std::size_t size{};
+        std::string info() const;
+    };
+
+    /// \brief Data for Mismatch1DError, including names, access indices, and
+    /// sizes of 1D containers.
+    struct Mismatch1DError {
+        const std::string type{"Mismatch (1D) error"};
+        const std::string name1{"internal storage"};
+        const std::size_t size1{};
+        const std::string name2{"internal storage"};
+        const std::size_t size2{};
         std::string info() const;
     };
 

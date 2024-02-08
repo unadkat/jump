@@ -14,6 +14,16 @@ inline std::string InvalidArgumentError::info() const {
             argument, value, expected);
 }
 
+inline std::string Range1DError::info() const {
+    return std::format("Attempted access at index {} in container {} (size {})",
+            index, name, size);
+}
+
+inline std::string Mismatch1DError::info() const {
+    return std::format("Mismatch between container {} (size {}) and container "
+            "{} (size {})", name1, size1, name2, size2);
+}
+
 template <typename ErrorData>
 inline void RuntimeError<ErrorData>::construct_message() {
     m_message =
