@@ -204,7 +204,7 @@ inline const T* Vector<T>::data() const {
 }
 
 // ============================================================================
-// Non-member arithmetic operators
+// Non-member functions
 // ============================================================================
 
 /// \relates Vector
@@ -291,6 +291,31 @@ template <typename T>
 inline Vector<T> operator/(Vector<T> lhs, const T& rhs) {
     lhs /= rhs;
     return lhs;
+}
+
+/// Note: takes string data by value so we can optimise in the case of quickly
+/// reading from a file, no copies are taken.
+template <typename T>
+inline void Vector<T>::operator<<(std::string data) {
+    T element;
+    std::stringstream ss(std::move(data));
+    std::vector<T> new_data;
+
+    // After each extraction, use `std::basic_ios::operator bool` to check
+    // failbit, at which point we'll assume we have everything
+    while (ss >> element)
+        new_data.push_back(element);
+
+    // Don't leave m_storage in an in-between state if anything happens
+    m_storage = std::move(new_data);
+}
+
+/// Outputs `Vector` data to output stream in a single line with spaces.
+template <typename T>
+inline std::ostream& operator<<(std::ostream& out, const Vector<T>& rhs) {
+    for (const auto& x : rhs)
+        out << x << ' ';
+    return out << std::endl;
 }
 
 // ============================================================================

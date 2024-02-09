@@ -8,6 +8,10 @@
 #include <cmath>
 #include <initializer_list>
 #include <numeric>
+#include <ostream>
+#include <sstream>
+#include <string>
+#include <utility>
 #include <vector>
 
 #ifdef __has_include
@@ -108,7 +112,9 @@ namespace Jump {
             /// libraries.
             const T* data() const;
 
-            // TODO: Decide on serialisation/deserialisation scheme
+            /// \brief Populate with data in a `std::string`. Continue to read
+            /// data until a `std::stringstream` fails to read a new value.
+            void operator<<(std::string data);
     };
 
     #include "vector_impl.hpp"
