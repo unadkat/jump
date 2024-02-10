@@ -55,8 +55,9 @@ inline const T& Vector<T>::operator[](std::size_t index) const {
 template <typename T>
 inline T& Vector<T>::operator[](std::size_t index) {
 #ifndef NDEBUG
-    if (index >= size())
+    if (index >= size()) {
         throw RuntimeError{Range1DError{.index = index, .size = size()}};
+    }
 #endif  // NDEBUG
 
     return storage[index];
@@ -126,15 +127,16 @@ inline const Vector<T>& Vector<T>::operator+() const {
 template <typename T>
 inline Vector<T> Vector<T>::operator-() const {
     Vector<T> temp{*this};
-    return temp *= -1.;
+    return temp *= -1;
 }
 
 template <typename T>
 inline Vector<T>& Vector<T>::operator+=(const Vector<T>& rhs) {
 #ifndef NDEBUG
-    if (size() != rhs.size())
+    if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
             .size2 = rhs.size()}};
+    }
 #endif  // NDEBUG
 
     for (std::size_t i{0}, N{size()}; i < N; ++i) {
@@ -146,9 +148,10 @@ inline Vector<T>& Vector<T>::operator+=(const Vector<T>& rhs) {
 template <typename T>
 inline Vector<T>& Vector<T>::operator-=(const Vector<T>& rhs) {
 #ifndef NDEBUG
-    if (size() != rhs.size())
+    if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
             .size2 = rhs.size()}};
+    }
 #endif  // NDEBUG
 
     for (std::size_t i{0}, N{size()}; i < N; ++i) {
@@ -172,19 +175,19 @@ inline Vector<T>& Vector<T>::operator/=(const T& rhs) {
 
 template <typename T>
 inline Real Vector<T>::L1_norm() const {
-    auto F = [](T acc, const T& x) { return acc + std::abs(x); };
+    auto F{[](T acc, const T& x) { return acc + std::abs(x); }};
     return std::ranges::fold_left(storage, T{0}, F);
 }
 
 template <typename T>
 inline Real Vector<T>::L2_norm() const {
-    auto F = [](T acc, const T& x) { return acc + std::pow(std::abs(x), 2.); };
+    auto F{[](T acc, const T& x) { return acc + std::pow(std::abs(x), 2.); }};
     return std::sqrt(std::ranges::fold_left(storage, T{0}, F));
 }
 
 template <typename T>
 inline Real Vector<T>::Linf_norm() const {
-    auto F = [](const T& x) { return std::abs(x); };
+    auto F{[](const T& x) { return std::abs(x); }};
     return std::ranges::max(storage, {}, F);
 }
 
@@ -203,13 +206,14 @@ inline const T* Vector<T>::data() const {
 template <typename T>
 inline void Vector<T>::operator<<(std::string data) {
     T element;
-    std::stringstream ss(std::move(data));
+    std::istringstream iss(std::move(data));
     std::vector<T> new_data;
 
     // After each extraction, use `std::basic_ios::operator bool` to check
     // failbit, at which point we'll assume we have everything
-    while (ss >> element)
+    while (iss >> element) {
         new_data.push_back(element);
+    }
 
     // Don't leave storage in an in-between state if anything happens
     storage = std::move(new_data);
@@ -308,9 +312,10 @@ inline Vector<T> operator/(Vector<T> lhs, const T& rhs) {
 /// \brief Outputs `Vector` data to output stream in a single line with spaces.
 template <typename T>
 inline std::ostream& operator<<(std::ostream& out, const Vector<T>& rhs) {
-    for (const auto& x : rhs)
+    for (const auto& x : rhs) {
         out << x << ' ';
-    return out << std::endl;
+    }
+    return out;
 }
 
 // ============================================================================
@@ -322,14 +327,14 @@ inline std::ostream& operator<<(std::ostream& out, const Vector<T>& rhs) {
 template <>
 inline Vector<Real>& Vector<Real>::operator+=(const Vector<Real>& rhs) {
 #ifndef NDEBUG
-    if (size() != rhs.size())
+    if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
             .size2 = rhs.size()}};
+    }
 #endif  // NDEBUG
 
     // Computes 1.*rhs + *this (with a pointer shift of 1 between elements)
-    cblas_daxpy(storage.size(), 1., rhs.storage.data(), 1, storage.data(),
-            1);
+    cblas_daxpy(storage.size(), 1., rhs.storage.data(), 1, storage.data(), 1);
     return *this;
 }
 
@@ -339,15 +344,15 @@ template <>
 inline Vector<Complex>& Vector<Complex>::operator+=(
         const Vector<Complex>& rhs) {
 #ifndef NDEBUG
-    if (size() != rhs.size())
+    if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
             .size2 = rhs.size()}};
+    }
 #endif  // NDEBUG
 
     // Computes 1.*rhs + *this (with a pointer shift of 1 between elements)
     Complex a {1., 0.};
-    cblas_zaxpy(storage.size(), &a, rhs.storage.data(), 1, storage.data(),
-            1);
+    cblas_zaxpy(storage.size(), &a, rhs.storage.data(), 1, storage.data(), 1);
     return *this;
 }
 
@@ -356,14 +361,14 @@ inline Vector<Complex>& Vector<Complex>::operator+=(
 template <>
 inline Vector<Real>& Vector<Real>::operator-=(const Vector<Real>& rhs) {
 #ifndef NDEBUG
-    if (size() != rhs.size())
+    if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
             .size2 = rhs.size()}};
+    }
 #endif  // NDEBUG
 
     // Computes -1.*rhs + *this (with a pointer shift of 1 between elements)
-    cblas_daxpy(storage.size(), -1., rhs.storage.data(), 1,
-            storage.data(), 1);
+    cblas_daxpy(storage.size(), -1., rhs.storage.data(), 1, storage.data(), 1);
     return *this;
 }
 
@@ -373,15 +378,15 @@ template <>
 inline Vector<Complex>& Vector<Complex>::operator-=(
         const Vector<Complex>& rhs) {
 #ifndef NDEBUG
-    if (size() != rhs.size())
+    if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
             .size2 = rhs.size()}};
+    }
 #endif  // NDEBUG
 
     // Computes -1.*rhs + *this (with a pointer shift of 1 between elements)
     Complex a {-1., 0.};
-    cblas_zaxpy(storage.size(), &a, rhs.storage.data(), 1, storage.data(),
-            1);
+    cblas_zaxpy(storage.size(), &a, rhs.storage.data(), 1, storage.data(), 1);
     return *this;
 }
 
@@ -406,9 +411,10 @@ inline Vector<Complex>& Vector<Complex>::operator*=(const Complex& rhs) {
 /// \brief Specialisation of the dot product for two real Vectors, using CBLAS.
 inline Real operator*(const Vector<Real>& lhs, const Vector<Real>& rhs) {
 #ifndef NDEBUG
-    if (lhs.size() != rhs.size())
+    if (lhs.size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
             .name2 = "rhs", .size2 = rhs.size()}};
+    }
 #endif  // NDEBUG
 
     // Computes dot product lhs*rhs (with a pointer shift of 1 between elements)
@@ -420,9 +426,10 @@ inline Real operator*(const Vector<Real>& lhs, const Vector<Real>& rhs) {
 inline Complex operator*(const Vector<Complex>& lhs,
         const Vector<Complex>& rhs) {
 #ifndef NDEBUG
-    if (lhs.size() != rhs.size())
+    if (lhs.size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
             .name2 = "rhs", .size2 = rhs.size()}};
+    }
 #endif  // NDEBUG
 
     // Computes dot product lhs*rhs (with a pointer shift of 1 between elements)
