@@ -4,6 +4,7 @@
 #ifndef JUMP_JUMP_HPP
 #define JUMP_JUMP_HPP
 
+#include "jump/data/matrix_base.hpp"
 #include "jump/data/vector.hpp"
 
 #include "jump/debug/exception.hpp"

@@ -310,7 +310,7 @@ inline void Vector<T>::operator<<(std::string data) {
     m_storage = std::move(new_data);
 }
 
-/// Outputs `Vector` data to output stream in a single line with spaces.
+/// \brief Outputs `Vector` data to output stream in a single line with spaces.
 template <typename T>
 inline std::ostream& operator<<(std::ostream& out, const Vector<T>& rhs) {
     for (const auto& x : rhs)
