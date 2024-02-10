@@ -9,13 +9,13 @@
 /// to a local cblas implementation.
 
 template <typename T>
-inline Vector<T>::Vector(const std::size_t& size, const T& value) :
-    m_storage(size, value) {
+inline Vector<T>::Vector(std::size_t size, const T& value) :
+    storage(size, value) {
 }
 
 template <typename T>
 inline Vector<T>::Vector(std::initializer_list<T>&& list) :
-    m_storage(std::forward<std::initializer_list<T>>(list)) {
+    storage(std::forward<std::initializer_list<T>>(list)) {
 }
 
 /// Useful when extracting columns from a matrix, for example. Combined with
@@ -25,7 +25,7 @@ inline Vector<T>::Vector(std::initializer_list<T>&& list) :
 template <typename T>
 template <class InputIt>
 inline Vector<T>::Vector(InputIt first, InputIt last) :
-    m_storage(std::move(first), std::move(last)) {
+    storage(std::move(first), std::move(last)) {
 }
 
 /// Initialises a complex-valued `Vector` of the correct size and loops
@@ -37,7 +37,7 @@ inline Vector<Real>::operator Vector<Complex>() const {
     const std::size_t N{size()};
     Vector<Complex> result(N);
     for (std::size_t i{0}; i < N; ++i) {
-        result[i] = m_storage[i];
+        result[i] = {storage[i]};
     }
     return result;
 }
@@ -49,7 +49,7 @@ inline const T& Vector<T>::operator[](std::size_t index) const {
         throw RuntimeError{Range1DError{.index = index, .size = size()}};
 #endif  // NDEBUG
 
-    return m_storage[index];
+    return storage[index];
 }
 
 template <typename T>
@@ -59,63 +59,58 @@ inline T& Vector<T>::operator[](std::size_t index) {
         throw RuntimeError{Range1DError{.index = index, .size = size()}};
 #endif  // NDEBUG
 
-    return m_storage[index];
+    return storage[index];
 }
 
 template <typename T>
 inline void Vector<T>::assign(std::size_t size, const T& value) {
-    m_storage.assign(size, value);
+    storage.assign(size, value);
 }
 
 template <typename T>
 template <class InputIt>
 inline void Vector<T>::assign(InputIt first, InputIt last) {
-    m_storage.assign(std::move(first), std::move(last));
-}
-
-template <typename T>
-inline void Vector<T>::reserve(std::size_t size) {
-    m_storage.reserve(size);
+    storage.assign(std::move(first), std::move(last));
 }
 
 template <typename T>
 inline void Vector<T>::clear() {
-    m_storage.clear();
+    storage.clear();
 }
 
 template <typename T>
 inline void Vector<T>::resize(std::size_t size) {
-    m_storage.resize(size);
+    storage.resize(size);
 }
 
 template <typename T>
 inline std::size_t Vector<T>::size() const {
-    return m_storage.size();
+    return storage.size();
 }
 
 template <typename T>
 inline typename Vector<T>::ConstIterator Vector<T>::begin() const {
-    return m_storage.begin();
+    return storage.cbegin();
 }
 
 template <typename T>
 inline typename Vector<T>::ConstIterator Vector<T>::end() const {
-    return m_storage.end();
+    return storage.cend();
 }
 
 template <typename T>
 inline typename Vector<T>::Iterator Vector<T>::begin() {
-    return m_storage.begin();
+    return storage.begin();
 }
 
 template <typename T>
 inline typename Vector<T>::Iterator Vector<T>::end() {
-    return m_storage.end();
+    return storage.end();
 }
 
 template <typename T>
 inline void Vector<T>::fill(const T& value) {
-    std::ranges::fill(m_storage, value);
+    std::ranges::fill(storage, value);
 }
 
 template <typename T>
@@ -143,7 +138,7 @@ inline Vector<T>& Vector<T>::operator+=(const Vector<T>& rhs) {
 #endif  // NDEBUG
 
     for (std::size_t i{0}, N{size()}; i < N; ++i) {
-        m_storage[i] += rhs[i];
+        storage[i] += rhs[i];
     }
     return *this;
 }
@@ -157,14 +152,14 @@ inline Vector<T>& Vector<T>::operator-=(const Vector<T>& rhs) {
 #endif  // NDEBUG
 
     for (std::size_t i{0}, N{size()}; i < N; ++i) {
-        m_storage[i] -= rhs[i];
+        storage[i] -= rhs[i];
     }
     return *this;
 }
 
 template <typename T>
 inline Vector<T>& Vector<T>::operator*=(const T& rhs) {
-    for (auto& x : m_storage) {
+    for (auto& x : storage) {
         x *= rhs;
     }
     return *this;
@@ -178,29 +173,46 @@ inline Vector<T>& Vector<T>::operator/=(const T& rhs) {
 template <typename T>
 inline Real Vector<T>::L1_norm() const {
     auto F = [](T acc, const T& x) { return acc + std::abs(x); };
-    return std::ranges::fold_left(m_storage, T{0}, F);
+    return std::ranges::fold_left(storage, T{0}, F);
 }
 
 template <typename T>
 inline Real Vector<T>::L2_norm() const {
     auto F = [](T acc, const T& x) { return acc + std::pow(std::abs(x), 2.); };
-    return std::sqrt(std::ranges::fold_left(m_storage, T{0}, F));
+    return std::sqrt(std::ranges::fold_left(storage, T{0}, F));
 }
 
 template <typename T>
 inline Real Vector<T>::Linf_norm() const {
     auto F = [](const T& x) { return std::abs(x); };
-    return std::ranges::max(m_storage, {}, F);
+    return std::ranges::max(storage, {}, F);
 }
 
 template <typename T>
 inline T* Vector<T>::data() {
-    return m_storage.data();
+    return storage.data();
 }
 
 template <typename T>
 inline const T* Vector<T>::data() const {
-    return m_storage.data();
+    return storage.data();
+}
+
+/// Note: takes string data by value so we can optimise in the case of quickly
+/// reading from a file, no copies are taken.
+template <typename T>
+inline void Vector<T>::operator<<(std::string data) {
+    T element;
+    std::stringstream ss(std::move(data));
+    std::vector<T> new_data;
+
+    // After each extraction, use `std::basic_ios::operator bool` to check
+    // failbit, at which point we'll assume we have everything
+    while (ss >> element)
+        new_data.push_back(element);
+
+    // Don't leave storage in an in-between state if anything happens
+    storage = std::move(new_data);
 }
 
 // ============================================================================
@@ -293,23 +305,6 @@ inline Vector<T> operator/(Vector<T> lhs, const T& rhs) {
     return lhs;
 }
 
-/// Note: takes string data by value so we can optimise in the case of quickly
-/// reading from a file, no copies are taken.
-template <typename T>
-inline void Vector<T>::operator<<(std::string data) {
-    T element;
-    std::stringstream ss(std::move(data));
-    std::vector<T> new_data;
-
-    // After each extraction, use `std::basic_ios::operator bool` to check
-    // failbit, at which point we'll assume we have everything
-    while (ss >> element)
-        new_data.push_back(element);
-
-    // Don't leave m_storage in an in-between state if anything happens
-    m_storage = std::move(new_data);
-}
-
 /// \brief Outputs `Vector` data to output stream in a single line with spaces.
 template <typename T>
 inline std::ostream& operator<<(std::ostream& out, const Vector<T>& rhs) {
@@ -333,7 +328,7 @@ inline Vector<Real>& Vector<Real>::operator+=(const Vector<Real>& rhs) {
 #endif  // NDEBUG
 
     // Computes 1.*rhs + *this (with a pointer shift of 1 between elements)
-    cblas_daxpy(m_storage.size(), 1., rhs.m_storage.data(), 1, m_storage.data(),
+    cblas_daxpy(storage.size(), 1., rhs.storage.data(), 1, storage.data(),
             1);
     return *this;
 }
@@ -351,7 +346,7 @@ inline Vector<Complex>& Vector<Complex>::operator+=(
 
     // Computes 1.*rhs + *this (with a pointer shift of 1 between elements)
     Complex a {1., 0.};
-    cblas_zaxpy(m_storage.size(), &a, rhs.m_storage.data(), 1, m_storage.data(),
+    cblas_zaxpy(storage.size(), &a, rhs.storage.data(), 1, storage.data(),
             1);
     return *this;
 }
@@ -367,8 +362,8 @@ inline Vector<Real>& Vector<Real>::operator-=(const Vector<Real>& rhs) {
 #endif  // NDEBUG
 
     // Computes -1.*rhs + *this (with a pointer shift of 1 between elements)
-    cblas_daxpy(m_storage.size(), -1., rhs.m_storage.data(), 1,
-            m_storage.data(), 1);
+    cblas_daxpy(storage.size(), -1., rhs.storage.data(), 1,
+            storage.data(), 1);
     return *this;
 }
 
@@ -385,7 +380,7 @@ inline Vector<Complex>& Vector<Complex>::operator-=(
 
     // Computes -1.*rhs + *this (with a pointer shift of 1 between elements)
     Complex a {-1., 0.};
-    cblas_zaxpy(m_storage.size(), &a, rhs.m_storage.data(), 1, m_storage.data(),
+    cblas_zaxpy(storage.size(), &a, rhs.storage.data(), 1, storage.data(),
             1);
     return *this;
 }
@@ -395,7 +390,7 @@ inline Vector<Complex>& Vector<Complex>::operator-=(
 template <>
 inline Vector<Real>& Vector<Real>::operator*=(const Real& rhs) {
     // Computes rhs*(*this) (with a pointer shift of 1 between elements)
-    cblas_dscal(m_storage.size(), rhs, m_storage.data(), 1);
+    cblas_dscal(storage.size(), rhs, storage.data(), 1);
     return *this;
 }
 
@@ -404,7 +399,7 @@ inline Vector<Real>& Vector<Real>::operator*=(const Real& rhs) {
 template <>
 inline Vector<Complex>& Vector<Complex>::operator*=(const Complex& rhs) {
     // Computes rhs*(*this) (with a pointer shift of 1 between elements)
-    cblas_zscal(m_storage.size(), &rhs, m_storage.data(), 1);
+    cblas_zscal(storage.size(), &rhs, storage.data(), 1);
     return *this;
 }
 
@@ -441,7 +436,7 @@ inline Complex operator*(const Vector<Complex>& lhs,
 template <>
 inline Vector<Real>& Vector<Real>::operator/=(const Real& rhs) {
     // Computes (1./rhs)*(*this) (with a pointer shift of 1 between elements)
-    cblas_dscal(m_storage.size(), 1./rhs, m_storage.data(), 1);
+    cblas_dscal(storage.size(), 1./rhs, storage.data(), 1);
     return *this;
 }
 
@@ -451,7 +446,7 @@ template <>
 inline Vector<Complex>& Vector<Complex>::operator/=(const Complex& rhs) {
     // Computes (1./rhs)*(*this) (with a pointer shift of 1 between elements)
     Complex a{1./rhs};
-    cblas_zscal(m_storage.size(), &a, m_storage.data(), 1);
+    cblas_zscal(storage.size(), &a, storage.data(), 1);
     return *this;
 }
 
@@ -461,7 +456,7 @@ template <>
 inline double Vector<Real>::L1_norm() const {
     // Computes sum of absolute element values (with a pointer shift of 1
     // between elements)
-    return cblas_dasum(m_storage.size(), m_storage.data(), 1);
+    return cblas_dasum(storage.size(), storage.data(), 1);
 }
 
 /// \brief Specialisation of the L1-norm calculation for a complex `Vector`,
@@ -471,7 +466,7 @@ inline double Vector<Complex>::L1_norm() const {
     // Computes sum of absolute real and imaginary element values (with a
     // pointer shift of 1 between elements). Note: this is not the same as the
     // usual definition of this norm
-    return cblas_dzasum(m_storage.size(), m_storage.data(), 1);
+    return cblas_dzasum(storage.size(), storage.data(), 1);
 }
 
 /// \brief Specialisation of the L2-norm calculation for a real `Vector`, using
@@ -480,7 +475,7 @@ template <>
 inline double Vector<Real>::L2_norm() const {
     // Computes the Euclidean norm of the `Vector` (with a pointer shift of 1
     // between elements)
-    return cblas_dnrm2(m_storage.size(), m_storage.data(), 1);
+    return cblas_dnrm2(storage.size(), storage.data(), 1);
 }
 
 /// \brief Specialisation of the L2-norm calculation for a complex `Vector`,
@@ -489,7 +484,7 @@ template <>
 inline double Vector<Complex>::L2_norm() const {
     // Computes the Euclidean norm of the `Vector` (with a pointer shift of 1
     // between elements)
-    return cblas_dznrm2(m_storage.size(), m_storage.data(), 1);
+    return cblas_dznrm2(storage.size(), storage.data(), 1);
 }
 #endif  // JUMP_HAS_CBLAS
 
