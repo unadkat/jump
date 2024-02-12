@@ -35,10 +35,14 @@ namespace Jump {
             DenseMatrix(std::size_t size = 0);
             /// \brief Construct a general matrix with the given size.
             DenseMatrix(std::size_t num_rows, std::size_t num_columns);
+            /// \brief Constuct a matrix with the given Vector data, specifying
+            /// a consistent size.
+            DenseMatrix(std::size_t num_rows, std::size_t num_columns,
+                    Vector<T> underlying_data);
 
-//            /// \brief Conversion operator to promote a real-valued
-//            /// `DenseMatrix` to a complex-valued one.
-//            operator DenseMatrix<Complex>() const;
+            /// \brief Conversion operator to promote a real-valued
+            /// `DenseMatrix` to a complex-valued one.
+            operator DenseMatrix<Complex>() const;
 
             /// \brief Const element access.
             const T& operator[](std::size_t row, std::size_t column) const;
@@ -49,6 +53,10 @@ namespace Jump {
             void assign(std::size_t size);
             /// \brief Initialise a general matrix with the given size.
             void assign(std::size_t num_rows, std::size_t num_columns);
+            /// \brief Initialise a matrix with the given Vector data,
+            /// specifying a consistent size.
+            void assign(std::size_t num_rows, std::size_t num_columns,
+                    Vector<T> underlying_data);
             /// \brief Set data via a pair of iterators.
             template <class InputIt>
             void assign(InputIt first, InputIt last);
@@ -102,6 +110,8 @@ namespace Jump {
             /// \brief Pointer to underlying data, for use with external
             /// libraries.
             const T* data() const;
+            /// \brief Const reference to underlying Vector (column-major).
+            const Vector<T>& as_vector() const;
 
             /// \brief Populate with data from a `std::string`. Noting that data
             /// storage is assumed to be column-major, matrices stored as

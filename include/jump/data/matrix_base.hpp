@@ -36,12 +36,6 @@ namespace Jump {
             MatrixBase(std::size_t size = 0);
             /// \brief Construct a general matrix with the given size.
             MatrixBase(std::size_t num_rows, std::size_t num_columns);
-            /// \brief Enable implicitly-defined copy constructor.
-            MatrixBase(const MatrixBase& other) = default;
-            /// \brief Enable implicitly-defined move constructor.
-            MatrixBase(MatrixBase&& other) = default;
-            /// \brief Enable default destructor.
-            virtual ~MatrixBase() = default;
 
             /// \brief Return the number of rows in the matrix.
             std::size_t num_rows() const;

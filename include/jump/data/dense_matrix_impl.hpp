@@ -34,14 +34,32 @@ inline DenseMatrix<T>::DenseMatrix(std::size_t num_rows,
     m_storage(num_rows*num_columns, T{0}) {
 }
 
-///// Initialises a complex-valued `DenseMatrix` of the correct size and delegates
-///// conversion of elements to the underlying `Vector`.
-//template <>
-//inline DenseMatrix<Real>::operator DenseMatrix<Complex>() const
-//{
-//    DenseMatrix<Complex> result(num_rows(), num_columns()); 
-//    return result.storage = {m_storage};
-//}
+template <typename T>
+inline DenseMatrix<T>::DenseMatrix(std::size_t num_rows,
+        std::size_t num_columns, Vector<T> underlying_data) :
+    MatrixBase<T>{num_rows, num_columns} {
+
+    if (underlying_data.size() != num_rows*num_columns) {
+        m_storage.assign(num_rows*num_columns, T{0});
+        throw RuntimeError{InvalidArgumentError{.argument = "underlying_data",
+            .value = std::format("Vector of size {}", underlying_data.size()),
+            .expected = std::format("Vector of size num_rows*num_columns = "
+                    "{} x {} = {}", num_rows, num_columns,
+                    num_rows*num_columns)}};
+    } else {
+        m_storage = std::move(underlying_data);
+    }
+}
+
+/// Initialises a complex-valued `DenseMatrix` of the correct size and delegates
+/// conversion of elements to the underlying `Vector`.
+template <>
+inline DenseMatrix<Real>::operator DenseMatrix<Complex>() const
+{
+    DenseMatrix<Complex> result;
+    result.assign(num_rows(), num_columns(), {m_storage});
+    return result;
+}
 
 /// The element at row `i` and column `j` appears at location
 /// `m_storage[j*num_rows() + i]` (see `DenseMatrix::m_storage`).
@@ -82,7 +100,24 @@ template <typename T>
 inline void DenseMatrix<T>::assign(std::size_t num_rows,
         std::size_t num_columns) {
     MatrixBase<T>::initialise(num_rows, num_columns);
-    m_storage.assign(this->num_rows()*this->num_columns(), T{0});
+    m_storage.assign(num_rows*num_columns, T{0});
+}
+
+template <typename T>
+inline void DenseMatrix<T>::assign(std::size_t num_rows,
+        std::size_t num_columns, Vector<T> underlying_data) {
+    MatrixBase<T>::initialise(num_rows, num_columns);
+
+    if (underlying_data.size() != num_rows*num_columns) {
+        m_storage.assign(num_rows*num_columns, T{0});
+        throw RuntimeError{InvalidArgumentError{.argument = "underlying_data",
+            .value = std::format("Vector of size {}", underlying_data.size()),
+            .expected = std::format("Vector of size num_rows*num_columns = "
+                    "{} x {} = {}", num_rows, num_columns,
+                    num_rows*num_columns)}};
+    } else {
+        m_storage = std::move(underlying_data);
+    }
 }
 
 template <typename T>
@@ -90,8 +125,8 @@ template <class InputIt>
 inline void DenseMatrix<T>::assign(InputIt first, InputIt last) {
 #ifndef NDEBUG
     if (last != first + m_storage.size()) {
-        throw RuntimeError{InvalidArgumentError{.argument = "last", .value =
-            std::format("first + {}", last - first),
+        throw RuntimeError{InvalidArgumentError{.argument = "last",
+            .value = std::format("first + {}", last - first),
             .expected = "first - last == m_storage.size()"}};
     }
 #endif  // NDEBUG
@@ -129,8 +164,8 @@ inline typename DenseMatrix<T>::Iterator DenseMatrix<T>::end() {
 /// column is at index `num_rows()*(j + 1)`.
 template <typename T>
 inline std::pair<typename DenseMatrix<T>::Iterator,
-    typename DenseMatrix<T>::Iterator>
-DenseMatrix<T>::column_iterators(std::size_t column) {
+       typename DenseMatrix<T>::Iterator>
+       DenseMatrix<T>::column_iterators(std::size_t column) {
 #ifndef NDEBUG
     if (column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {0, column},
@@ -224,15 +259,18 @@ inline DenseMatrix<T>& DenseMatrix<T>::operator*=(const DenseMatrix<T>& rhs) {
 #endif  // NDEBUG
 
     // TODO: ranges
-    DenseMatrix<T> result(this->num_rows(), rhs.num_columns());
-    for (std::size_t row(0); row < this->num_rows(); ++row)
-        for (std::size_t col(0); col < rhs.num_columns(); ++col)
-            for (std::size_t i(0); i < this->num_columns(); ++i)
-                result(row, col) += operator[](row, i)*rhs(i, col);
+    std::size_t N{this->num_rows()}, M{rhs.num_columns()};
+    std::size_t X{this->num_columns()};
+    DenseMatrix<T> result{N, M};
+    for (std::size_t col{0}; col < M; ++col) {
+        for (std::size_t row{0}; row < N; ++row) {
+            for (std::size_t i{0}; i < X; ++i) {
+                result[row, col] += (*this)[row, i]*rhs[i, col];
+            }
+        }
+    }
 
-    this->m_num_columns = rhs.num_columns();
-    m_storage = std::move(result.m_storage);
-    return *this;
+    return *this = std::move(result);
 }
 
 template <typename T>
@@ -293,6 +331,11 @@ inline const T* DenseMatrix<T>::data() const {
     return m_storage.data();
 }
 
+template <typename T>
+inline const Vector<T>& DenseMatrix<T>::as_vector() const {
+    return m_storage;
+}
+
 /// Loads a block of data from the given string by reading all valid values into
 /// the underlying storage. The only thing that will be checked is that the
 /// total number of values read is equal to `num_elements()`. Note that this
@@ -319,8 +362,7 @@ inline void DenseMatrix<T>::operator<<(std::string data) {
 /// Iterates through columns of matrix and dumps them to a string, formatted
 /// as the transpose.
 template <typename T>
-inline std::string DenseMatrix<T>::as_string() const
-{
+inline std::string DenseMatrix<T>::as_string() const {
     std::ostringstream oss;
     auto inserter{[&oss](const auto& x) { oss << x << ' '; }};
     for (std::size_t i{0}, num_cols{this->num_columns()}; i < num_cols; ++i) {
@@ -333,11 +375,122 @@ inline std::string DenseMatrix<T>::as_string() const
 }
 
 template <typename T>
-inline DenseMatrix<T> DenseMatrix<T>::identity(std::size_t size)
-{
+inline DenseMatrix<T> DenseMatrix<T>::identity(std::size_t size) {
     DenseMatrix<T> I{size};
     for (std::size_t i{0}; i < size; ++i)
         I[i, i] = T{1};
     return I;
 }
+
+// ============================================================================
+// Non-member functions
+// ============================================================================
+
+/// \relates DenseMatrix
+/// \brief Addition of two DenseMatrices.
+///
+/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
+/// return. Also handles the case that lhs is given an rvalue (NRVO).
+template <typename T>
+inline DenseMatrix<T> operator+(DenseMatrix<T> lhs, const DenseMatrix<T>& rhs) {
+    lhs += rhs;
+    return lhs;
+}
+
+/// \relates DenseMatrix
+/// \brief Addition of two DenseMatrices.
+///
+/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
+/// reference parameter (NRVO).
+template <typename T>
+inline DenseMatrix<T> operator+(const DenseMatrix<T>& lhs,
+        DenseMatrix<T>&& rhs) {
+    rhs += lhs;
+    return rhs;
+}
+
+/// \relates DenseMatrix
+/// \brief Difference of two DenseMatrices.
+///
+/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
+/// return. Also handles the case that lhs is given an rvalue (NRVO).
+template <typename T>
+inline DenseMatrix<T> operator-(DenseMatrix<T> lhs, const DenseMatrix<T>& rhs) {
+    lhs -= rhs;
+    return lhs;
+}
+
+/// \relates DenseMatrix
+/// \brief Difference of two DenseMatrices.
+///
+/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
+/// reference parameter (NRVO).
+template <typename T>
+inline DenseMatrix<T> operator-(const DenseMatrix<T>& lhs,
+        DenseMatrix<T>&& rhs) {
+    rhs *= T{-1};
+    rhs += lhs;
+    return rhs;
+}
+
+/// \relates DenseMatrix
+/// \brief Right-hand-side multiplication by vector.
+template <typename T>
+inline Vector<T> operator*(const DenseMatrix<T>& lhs, const Vector<T>& rhs) {
+#ifndef NDEBUG
+    if (lhs.num_columns() != rhs.size()) {
+        throw RuntimeError{Mismatch2DError{.size1 = lhs.size(), .name2 = "rhs",
+            .size2 = {rhs.size(), 0}}};
+    }
+#endif  // NDEBUG
+
+    std::size_t N{rhs.size()}, X{lhs.num_columns()};
+    Vector<T> result(N);
+    for (std::size_t row{0}; row < N; ++row) {
+        for (std::size_t i(0); i < X; ++i) {
+            result[row] += lhs[row, i]*rhs[i];
+        }
+    }
+
+    return result;
+}
+
+/// \relates DenseMatrix
+/// \brief Left-hand multiplication by scalar.
+template <typename T>
+inline DenseMatrix<T> operator*(const T& lhs, DenseMatrix<T> rhs) {
+    rhs *= lhs;
+    return rhs;
+}
+
+/// \relates DenseMatrix
+/// \brief Right-hand multiplication by scalar.
+template <typename T>
+inline DenseMatrix<T> operator*(DenseMatrix<T> lhs, const T& rhs) {
+    lhs *= rhs;
+    return lhs;
+}
+
+/// \relates DenseMatrix
+/// \brief Multiplication of two DenseMatrices.
+template <typename T>
+inline DenseMatrix<T> operator*(DenseMatrix<T> lhs, const DenseMatrix<T>& rhs) {
+    lhs *= rhs;
+    return lhs;
+}
+
+/// \relates DenseMatrix
+/// \brief Division by a scalar.
+template <typename T>
+DenseMatrix<T> operator/(DenseMatrix<T> lhs, const T& rhs) {
+    lhs /= rhs;
+    return lhs;
+}
+
+// ============================================================================
+// CBLAS
+// ============================================================================
+
+#ifdef JUMP_HAS_CBLAS
+#endif  // JUMP_HAS_CBLAS
 

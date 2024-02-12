@@ -309,6 +309,7 @@ inline Vector<T> operator/(Vector<T> lhs, const T& rhs) {
     return lhs;
 }
 
+/// \relates Vector
 /// \brief Outputs `Vector` data to output stream in a single line with spaces.
 template <typename T>
 inline std::ostream& operator<<(std::ostream& out, const Vector<T>& rhs) {
@@ -323,6 +324,7 @@ inline std::ostream& operator<<(std::ostream& out, const Vector<T>& rhs) {
 // ============================================================================
 
 #ifdef JUMP_HAS_CBLAS
+
 /// \brief Specialisation of in-place addition of two real Vectors, using CBLAS.
 template <>
 inline Vector<Real>& Vector<Real>::operator+=(const Vector<Real>& rhs) {
@@ -493,5 +495,6 @@ inline double Vector<Complex>::L2_norm() const {
     // between elements)
     return cblas_dznrm2(storage.size(), storage.data(), 1);
 }
+
 #endif  // JUMP_HAS_CBLAS
 
