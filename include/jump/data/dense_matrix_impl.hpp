@@ -492,5 +492,159 @@ DenseMatrix<T> operator/(DenseMatrix<T> lhs, const T& rhs) {
 // ============================================================================
 
 #ifdef JUMP_HAS_CBLAS
+
+/// \brief Specialisation of multiplication of a real `DenseMatrix` by a real
+/// Vector, using CBLAS.
+inline Vector<Real> operator*(const DenseMatrix<Real>& lhs,
+        const Vector<Real>& rhs) {
+#ifndef NDEBUG
+    if (lhs.num_columns() != rhs.size()) {
+        throw RuntimeError{Mismatch2DError{.size1 = lhs.size(), .name2 = "rhs",
+            .size2 = {rhs.size(), 0}}};
+    }
+#endif  // NDEBUG
+
+    // Computes 1.*lhs*rhs + 0. (with a pointer shift of 1 between elements)
+    Vector<Real> result(lhs.num_rows());
+    cblas_dgemv(CblasColMajor, CblasNoTrans, lhs.num_rows(), lhs.num_columns(),
+            1., lhs.data(), lhs.num_rows(), rhs.data(), 1, 0., result.data(),
+            1);
+    return result;
+}
+
+/// \brief Specialisation of multiplication of a complex `DenseMatrix` by a
+/// complex Vector, using CBLAS.
+inline Vector<Complex> operator*(const DenseMatrix<Complex>& lhs,
+        const Vector<Complex>& rhs) {
+#ifndef NDEBUG
+    if (lhs.num_columns() != rhs.size()) {
+        throw RuntimeError{Mismatch2DError{.size1 = lhs.size(), .name2 = "rhs",
+            .size2 = {rhs.size(), 0}}};
+    }
+#endif  // NDEBUG
+
+    // Computes 1.*lhs*rhs + 0. (with a pointer shift of 1 between elements)
+    Vector<Complex> result(lhs.num_rows());
+    Complex alpha {1., 0.}, beta {0.};
+    cblas_zgemv(CblasColMajor, CblasNoTrans, lhs.num_rows(), lhs.num_columns(),
+            &alpha, lhs.data(), lhs.num_rows(), rhs.data(), 1, &beta,
+            result.data(), 1);
+    return result;
+}
+
+/// \brief Specialisation of multiplication of two real DenseMatrices, using
+/// CBLAS.
+template <>
+inline DenseMatrix<Real>& DenseMatrix<Real>::operator*=(
+        const DenseMatrix<Real>& rhs) {
+#ifndef NDEBUG
+    if (this->num_columns() != rhs.num_rows()) {
+        throw RuntimeError{Mismatch2DError{.size1 = this->size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    // Computes 1.*lhs*rhs + 0.
+    DenseMatrix<Real> result{this->num_rows(), rhs.num_columns()};
+    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, this->num_rows(),
+            rhs.num_columns(), this->num_columns(), 1., m_storage.data(),
+            this->num_rows(), rhs.m_storage.data(), rhs.num_rows(), 0.,
+            result.m_storage.data(), this->num_rows());
+
+    return *this = std::move(result);
+}
+
+/// \brief Specialisation of multiplication of two complex DenseMatrices, using
+/// CBLAS.
+template <>
+inline DenseMatrix<Complex>& DenseMatrix<Complex>::operator*=(
+        const DenseMatrix<Complex>& rhs) {
+#ifndef NDEBUG
+    if (this->num_columns() != rhs.num_rows()) {
+        throw RuntimeError{Mismatch2DError{.size1 = this->size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    // Computes 1.*lhs*rhs + 0.
+    DenseMatrix<Complex> result{this->num_rows(), rhs.num_columns()};
+    Complex alpha {1., 0.}, beta {0.};
+    cblas_zgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, this->num_rows(),
+            rhs.num_columns(), this->num_columns(), &alpha, m_storage.data(),
+            this->num_rows(), rhs.m_storage.data(), rhs.num_rows(), &beta,
+            result.m_storage.data(), this->num_rows());
+
+    return *this = std::move(result);
+}
+
+/// \brief Specialisation of the column L1-norm calculation for a real
+/// `DenseMatrix`, using CBLAS.
+template <>
+inline double DenseMatrix<Real>::column_L1_norm(std::size_t column) const {
+#ifndef NDEBUG
+    if (column >= this->num_columns()) {
+        throw RuntimeError{Range2DError{.indices = {0, column},
+            .size = this->size()}};
+    }
+#endif  // NDEBUG
+
+    // Computes sum of absolute element values in a column (with a pointer shift
+    // of 1 between elements)
+    return cblas_dasum(this->m_num_rows,
+            &(*(m_storage.begin() + this->m_num_rows*column)), 1);
+}
+
+/// \brief Specialisation of the column L1-norm calculation for a complex
+/// `DenseMatrix`, using CBLAS.
+template <>
+inline double DenseMatrix<Complex>::column_L1_norm(std::size_t column) const {
+#ifndef NDEBUG
+    if (column >= this->num_columns()) {
+        throw RuntimeError{Range2DError{.indices = {0, column},
+            .size = this->size()}};
+    }
+#endif  // NDEBUG
+
+    // Computes sum of absolute real and imaginary element values (with a
+    // pointer shift of 1 between elements). Note: this is not the same as the
+    // usual definition of this norm
+    return cblas_dzasum(this->m_num_rows,
+            &(*(m_storage.begin() + this->m_num_rows*column)), 1);
+}
+
+/// \brief Specialisation of the column L2-norm calculation for a real
+/// `DenseMatrix`, using CBLAS.
+template <>
+inline double DenseMatrix<Real>::column_L2_norm(std::size_t column) const {
+#ifndef NDEBUG
+    if (column >= this->num_columns()) {
+        throw RuntimeError{Range2DError{.indices = {0, column},
+            .size = this->size()}};
+    }
+#endif  // NDEBUG
+
+    // Computes the Euclidean norm of the Vector (with a pointer shift of 1
+    // between elements)
+    return cblas_dnrm2(this->m_num_rows,
+            &(*(m_storage.begin() + this->m_num_rows*column)), 1);
+}
+
+/// \brief Specialisation of the column L2-norm calculation for a complex
+/// `DenseMatrix`, using CBLAS.
+template <>
+inline double DenseMatrix<Complex>::column_L2_norm(std::size_t column) const {
+#ifndef NDEBUG
+    if (column >= this->num_columns()) {
+        throw RuntimeError{Range2DError{.indices = {0, column},
+            .size = this->size()}};
+    }
+#endif  // NDEBUG
+
+    // Computes the Euclidean norm of the Vector (with a pointer shift of 1
+    // between elements)
+    return cblas_dznrm2(this->m_num_rows,
+            &(*(m_storage.begin() + this->m_num_rows*column)), 1);
+}
+
 #endif  // JUMP_HAS_CBLAS
 
