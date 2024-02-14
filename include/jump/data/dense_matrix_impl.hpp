@@ -493,6 +493,7 @@ DenseMatrix<T> operator/(DenseMatrix<T> lhs, const T& rhs) {
 
 #ifdef JUMP_HAS_CBLAS
 
+/// \relates DenseMatrix
 /// \brief Specialisation of multiplication of a real `DenseMatrix` by a real
 /// Vector, using CBLAS.
 inline Vector<Real> operator*(const DenseMatrix<Real>& lhs,
@@ -512,6 +513,7 @@ inline Vector<Real> operator*(const DenseMatrix<Real>& lhs,
     return result;
 }
 
+/// \relates DenseMatrix
 /// \brief Specialisation of multiplication of a complex `DenseMatrix` by a
 /// complex Vector, using CBLAS.
 inline Vector<Complex> operator*(const DenseMatrix<Complex>& lhs,
@@ -525,7 +527,7 @@ inline Vector<Complex> operator*(const DenseMatrix<Complex>& lhs,
 
     // Computes 1.*lhs*rhs + 0. (with a pointer shift of 1 between elements)
     Vector<Complex> result(lhs.num_rows());
-    Complex alpha {1., 0.}, beta {0.};
+    Complex alpha{1., 0.}, beta{0.};
     cblas_zgemv(CblasColMajor, CblasNoTrans, lhs.num_rows(), lhs.num_columns(),
             &alpha, lhs.data(), lhs.num_rows(), rhs.data(), 1, &beta,
             result.data(), 1);
@@ -568,7 +570,7 @@ inline DenseMatrix<Complex>& DenseMatrix<Complex>::operator*=(
 
     // Computes 1.*lhs*rhs + 0.
     DenseMatrix<Complex> result{this->num_rows(), rhs.num_columns()};
-    Complex alpha {1., 0.}, beta {0.};
+    Complex alpha{1., 0.}, beta{0.};
     cblas_zgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, this->num_rows(),
             rhs.num_columns(), this->num_columns(), &alpha, m_storage.data(),
             this->num_rows(), rhs.m_storage.data(), rhs.num_rows(), &beta,
