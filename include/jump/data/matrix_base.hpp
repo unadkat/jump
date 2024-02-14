@@ -8,12 +8,7 @@
 #include <string>
 #include <utility>
 
-#ifdef __has_include
-    #if defined(JUMP_USE_CBLAS) && __has_include(<cblas.h>)
-        #include <cblas.h>
-        #define JUMP_HAS_CBLAS
-    #endif  // __has_include(<cblash.h>)
-#endif  // __has_include
+#include "jump/utility/external.hpp"
 
 namespace Jump {
 

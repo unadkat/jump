@@ -24,6 +24,7 @@ namespace Jump {
             /// \brief Details about the source location where the error
             /// occurred.
             std::source_location m_source;
+            // TODO: add std::stacktrace when available
 
             /// \brief Construct full error message from constituent parts.
             void construct_message();

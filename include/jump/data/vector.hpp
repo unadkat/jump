@@ -14,14 +14,8 @@
 #include <utility>
 #include <vector>
 
-#ifdef __has_include
-    #if defined(JUMP_USE_CBLAS) && __has_include(<cblas.h>)
-        #include <cblas.h>
-        #define JUMP_HAS_CBLAS
-    #endif  // __has_include(<cblash.h>)
-#endif  // __has_include
-
 #include "jump/debug/exception.hpp"
+#include "jump/utility/external.hpp"
 #include "jump/utility/types.hpp"
 
 namespace Jump {

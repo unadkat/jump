@@ -11,6 +11,9 @@
 
 #include "jump/debug/exception.hpp"
 
+#include "jump/linear_algebra/dense_linear_system.hpp"
+#include "jump/linear_algebra/linear_system_base.hpp"
+
 #include "jump/utility/command_line_args.hpp"
 #include "jump/utility/file_system.hpp"
 #include "jump/utility/io.hpp"
