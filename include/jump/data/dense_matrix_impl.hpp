@@ -280,7 +280,7 @@ inline DenseMatrix<T>& DenseMatrix<T>::operator/=(const T& k) {
 }
 
 template <typename T>
-inline double DenseMatrix<T>::column_L1_norm(std::size_t column) const {
+inline Real DenseMatrix<T>::column_L1_norm(std::size_t column) const {
 #ifndef NDEBUG
     if (column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {0, column},
@@ -289,12 +289,12 @@ inline double DenseMatrix<T>::column_L1_norm(std::size_t column) const {
 #endif  // NDEBUG
 
     auto it{column_iterators(column)};
-    auto F{[](T acc, const T& x) { return acc + std::abs(x); }};
-    return std::ranges::fold_left(it.first, it.second, T{0}, F);
+    auto F{[](Real acc, const T& x) { return acc + std::abs(x); }};
+    return std::ranges::fold_left(it.first, it.second, Real{0}, F);
 }
 
 template <typename T>
-inline double DenseMatrix<T>::column_L2_norm(std::size_t column) const {
+inline Real DenseMatrix<T>::column_L2_norm(std::size_t column) const {
 #ifndef NDEBUG
     if (column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {0, column},
@@ -303,12 +303,13 @@ inline double DenseMatrix<T>::column_L2_norm(std::size_t column) const {
 #endif  // NDEBUG
 
     auto it{column_iterators(column)};
-    auto F{[](T acc, const T& x) { return acc + std::pow(std::abs(x), 2.); }};
-    return std::sqrt(std::ranges::fold_left(it.first, it.second, T{0}, F));
+    auto F{[](Real acc, const T& x) {
+        return acc + std::pow(std::abs(x), 2.); }};
+    return std::sqrt(std::ranges::fold_left(it.first, it.second, Real{0}, F));
 }
 
 template <typename T>
-inline double DenseMatrix<T>::column_Linf_norm(std::size_t column) const {
+inline Real DenseMatrix<T>::column_Linf_norm(std::size_t column) const {
 #ifndef NDEBUG
     if (column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {0, column},

@@ -175,14 +175,14 @@ inline Vector<T>& Vector<T>::operator/=(const T& rhs) {
 
 template <typename T>
 inline Real Vector<T>::L1_norm() const {
-    auto F{[](T acc, const T& x) { return acc + std::abs(x); }};
-    return std::ranges::fold_left(storage, T{0}, F);
+    auto F{[](Real acc, const T& x) { return acc + std::abs(x); }};
+    return std::ranges::fold_left(storage, Real{0}, F);
 }
 
 template <typename T>
 inline Real Vector<T>::L2_norm() const {
-    auto F{[](T acc, const T& x) { return acc + std::pow(std::abs(x), 2.); }};
-    return std::sqrt(std::ranges::fold_left(storage, T{0}, F));
+    auto F{[](Real acc, const T& x) { return acc + std::pow(std::abs(x), 2.); }};
+    return std::sqrt(std::ranges::fold_left(storage, Real{0}, F));
 }
 
 template <typename T>

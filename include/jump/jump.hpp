@@ -12,6 +12,7 @@
 #include "jump/debug/exception.hpp"
 
 #include "jump/linear_algebra/dense_linear_system.hpp"
+#include "jump/linear_algebra/generalised_eigenvalue_system.hpp"
 #include "jump/linear_algebra/linear_system_base.hpp"
 
 #include "jump/utility/command_line_args.hpp"
