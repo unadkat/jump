@@ -19,9 +19,8 @@ namespace Jump {
     /// \brief Stores all elements of a general \f$m\f$ by \f$n\f$ matrix, with
     /// common arithmetic operations enabled.
     template <typename T>
-    class DenseMatrix : public MatrixBase<T>
-    {
-        protected:
+    class DenseMatrix : public MatrixBase<T> {
+        private:
             /// \brief Internal contiguous storage.
             Vector<T> m_storage;
 

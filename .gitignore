@@ -4,6 +4,9 @@ build/
 tests/
 external/
 
+# clangd config
+.clangd
+
 # CMake support to be added for more general usage at a later stage
 CMakeLists.txt
 

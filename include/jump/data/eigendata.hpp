@@ -14,8 +14,7 @@ namespace Jump {
 
     /// \brief Simple struct to hold a complex eigenvalue and corresponding
     /// complex eigenvector.
-    struct Eigendatum
-    {
+    struct Eigendatum {
         /// \brief Complex eigenvalue.
         Complex value;
         /// \brief Complex eigenvector corresponding to the stored eigenvalue.
