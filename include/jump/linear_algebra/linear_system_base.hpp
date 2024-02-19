@@ -9,17 +9,15 @@
 #include "../debug/exception.hpp"
 
 namespace Jump {
-
-    /// \brief Interface for linear system solvers.
-    class LinearSystemBase
-    {
-        public:
-            /// \brief Solve the linear system.
-            virtual void solve() = 0;
-            /// \brief Return the number of equations in the linear system.
-            virtual std::size_t order() const = 0;
-    };
-
+/// \brief Interface for linear system solvers.
+class LinearSystemBase
+{
+    public:
+        /// \brief Solve the linear system.
+        virtual void solve() = 0;
+        /// \brief Return the number of equations in the linear system.
+        virtual std::size_t order() const = 0;
+};
 }   // namespace Jump
 
 #endif  // JUMP_LINEAR_SYSTEM_BASE

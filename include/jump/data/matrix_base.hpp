@@ -4,57 +4,55 @@
 #ifndef JUMP_MATRIX_BASE_HPP
 #define JUMP_MATRIX_BASE_HPP
 
-#include <ostream>
-#include <string>
-#include <utility>
-
-#include "jump/utility/external.hpp"
+#include "jump/data/matrix_base_decl.hpp"
 
 namespace Jump {
+template <typename T>
+inline void MatrixBase<T>::initialise(std::size_t size) {
+    m_num_rows = m_num_columns = size;
+}
 
-    /// \brief General matrix interface.
-    template <typename T>
-    class MatrixBase {
-        protected:
-            /// \brief Number of matrix rows.
-            std::size_t m_num_rows{0};
-            /// \brief Number of matrix columns.
-            std::size_t m_num_columns{0};
+template <typename T>
+inline void MatrixBase<T>::initialise(std::size_t num_rows,
+        std::size_t num_columns) {
+    m_num_rows = num_rows;
+    m_num_columns = num_columns;
+}
 
-            /// \brief Set the number of rows and columns to be equal.
-            void initialise(std::size_t size = 0);
-            /// \brief Set the number of rows and columns separately.
-            void initialise(std::size_t num_rows, std::size_t num_columns);
+template <typename T>
+inline MatrixBase<T>::MatrixBase(std::size_t size) :
+    m_num_rows{size},
+    m_num_columns{size} {
+}
 
-        public:
-            /// \brief Construct a square matrix with the given size.
-            MatrixBase(std::size_t size = 0);
-            /// \brief Construct a general matrix with the given size.
-            MatrixBase(std::size_t num_rows, std::size_t num_columns);
+template <typename T>
+inline MatrixBase<T>::MatrixBase(std::size_t num_rows,
+        std::size_t num_columns) :
+    m_num_rows{num_rows},
+    m_num_columns{num_columns} {
+}
 
-            /// \brief Return the number of rows in the matrix.
-            std::size_t num_rows() const;
-            /// \brief Return the number of columns in the matrix.
-            std::size_t num_columns() const;
-            /// \brief Interface for returning the number of elements actually
-            /// stored by the matrix.
-            virtual std::size_t num_elements() const = 0;
-            /// \brief Return the size of the matrix as a pair (rows, columns).
-            std::pair<std::size_t, std::size_t> size() const;
+template <typename T>
+inline std::size_t MatrixBase<T>::num_rows() const {
+    return m_num_rows;
+}
 
-            /// \brief Interface for zeroing the matrix.
-            virtual void zero() = 0;
+template <typename T>
+inline std::size_t MatrixBase<T>::num_columns() const {
+    return m_num_columns;
+}
 
-            /// \brief Populate with data from a `std::string`. Noting that data
-            /// storage is assumed to be column-major, matrices stored as
-            /// strings will appear as transposes.
-            virtual void operator<<(std::string data) = 0;
-            /// \brief Interface for matrix serialisation to a `std::string`.
-            virtual std::string as_string() const = 0;
-    };
+template <typename T>
+inline std::pair<std::size_t, std::size_t> MatrixBase<T>::size() const {
+    return {m_num_rows, m_num_columns};
+}
 
-    #include "matrix_base_impl.hpp"
-
+/// \brief Send internal representation of the matrix (as a `std::string`) to
+/// the output stream.
+template <typename T>
+inline std::ostream& operator<<(std::ostream& out, const MatrixBase<T>& rhs) {
+    return out << rhs.as_string();
+}
 }   // namespace Jump
 
 #endif  // JUMP_MATRIX_BASE_HPP

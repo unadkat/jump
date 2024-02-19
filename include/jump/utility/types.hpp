@@ -7,8 +7,8 @@
 #include <complex>
 
 namespace Jump {
-    using Real = double;
-    using Complex = std::complex<double>;
+using Real = double;
+using Complex = std::complex<double>;
 }   // namespace Jump
 
 #endif  // JUMP_TYPES_HPP

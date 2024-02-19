@@ -4,43 +4,46 @@
 #ifndef JUMP_EIGENDATA_HPP
 #define JUMP_EIGENDATA_HPP
 
-#include <vector>
+#include "jump/data/eigendata_decl.hpp"
 
-#include "jump/data/vector.hpp"
-#include "jump/debug/exception.hpp"
-#include "jump/utility/types.hpp"
+namespace Jump::Eigendata {
+/// After the population with the new eigenvalue/eigenvector pairs, the data is
+/// left unsorted with respect to the eigenvalues. It is up to the user to sort
+/// the data as required for their purposes.
+inline std::vector<Eigendatum> combine(const std::vector<Complex>& eigenvalues,
+        const std::vector<Vector<Complex>>& eigenvectors) {
+#ifndef NDEBUG
+    if (eigenvalues.size() != eigenvectors.size())
+        throw RuntimeError{Mismatch1DError{.name1 = "eigenvalues",
+            .size1 = eigenvalues.size(), .name2 = "eigenvectors",
+            .size2 = eigenvectors.size()}};
+#endif  // NDEBUG
 
-namespace Jump {
+    // TODO: rewrite when std::ranges::to is available to convert from view
+    std::vector<Eigendatum> result;
+    for (std::size_t i{0}, size{eigenvalues.size()}; i < size; ++i) {
+        result.push_back(std::move(Eigendatum{eigenvalues[i],
+                    eigenvectors[i]}));
+    }
+    return result;
+}
 
-    /// \brief Simple struct to hold a complex eigenvalue and corresponding
-    /// complex eigenvector.
-    struct Eigendatum {
-        /// \brief Complex eigenvalue.
-        Complex value;
-        /// \brief Complex eigenvector corresponding to the stored eigenvalue.
-        Vector<Complex> vector;
-    };
+/// If Re(w) < Re(z), or Re(w) = Re(z) and Im(w) < Im(z), we assert that w < z.
+/// This sets up a strict weak ordering in line with the requirements for
+/// `std::sort`.
+inline bool by_real_part(const Complex& lhs, const Complex& rhs) {
+    return lhs.real() < rhs.real() ? true :
+        (lhs.real() == rhs.real() ? lhs.imag() < rhs.imag() : false);
+}
 
-    /// \brief Collection of eigendata-related helpers.
-    namespace Eigendata {
-
-        /// \brief Combine separate eigenvalue/eigenvector data from external
-        /// solvers into a single vector.
-        std::vector<Eigendatum> combine(const std::vector<Complex>& eigenvalues,
-                const std::vector<Vector<Complex>>& eigenvectors);
-
-        /// \brief Predicate for sorting eigendata by real part of associated
-        /// eigenvalue.
-        bool by_real_part(const Complex& lhs, const Complex& rhs);
-        /// \brief Predicate for sorting eigendata by imaginary part of
-        /// associated eigenvalue.
-        bool by_imaginary_part(const Complex& lhs, const Complex& rhs);
-
-        #include "eigendata_impl.hpp"
-
-    }   // namespace Eigendata
-
-}   // namespace Jump
+/// If Im(w) < Im(z), or Im(w) = Im(z) and Re(w) < Re(z), we assert that w < z.
+/// This sets up a strict weak ordering in line with the requirements for
+/// `std::sort`.
+inline bool by_imaginary_part(const Complex& lhs, const Complex& rhs) {
+    return lhs.real() < rhs.real() ? true :
+        (lhs.real() == rhs.real() ? lhs.imag() < rhs.imag() : false);
+}
+}   // namespace Jump::Eigendata
 
 #endif  // JUMP_EIGENDATA_HPP
 

@@ -4,110 +4,505 @@
 #ifndef JUMP_VECTOR_HPP
 #define JUMP_VECTOR_HPP
 
-#include <algorithm>
-#include <cmath>
-#include <initializer_list>
-#include <numeric>
-#include <ostream>
-#include <sstream>
-#include <string>
-#include <utility>
-#include <vector>
-
-#include "jump/debug/exception.hpp"
-#include "jump/utility/external.hpp"
-#include "jump/utility/types.hpp"
+#include "jump/data/vector_decl.hpp"
 
 namespace Jump {
+/// \class Vector
+/// Most operations are simply passed through to the underlying `std::vector`
+/// storage, but arithmetic operations are implemented in two forms. Generally,
+/// a simple default version for all basic `Vector` operations is provided, but
+/// in the case of the preprocessor definition `JUMP_HAS_CBLAS` we will offload
+/// to a local cblas implementation.
 
-    /// \brief Permissive encapulation of `std::vector` with arithmetic
-    /// operators enabled.
-    template <typename T>
-    struct Vector {
-        /// \brief Internal contiguous storage.
-        std::vector<T> storage;
+template <typename T>
+inline Vector<T>::Vector(std::size_t size, const T& value) :
+    storage(size, value) {
+}
 
-        /// \brief Iterator for algorithms.
-        using Iterator = typename std::vector<T>::iterator;
-        /// \brief Iterator for algorithms.
-        using ConstIterator = typename std::vector<T>::const_iterator;
+template <typename T>
+inline Vector<T>::Vector(std::initializer_list<T>&& list) :
+    storage(std::forward<std::initializer_list<T>>(list)) {
+}
 
-        /// \brief Construct a zero `Vector` with a given size (empty by
-        /// default) filled with the given item (`T{}` by default).
-        Vector(std::size_t size = 0, const T& value = T{0});
-        /// \brief Construct a `Vector` from a brace-enclosed list.
-        Vector(std::initializer_list<T>&& list);
-        /// \brief Construct a `Vector` via a pair of iterators.
-        template <typename InputIt>
-            Vector(InputIt first, InputIt last);
+/// Useful when extracting columns from a matrix, for example. Combined with a
+/// way of getting iterators to the internal storage locations representing the
+/// top and bottom of a given matrix column, this is the fastest way of
+/// obtaining that isolated column.
+template <typename T>
+template <class InputIt>
+inline Vector<T>::Vector(InputIt first, InputIt last) :
+    storage(std::move(first), std::move(last)) {
+}
 
-        /// \brief Conversion operator to promote a real-valued `Vector` to a
-        /// complex-valued one.
-        operator Vector<Complex>() const;
+/// Initialises a complex-valued `Vector` of the correct size and loops through
+/// it to convert the real-valued elements in the source `Vector`. This is not
+/// terribly efficient but the only way of achieving the promotion easily.
+template <>
+inline Vector<Real>::operator Vector<Complex>() const {
+    const std::size_t N{size()};
+    Vector<Complex> result(N);
+    for (std::size_t i{0}; i < N; ++i) {
+        result[i] = {storage[i]};
+    }
+    return result;
+}
 
-        /// \brief Const element access.
-        const T& operator[](std::size_t index) const;
-        /// \brief Mutable element access.
-        T& operator[](std::size_t index);
+template <typename T>
+inline const T& Vector<T>::operator[](std::size_t index) const {
+#ifndef NDEBUG
+    if (index >= size()) {
+        throw RuntimeError{Range1DError{.index = index, .size = size()}};
+    }
+#endif  // NDEBUG
 
-        /// \brief Set size and fill with a given value.
-        void assign(std::size_t size, const T& value = T{0});
-        /// \brief Set data via pair of iterators.
-        template <class InputIt>
-            void assign(InputIt first, InputIt last);
-        /// \brief Empty the `Vector`.
-        void clear();
-        /// \brief Resize the `Vector`.
-        void resize(std::size_t size);
-        /// \brief Return number of elements.
-        std::size_t size() const;
+    return storage[index];
+}
 
-        /// \brief Const begin iterator for algorithms.
-        ConstIterator begin() const;
-        /// \brief Const past-the-end iterator for algorithms.
-        ConstIterator end() const;
-        /// \brief Begin iterator for algorithms.
-        Iterator begin();
-        /// \brief Past-end-end iterator for algorithms.
-        Iterator end();
+template <typename T>
+inline T& Vector<T>::operator[](std::size_t index) {
+#ifndef NDEBUG
+    if (index >= size()) {
+        throw RuntimeError{Range1DError{.index = index, .size = size()}};
+    }
+#endif  // NDEBUG
 
-        /// \brief Fill with given value.
-        void fill(const T& value);
-        /// \brief Fill vector with zeroes.
-        void zero();
+    return storage[index];
+}
 
-        /// \brief No operation on `Vector`.
-        const Vector& operator+() const;
-        /// \brief Negate `Vector`.
-        Vector operator-() const;
-        /// \brief Add two Vectors together in place.
-        Vector& operator+=(const Vector& rhs);
-        /// \brief Subtract one `Vector` from another in place.
-        Vector& operator-=(const Vector& rhs);
-        /// \brief Multiply by scalar in place.
-        Vector& operator*=(const T& rhs);
-        /// \brief Divide by scalar in place.
-        Vector& operator/=(const T& rhs);
+template <typename T>
+inline void Vector<T>::assign(std::size_t size, const T& value) {
+    storage.assign(size, value);
+}
 
-        /// \brief Return sum of element magnitudes.
-        Real L1_norm() const;
-        /// \brief Return Euclidean norm.
-        Real L2_norm() const;
-        /// \brief Return maximum magnitude over all elements.
-        Real Linf_norm() const;
+template <typename T>
+template <class InputIt>
+inline void Vector<T>::assign(InputIt first, InputIt last) {
+    storage.assign(std::move(first), std::move(last));
+}
 
-        /// \brief Pointer to underlying data, for use with external libraries.
-        T* data();
-        /// \brief Pointer to underlying data, for use with external libraries.
-        const T* data() const;
+template <typename T>
+inline void Vector<T>::clear() {
+    storage.clear();
+}
 
-        /// \brief Populate with data in a `std::string`. Continue to read data
-        /// until a `std::stringstream` fails to read a new value.
-        void operator<<(std::string data);
-    };
+template <typename T>
+inline void Vector<T>::resize(std::size_t size) {
+    storage.resize(size);
+}
 
-    #include "vector_impl.hpp"
+template <typename T>
+inline std::size_t Vector<T>::size() const {
+    return storage.size();
+}
 
+template <typename T>
+inline typename Vector<T>::ConstIterator Vector<T>::begin() const {
+    return storage.cbegin();
+}
+
+template <typename T>
+inline typename Vector<T>::ConstIterator Vector<T>::end() const {
+    return storage.cend();
+}
+
+template <typename T>
+inline typename Vector<T>::Iterator Vector<T>::begin() {
+    return storage.begin();
+}
+
+template <typename T>
+inline typename Vector<T>::Iterator Vector<T>::end() {
+    return storage.end();
+}
+
+template <typename T>
+inline void Vector<T>::fill(const T& value) {
+    std::ranges::fill(storage, value);
+}
+
+template <typename T>
+inline void Vector<T>::zero() {
+    fill(T{0});
+}
+
+template <typename T>
+inline const Vector<T>& Vector<T>::operator+() const {
+    return *this;
+}
+
+template <typename T>
+inline Vector<T> Vector<T>::operator-() const {
+    Vector<T> temp{*this};
+    return temp *= -1;
+}
+
+template <typename T>
+inline Vector<T>& Vector<T>::operator+=(const Vector<T>& rhs) {
+#ifndef NDEBUG
+    if (size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
+            .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    for (std::size_t i{0}, N{size()}; i < N; ++i) {
+        storage[i] += rhs[i];
+    }
+    return *this;
+}
+
+template <typename T>
+inline Vector<T>& Vector<T>::operator-=(const Vector<T>& rhs) {
+#ifndef NDEBUG
+    if (size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
+            .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    for (std::size_t i{0}, N{size()}; i < N; ++i) {
+        storage[i] -= rhs[i];
+    }
+    return *this;
+}
+
+template <typename T>
+inline Vector<T>& Vector<T>::operator*=(const T& rhs) {
+    for (auto& x : storage) {
+        x *= rhs;
+    }
+    return *this;
+}
+
+template <typename T>
+inline Vector<T>& Vector<T>::operator/=(const T& rhs) {
+    return *this *= (T{1}/rhs);
+}
+
+template <typename T>
+inline Real Vector<T>::L1_norm() const {
+    auto F{[](Real acc, const T& x) { return acc + std::abs(x); }};
+    return std::ranges::fold_left(storage, Real{0}, F);
+}
+
+template <typename T>
+inline Real Vector<T>::L2_norm() const {
+    auto F{[](Real acc, const T& x) { return acc + std::pow(std::abs(x),
+            2.); }};
+    return std::sqrt(std::ranges::fold_left(storage, Real{0}, F));
+}
+
+template <typename T>
+inline Real Vector<T>::Linf_norm() const {
+    auto F{[](const T& x) { return std::abs(x); }};
+    return std::ranges::max(storage, {}, F);
+}
+
+template <typename T>
+inline T* Vector<T>::data() {
+    return storage.data();
+}
+
+template <typename T>
+inline const T* Vector<T>::data() const {
+    return storage.data();
+}
+
+/// Note: takes string data by value so we can optimise in the case of quickly
+/// reading from a file, no copies are taken.
+template <typename T>
+inline void Vector<T>::operator<<(std::string data) {
+    T element;
+    std::istringstream iss(std::move(data));
+    std::vector<T> new_data;
+
+    // After each extraction, use `std::basic_ios::operator bool` to check
+    // failbit, at which point we'll assume we have everything
+    while (iss >> element) {
+        new_data.push_back(element);
+    }
+
+    // Don't leave storage in an in-between state if anything happens
+    storage = std::move(new_data);
+}
+
+// ========================================================================
+// Non-member functions
+// ========================================================================
+
+/// \relates Vector
+/// \brief Addition of two Vectors.
+///
+/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
+/// return. Also handles the case that lhs is given an rvalue (NRVO).
+template <typename T>
+inline Vector<T> operator+(Vector<T> lhs, const Vector<T>& rhs) {
+    lhs += rhs;
+    return lhs;
+}
+
+/// \relates Vector
+/// \brief Addition of two Vectors.
+///
+/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
+/// reference parameter (NRVO).
+template <typename T>
+inline Vector<T> operator+(const Vector<T>& lhs, Vector<T>&& rhs) {
+    rhs += lhs;
+    return rhs;
+}
+
+/// \relates Vector
+/// \brief Difference of two Vectors.
+///
+/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
+/// return. Also handles the case that lhs is given an rvalue (NRVO).
+template <typename T>
+inline Vector<T> operator-(Vector<T> lhs, const Vector<T>& rhs) {
+    lhs -= rhs;
+    return lhs;
+}
+
+/// \relates Vector
+/// \brief Difference of two Vectors.
+///
+/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
+/// reference parameter (NRVO).
+template <typename T>
+inline Vector<T> operator-(const Vector<T>& lhs, Vector<T>&& rhs) {
+    rhs *= T{-1};
+    rhs += lhs;
+    return rhs;
+}
+
+/// \relates Vector
+/// \brief Left-hand multiplication by scalar.
+template <typename T>
+inline Vector<T> operator*(const T& lhs, Vector<T> rhs) {
+    rhs *= lhs;
+    return rhs;
+}
+
+/// \relates Vector
+/// \brief Right-hand multiplication by scalar.
+template <typename T>
+inline Vector<T> operator*(Vector<T> lhs, const T& rhs) {
+    lhs *= rhs;
+    return lhs;
+}
+
+/// \relates Vector
+/// \brief Inner product of two Vectors.
+template <typename T>
+inline T operator*(const Vector<T>& lhs, const Vector<T>& rhs) {
+#ifndef NDEBUG
+    if (lhs.size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    T dot_product{0};
+    for (std::size_t i{0}, N{lhs.size()}; i < N; ++i) {
+        dot_product += lhs[i]*rhs[i];
+    }
+    return dot_product;
+}
+
+/// \relates Vector
+/// \brief Right-hand division by scalar.
+template <typename T>
+inline Vector<T> operator/(Vector<T> lhs, const T& rhs) {
+    lhs /= rhs;
+    return lhs;
+}
+
+/// \relates Vector
+/// \brief Outputs `Vector` data to output stream in a single line with spaces.
+template <typename T>
+inline std::ostream& operator<<(std::ostream& out, const Vector<T>& rhs) {
+    for (const auto& x : rhs) {
+        out << x << ' ';
+    }
+    return out;
+}
+
+// ========================================================================
+// CBLAS
+// ========================================================================
+
+#ifdef JUMP_HAS_CBLAS
+/// \brief Specialisation of in-place addition of two real Vectors, using CBLAS.
+template <>
+inline Vector<Real>& Vector<Real>::operator+=(const Vector<Real>& rhs) {
+#ifndef NDEBUG
+    if (size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
+            .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    // Computes 1.*rhs + *this (with a pointer shift of 1 between elements)
+    cblas_daxpy(storage.size(), 1., rhs.storage.data(), 1, storage.data(), 1);
+    return *this;
+}
+
+/// \brief Specialisation of in-place addition of two complex Vectors, using
+/// CBLAS.
+template <>
+inline Vector<Complex>& Vector<Complex>::operator+=(
+        const Vector<Complex>& rhs) {
+#ifndef NDEBUG
+    if (size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
+            .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    // Computes 1.*rhs + *this (with a pointer shift of 1 between elements)
+    Complex a {1.};
+    cblas_zaxpy(storage.size(), &a, rhs.storage.data(), 1, storage.data(), 1);
+    return *this;
+}
+
+/// \brief Specialisation of in-place subtraction of two real Vectors, using
+/// CBLAS.
+template <>
+inline Vector<Real>& Vector<Real>::operator-=(const Vector<Real>& rhs) {
+#ifndef NDEBUG
+    if (size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
+            .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    // Computes -1.*rhs + *this (with a pointer shift of 1 between elements)
+    cblas_daxpy(storage.size(), -1., rhs.storage.data(), 1, storage.data(), 1);
+    return *this;
+}
+
+/// \brief Specialisation of in-place subtraction of two complex Vectors, using
+/// CBLAS.
+template <>
+inline Vector<Complex>& Vector<Complex>::operator-=(
+        const Vector<Complex>& rhs) {
+#ifndef NDEBUG
+    if (size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
+            .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    // Computes -1.*rhs + *this (with a pointer shift of 1 between elements)
+    Complex a {-1.};
+    cblas_zaxpy(storage.size(), &a, rhs.storage.data(), 1, storage.data(), 1);
+    return *this;
+}
+
+/// \brief Specialisation of in-place multiplication of a real `Vector` by a
+/// real scalar, using CBLAS.
+template <>
+inline Vector<Real>& Vector<Real>::operator*=(const Real& rhs) {
+    // Computes rhs*(*this) (with a pointer shift of 1 between elements)
+    cblas_dscal(storage.size(), rhs, storage.data(), 1);
+    return *this;
+}
+
+/// \brief Specialisation of in-place multiplication of a complex `Vector` by a
+/// complex scalar, using CBLAS.
+template <>
+inline Vector<Complex>& Vector<Complex>::operator*=(const Complex& rhs) {
+    // Computes rhs*(*this) (with a pointer shift of 1 between elements)
+    cblas_zscal(storage.size(), &rhs, storage.data(), 1);
+    return *this;
+}
+
+/// \brief Specialisation of the dot product for two real Vectors, using CBLAS.
+inline Real operator*(const Vector<Real>& lhs, const Vector<Real>& rhs) {
+#ifndef NDEBUG
+    if (lhs.size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    // Computes dot product lhs*rhs (with a pointer shift of 1 between elements)
+    return cblas_ddot(lhs.size(), lhs.data(), 1, rhs.data(), 1);
+}
+
+/// \brief Specialisation of the dot product for two complex Vectors, using
+/// CBLAS.
+inline Complex operator*(const Vector<Complex>& lhs,
+        const Vector<Complex>& rhs) {
+#ifndef NDEBUG
+    if (lhs.size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    // Computes dot product lhs*rhs (with a pointer shift of 1 between elements)
+    Complex result;
+    cblas_zdotu_sub(lhs.size(), lhs.data(), 1, rhs.data(), 1, &result);
+    return result;
+}
+
+/// \brief Specialisation of in-place division of a real `Vector` by a real
+/// scalar, using CBLAS.
+template <>
+inline Vector<Real>& Vector<Real>::operator/=(const Real& rhs) {
+    // Computes (1./rhs)*(*this) (with a pointer shift of 1 between elements)
+    cblas_dscal(storage.size(), 1./rhs, storage.data(), 1);
+    return *this;
+}
+
+/// \brief Specialisation of in-place division of a complex `Vector` by a
+/// complex scalar using CBLAS.
+template <>
+inline Vector<Complex>& Vector<Complex>::operator/=(const Complex& rhs) {
+    // Computes (1./rhs)*(*this) (with a pointer shift of 1 between elements)
+    Complex a{1./rhs};
+    cblas_zscal(storage.size(), &a, storage.data(), 1);
+    return *this;
+}
+
+/// \brief Specialisation of the L1-norm calculation for a real `Vector`, using
+/// CBLAS.
+template <>
+inline double Vector<Real>::L1_norm() const {
+    // Computes sum of absolute element values (with a pointer shift of 1
+    // between elements)
+    return cblas_dasum(storage.size(), storage.data(), 1);
+}
+
+/// \brief Specialisation of the L1-norm calculation for a complex `Vector`,
+/// using CBLAS.
+template <>
+inline double Vector<Complex>::L1_norm() const {
+    // Computes sum of absolute real and imaginary element values (with a
+    // pointer shift of 1 between elements). Note: this is not the same as the
+    // usual definition of this norm
+    return cblas_dzasum(storage.size(), storage.data(), 1);
+}
+
+/// \brief Specialisation of the L2-norm calculation for a real `Vector`, using
+/// CBLAS.
+template <>
+inline double Vector<Real>::L2_norm() const {
+    // Computes the Euclidean norm of the `Vector` (with a pointer shift of 1
+    // between elements)
+    return cblas_dnrm2(storage.size(), storage.data(), 1);
+}
+
+/// \brief Specialisation of the L2-norm calculation for a complex `Vector`,
+/// using CBLAS.
+template <>
+inline double Vector<Complex>::L2_norm() const {
+    // Computes the Euclidean norm of the `Vector` (with a pointer shift of 1
+    // between elements)
+    return cblas_dznrm2(storage.size(), storage.data(), 1);
+}
+#endif  // JUMP_HAS_CBLAS
 }   // namespace Jump
 
 #endif  // JUMP_VECTOR_HPP
