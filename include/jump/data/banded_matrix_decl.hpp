@@ -54,6 +54,10 @@ class BandedMatrix : public MatrixBase<T> {
 
         /// \brief Pointer to underlying data, for use with external libraries.
         T* data();
+        /// \brief Pointer to underlying data, for use with external libraries.
+        const T* data() const;
+        /// \brief Const reference to underlying Vector (column-major).
+        const Vector<T>& as_vector() const;
 
         /// \brief Populate with data from a `std::string`. Noting that data
         /// storage is assumed to be column-major, matrices stored as strings

@@ -102,11 +102,9 @@ class DenseMatrix : public MatrixBase<T> {
         /// \brief Return maximum magnitude over all elements in a column.
         Real column_Linf_norm(std::size_t column) const;
 
-        /// \brief Pointer to underlying data, for use with external
-        /// libraries.
+        /// \brief Pointer to underlying data, for use with external libraries.
         T* data();
-        /// \brief Pointer to underlying data, for use with external
-        /// libraries.
+        /// \brief Pointer to underlying data, for use with external libraries.
         const T* data() const;
         /// \brief Const reference to underlying Vector (column-major).
         const Vector<T>& as_vector() const;

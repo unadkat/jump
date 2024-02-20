@@ -140,6 +140,16 @@ inline T* BandedMatrix<T>::data() {
     return m_storage.data();
 }
 
+template <typename T>
+inline const T* BandedMatrix<T>::data() const {
+    return m_storage.data();
+}
+
+template <typename T>
+inline const Vector<T>& BandedMatrix<T>::as_vector() const {
+    return m_storage;
+}
+
 /// Loads a block of data from the given string by reading all valid values into
 /// the underlying storage. The only thing that will be checked is that the
 /// total number of values read is equal to `num_elements()`. Note that this
