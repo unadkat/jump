@@ -50,7 +50,7 @@ inline DenseMatrix<T>::DenseMatrix(std::size_t num_rows,
         throw RuntimeError{InvalidArgumentError{.argument = "underlying_data",
             .value = std::format("Vector of size {}", underlying_data.size()),
             .expected = std::format(
-                    "Vector of size num_rows*num_columns = {} x {} = {}",
+                    "Vector of size num_rows*num_columns = {}x{} = {}",
                     num_rows, num_columns, num_rows*num_columns)}};
     } else {
         m_storage = std::move(underlying_data);
@@ -64,6 +64,55 @@ inline DenseMatrix<Real>::operator DenseMatrix<Complex>() const {
     DenseMatrix<Complex> result;
     result.assign(num_rows(), num_columns(), {m_storage});
     return result;
+}
+
+template <typename T>
+inline void DenseMatrix<T>::assign(std::size_t size) {
+    MatrixBase<T>::initialise(size);
+    m_storage.assign(this->num_rows()*this->num_columns(), T{0});
+}
+
+template <typename T>
+inline void DenseMatrix<T>::assign(std::size_t num_rows,
+        std::size_t num_columns) {
+    MatrixBase<T>::initialise(num_rows, num_columns);
+    m_storage.assign(num_rows*num_columns, T{0});
+}
+
+template <typename T>
+inline void DenseMatrix<T>::assign(std::size_t num_rows,
+        std::size_t num_columns, Vector<T> underlying_data) {
+    MatrixBase<T>::initialise(num_rows, num_columns);
+
+    if (underlying_data.size() != num_rows*num_columns) {
+        m_storage.assign(num_rows*num_columns, T{0});
+        throw RuntimeError{InvalidArgumentError{.argument = "underlying_data",
+            .value = std::format("Vector of size {}", underlying_data.size()),
+            .expected = std::format(
+                    "Vector of size num_rows*num_columns = {}x{} = {}",
+                    num_rows, num_columns, num_rows*num_columns)}};
+    } else {
+        m_storage = std::move(underlying_data);
+    }
+}
+
+template <typename T>
+template <class InputIt>
+inline void DenseMatrix<T>::assign(InputIt first, InputIt last) {
+#ifndef NDEBUG
+    if (last != first + m_storage.size()) {
+        throw RuntimeError{InvalidArgumentError{.argument = "last",
+            .value = std::format("first + {}", last - first),
+            .expected = "first - last == m_storage.size()"}};
+    }
+#endif  // NDEBUG
+
+    m_storage.assign(std::move(first), std::move(last));
+}
+
+template <typename T>
+inline std::size_t DenseMatrix<T>::num_elements() const {
+    return m_storage.size();
 }
 
 /// The element at row `i` and column `j` appears at location
@@ -93,55 +142,6 @@ inline T& DenseMatrix<T>::operator[](std::size_t row, std::size_t column) {
 #endif  // NDEBUG
 
     return m_storage[column*this->num_rows() + row];
-}
-
-template <typename T>
-inline void DenseMatrix<T>::assign(std::size_t size) {
-    MatrixBase<T>::initialise(size);
-    m_storage.assign(this->num_rows()*this->num_columns(), T{0});
-}
-
-template <typename T>
-inline void DenseMatrix<T>::assign(std::size_t num_rows,
-        std::size_t num_columns) {
-    MatrixBase<T>::initialise(num_rows, num_columns);
-    m_storage.assign(num_rows*num_columns, T{0});
-}
-
-template <typename T>
-inline void DenseMatrix<T>::assign(std::size_t num_rows,
-        std::size_t num_columns, Vector<T> underlying_data) {
-    MatrixBase<T>::initialise(num_rows, num_columns);
-
-    if (underlying_data.size() != num_rows*num_columns) {
-        m_storage.assign(num_rows*num_columns, T{0});
-        throw RuntimeError{InvalidArgumentError{.argument = "underlying_data",
-            .value = std::format("Vector of size {}", underlying_data.size()),
-            .expected = std::format(
-                    "Vector of size num_rows*num_columns = {} x {} = {}",
-                    num_rows, num_columns, num_rows*num_columns)}};
-    } else {
-        m_storage = std::move(underlying_data);
-    }
-}
-
-template <typename T>
-template <class InputIt>
-inline void DenseMatrix<T>::assign(InputIt first, InputIt last) {
-#ifndef NDEBUG
-    if (last != first + m_storage.size()) {
-        throw RuntimeError{InvalidArgumentError{.argument = "last",
-            .value = std::format("first + {}", last - first),
-            .expected = "first - last == m_storage.size()"}};
-    }
-#endif  // NDEBUG
-
-    m_storage.assign(std::move(first), std::move(last));
-}
-
-template <typename T>
-inline std::size_t DenseMatrix<T>::num_elements() const {
-    return m_storage.size();
 }
 
 template <typename T>
@@ -358,7 +358,7 @@ inline void DenseMatrix<T>::operator<<(std::string data) {
             .value = std::format("(matrix data with a total of {} elements)",
                     new_data.size()),
             .expected = std::format(
-                    "matrix data with a total of {} x {} = {} elements",
+                    "matrix data with a total of {}x{} = {} elements",
                     this->num_rows(), this->num_columns(),
                     this->num_rows()*this->num_columns())}};
     }

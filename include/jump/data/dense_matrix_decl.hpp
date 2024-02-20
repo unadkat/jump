@@ -42,11 +42,6 @@ class DenseMatrix : public MatrixBase<T> {
         /// to a complex-valued one.
         operator DenseMatrix<Complex>() const;
 
-        /// \brief Const element access.
-        const T& operator[](std::size_t row, std::size_t column) const;
-        /// \brief Mutable element access.
-        T& operator[](std::size_t row, std::size_t column);
-
         /// \brief Initialise a square matrix with the given size.
         void assign(std::size_t size);
         /// \brief Initialise a general matrix with the given size.
@@ -60,6 +55,11 @@ class DenseMatrix : public MatrixBase<T> {
         void assign(InputIt first, InputIt last);
         /// \brief Return size of internal storage.
         std::size_t num_elements() const override;
+
+        /// \brief Const element access.
+        const T& operator[](std::size_t row, std::size_t column) const;
+        /// \brief Mutable element access.
+        T& operator[](std::size_t row, std::size_t column);
 
         /// \brief Const iterator for algorithms.
         ConstIterator begin() const;

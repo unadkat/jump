@@ -27,31 +27,40 @@ class BandedMatrix : public MatrixBase<T> {
         /// \brief Construct a square matrix with the given number of diagonals
         /// on each side of the leading diagonal.
         BandedMatrix(std::size_t size = 0, std::size_t num_bands = 0);
+        /// \brief Constuct a matrix with the given Vector data, specifying a
+        /// consistent size.
+        BandedMatrix(std::size_t size, std::size_t num_bands,
+                Vector<T> underlying_data);
 
         /// \brief Initialise matrix with the given size and number of
         /// off-leading diagonal diagonals.
         void assign(std::size_t size = 0, std::size_t num_bands = 0);
-        /// \brief Zero the matrix.
-        void zero() override;
+        /// \brief Initialise a matrix with the given Vector data, specifying a
+        /// consistent size.
+        void assign(std::size_t size, std::size_t num_bands,
+                Vector<T> underlying_data);
+        /// \brief Return number of off-leading diagonal diagonals.
+        std::size_t num_bands() const;
+        /// \brief Return size of internal storage.
+        std::size_t num_elements() const override;
 
         /// \brief Const element access.
         T operator[](std::size_t row, std::size_t column) const;
         /// \brief Mutable element access.
         T& operator[](std::size_t row, std::size_t column);
 
-        /// \brief Return number of off-leading diagonal diagonals.
-        std::size_t num_bands() const;
-        /// \brief Return size of internal storage.
-        std::size_t num_elements() const override;
+        /// \brief Zero the matrix.
+        void zero() override;
 
         /// \brief Pointer to underlying data, for use with external libraries.
         T* data();
 
-        /// \brief Populate with data from a `std::string`. Note that data
-        /// storage is assumed to be column-major.
+        /// \brief Populate with data from a `std::string`. Noting that data
+        /// storage is assumed to be column-major, matrices stored as strings
+        /// will be assumed to be a transpose matrix.
         void operator<<(std::string data) override;
         /// \brief Matrix serialisation to a string.
-        std::string as_string() const;
+        std::string as_string() const override;
 };
 }   // namespace Jump
 

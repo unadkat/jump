@@ -48,28 +48,6 @@ inline Vector<Real>::operator Vector<Complex>() const {
 }
 
 template <typename T>
-inline const T& Vector<T>::operator[](std::size_t index) const {
-#ifndef NDEBUG
-    if (index >= size()) {
-        throw RuntimeError{Range1DError{.index = index, .size = size()}};
-    }
-#endif  // NDEBUG
-
-    return storage[index];
-}
-
-template <typename T>
-inline T& Vector<T>::operator[](std::size_t index) {
-#ifndef NDEBUG
-    if (index >= size()) {
-        throw RuntimeError{Range1DError{.index = index, .size = size()}};
-    }
-#endif  // NDEBUG
-
-    return storage[index];
-}
-
-template <typename T>
 inline void Vector<T>::assign(std::size_t size, const T& value) {
     storage.assign(size, value);
 }
@@ -93,6 +71,28 @@ inline void Vector<T>::resize(std::size_t size) {
 template <typename T>
 inline std::size_t Vector<T>::size() const {
     return storage.size();
+}
+
+template <typename T>
+inline const T& Vector<T>::operator[](std::size_t index) const {
+#ifndef NDEBUG
+    if (index >= size()) {
+        throw RuntimeError{Range1DError{.index = index, .size = size()}};
+    }
+#endif  // NDEBUG
+
+    return storage[index];
+}
+
+template <typename T>
+inline T& Vector<T>::operator[](std::size_t index) {
+#ifndef NDEBUG
+    if (index >= size()) {
+        throw RuntimeError{Range1DError{.index = index, .size = size()}};
+    }
+#endif  // NDEBUG
+
+    return storage[index];
 }
 
 template <typename T>

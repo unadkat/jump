@@ -44,11 +44,6 @@ struct Vector {
     /// complex-valued one.
     operator Vector<Complex>() const;
 
-    /// \brief Const element access.
-    const T& operator[](std::size_t index) const;
-    /// \brief Mutable element access.
-    T& operator[](std::size_t index);
-
     /// \brief Set size and fill with a given value.
     void assign(std::size_t size, const T& value = T{0});
     /// \brief Set data via pair of iterators.
@@ -60,6 +55,11 @@ struct Vector {
     void resize(std::size_t size);
     /// \brief Return number of elements.
     std::size_t size() const;
+
+    /// \brief Const element access.
+    const T& operator[](std::size_t index) const;
+    /// \brief Mutable element access.
+    T& operator[](std::size_t index);
 
     /// \brief Const begin iterator for algorithms.
     ConstIterator begin() const;
