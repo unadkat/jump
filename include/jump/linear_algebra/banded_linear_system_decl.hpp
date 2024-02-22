@@ -13,7 +13,7 @@
 #include "jump/linear_algebra/linear_system_base.hpp"
 #include "jump/utility/external.hpp"
 
-namespace Jump {
+namespace jump {
 /// \brief A linear system \f$A\vec{x}=\vec{b}\f$, where \f$A\f$ is a matrix and
 /// \f$\vec{b}\f$ is a right-hand side vector. Upon solving, we have the
 /// solution \f$x\f$.
@@ -41,7 +41,7 @@ class BandedLinearSystem : public LinearSystemBase {
         /// \brief Return the number of equations in the linear system.
         std::size_t order() const;
 };
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_BANDED_LINEAR_SYSTEM_DECL_HPP
 

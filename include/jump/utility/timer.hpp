@@ -6,7 +6,7 @@
 
 #include "jump/utility/timer_decl.hpp"
 
-namespace Jump {
+namespace jump {
 /// The time is returned formatted based on the largest time unit
 /// (hours/minutes/seconds) that have been measured. If the number of hours is
 /// non-zero, the time is given in the format hh:mm:ss.sss. Otherwise if the
@@ -98,7 +98,7 @@ inline Os& operator<<(Os& out, const Timer& rhs) {
     }
     return out;
 }
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_TIMER_HPP
 

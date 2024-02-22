@@ -10,7 +10,7 @@
 #include "jump/debug/exception.hpp"
 #include "jump/utility/types.hpp"
 
-namespace Jump {
+namespace jump {
 /// \brief Simple struct to hold a complex eigenvalue and corresponding complex
 /// eigenvector.
 struct Eigendatum {
@@ -21,7 +21,7 @@ struct Eigendatum {
 };
 
 /// \brief Collection of eigendata-related helpers.
-namespace Eigendata {
+namespace eigendata {
     /// \brief Combine separate eigenvalue/eigenvector data from external
     /// solvers into a single vector.
     std::vector<Eigendatum> combine(const std::vector<Complex>& eigenvalues,
@@ -33,8 +33,8 @@ namespace Eigendata {
     /// \brief Predicate for sorting eigendata by imaginary part of associated
     /// eigenvalue.
     bool by_imaginary_part(const Complex& lhs, const Complex& rhs);
-}   // namespace Eigendata
-}   // namespace Jump
+}   // namespace eigendata
+}   // namespace jump
 
 #endif  // JUMP_EIGENDATA_DECL_HPP
 

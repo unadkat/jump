@@ -18,7 +18,7 @@
 #include "jump/utility/external.hpp"
 #include "jump/utility/types.hpp"
 
-namespace Jump {
+namespace jump {
 /// \brief Permissive encapulation of `std::vector` with arithmetic
 /// operators enabled.
 template <typename T>
@@ -104,7 +104,7 @@ struct Vector {
     /// until a `std::stringstream` fails to read a new value.
     void operator<<(std::string data);
 };
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_VECTOR_DECL_HPP
 

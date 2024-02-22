@@ -6,7 +6,7 @@
 
 #include "jump/data/banded_matrix_decl.hpp"
 
-namespace Jump {
+namespace jump {
 /// \var BandedMatrix::m_storage
 /// In short, the interal storage takes the form of a dense matrix with
 /// `num_columns()` columns and `1 + 3*#num_bands()` rows. Refer to the
@@ -197,7 +197,7 @@ inline std::string BandedMatrix<T>::as_string() const {
 
     return oss.str();
 }
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_BANDED_MATRIX_HPP
 

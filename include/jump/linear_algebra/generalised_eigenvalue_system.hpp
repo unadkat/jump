@@ -6,7 +6,7 @@
 
 #include "jump/linear_algebra/generalised_eigenvalue_system_decl.hpp"
 
-namespace Jump {
+namespace jump {
 template <typename T>
 inline GeneralisedEigenvalueSystem<T>::GeneralisedEigenvalueSystem(
         DenseMatrix<T>& A, DenseMatrix<T>& B, std::vector<Eigendatum>& data) :
@@ -129,7 +129,7 @@ template <typename T>
 inline std::size_t GeneralisedEigenvalueSystem<T>::order() const {
     return m_A.num_rows();
 }
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_GENERALISED_EIGENVALUE_SYSTEM_HPP
 

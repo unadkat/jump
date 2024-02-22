@@ -14,7 +14,7 @@
 #include "jump/debug/exception.hpp"
 #include "jump/utility/types.hpp"
 
-namespace Jump {
+namespace jump {
 /// \brief Stores all elements of a general \f$m\f$ by \f$n\f$ matrix, with
 /// common arithmetic operations enabled.
 template <typename T>
@@ -119,7 +119,7 @@ class DenseMatrix : public MatrixBase<T> {
         /// \brief Return identity matrix of specified size.
         static DenseMatrix identity(std::size_t size);
 };
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_DENSE_MATRIX_DECL_HPP
 

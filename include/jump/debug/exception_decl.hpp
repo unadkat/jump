@@ -9,7 +9,7 @@
 #include <source_location>
 #include <string>
 
-namespace Jump {
+namespace jump {
 /// \brief Custom exception class to give information about general runtime
 /// errors. The template parameter is to package specific information about the
 /// type of error being thrown.
@@ -110,7 +110,7 @@ struct Mismatch2DError {
     const std::pair<std::size_t, std::size_t> size2;
     std::string info() const;
 };
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_EXCEPTION_DECL_HPP
 

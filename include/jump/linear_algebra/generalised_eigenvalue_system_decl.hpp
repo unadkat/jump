@@ -13,7 +13,7 @@
 #include "jump/linear_algebra/linear_system_base.hpp"
 #include "jump/utility/external.hpp"
 
-namespace Jump {
+namespace jump {
 /// \brief A linear eigenvalue system \f$A\vec{x}=\lambda B\vec{x}\f$, where
 /// \f$A\f$ and \f$B\f$ are DenseMatrices. Upon solving, we have pairs
 /// comprising an eigenvalue \f$\lambda\f$ and corresponding eigenvector
@@ -46,7 +46,7 @@ class GeneralisedEigenvalueSystem : public LinearSystemBase {
         /// \brief Return the number of equations in the eigenvalue system.
         std::size_t order() const;
 };
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_GENERALISED_EIGENVALUE_SYSTEM_DECL_HPP
 

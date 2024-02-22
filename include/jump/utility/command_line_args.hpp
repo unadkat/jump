@@ -6,7 +6,7 @@
 
 #include "jump/utility/command_line_args_decl.hpp"
 
-namespace Jump {
+namespace jump {
 /// Note: there is currently an edge case where a valueless option followed
 /// directly by a flag collection will register the flag collection as the value
 /// for the option.
@@ -125,7 +125,7 @@ inline Os& operator<<(Os& out, const CommandLineArgs& rhs) {
 
     return out;
 }
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_COMMAND_LINE_ARGS_HPP
 

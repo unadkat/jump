@@ -12,7 +12,7 @@
 
 #include "jump/debug/exception.hpp"
 
-namespace Jump {
+namespace jump {
 /// \brief Repackage standard library flags from `std::ios_base` for
 /// input/output file access methods.
 ///
@@ -83,7 +83,7 @@ class FileSystem {
         /// it exists, otherwise throw an exception.
         std::fstream& operator()(const std::string& key);
 };
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_FILE_SYSTEM_DECL_HPP
 

@@ -6,7 +6,7 @@
 
 #include <random>
 
-namespace Jump {
+namespace jump {
 /// \brief Supplies easy random number generation capabilities, with a templated
 /// type for the random numbers and underlying distribution.
 template <typename T = double, template <typename> typename Distribution
@@ -29,7 +29,7 @@ class RandomNumbers {
         /// distribution.
         T generate();
 };
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_RANDOM_DECL_HPP
 

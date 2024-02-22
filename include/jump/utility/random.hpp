@@ -6,7 +6,7 @@
 
 #include "jump/utility/random_decl.hpp"
 
-namespace Jump {
+namespace jump {
 /// Note that T must be appropriate for the chosen distribution, i.e. an
 /// integral type for `std::uniform_int_distribution`, etc.
 template <typename T, template <typename> typename Distribution>
@@ -20,7 +20,7 @@ template <typename T, template <typename> typename Distribution>
 inline T RandomNumbers<T, Distribution>::generate() {
     return m_distribution(m_engine);
 }
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_RANDOM_HPP
 

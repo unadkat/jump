@@ -6,7 +6,7 @@
 
 #include "jump/utility/file_system_decl.hpp"
 
-namespace Jump {
+namespace jump {
 inline FileSystem::FileSystem(const std::string& path) :
     m_root{"./" + path} {
 
@@ -77,7 +77,7 @@ inline std::fstream& FileSystem::operator()(const std::string& key) {
             .expected = "valid key"}};
     }
 }
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_FILE_SYSTEM_HPP
 

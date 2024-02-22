@@ -6,7 +6,7 @@
 
 #include "jump/linear_algebra/dense_linear_system_decl.hpp"
 
-namespace Jump {
+namespace jump {
 template <typename T>
 inline DenseLinearSystem<T>::DenseLinearSystem(DenseMatrix<T>& A,
         Vector<T>& b) :
@@ -92,7 +92,7 @@ template <typename T>
 inline std::size_t DenseLinearSystem<T>::order() const {
     return m_A.num_rows();
 }
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_DENSE_LINEAR_SYSTEM_HPP
 

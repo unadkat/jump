@@ -6,7 +6,7 @@
 
 #include "jump/debug/exception_decl.hpp"
 
-namespace Jump {
+namespace jump {
 template <typename ErrorData>
 inline void RuntimeError<ErrorData>::construct_message() {
     m_message =
@@ -77,7 +77,7 @@ inline std::string Mismatch2DError::info() const {
             "container {} (size ({}, {}))", name1, size1.first, size1.second,
             name2, size2.first, size2.second);
 }
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_EXCEPTION_HPP
 

@@ -10,7 +10,7 @@
 #include <sstream>
 #include <vector>
 
-namespace Jump {
+namespace jump {
 /// \brief Parses and stores information supplied at runtime via command-line
 /// arguments, and enables their extraction.
 class CommandLineArgs {
@@ -49,7 +49,7 @@ class CommandLineArgs {
         template <typename Os> friend
         Os& operator<<(Os& out, const CommandLineArgs& rhs);
 };
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_COMMAND_LINE_ARGS_DECL_HPP
 

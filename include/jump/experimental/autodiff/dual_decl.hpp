@@ -9,7 +9,7 @@
 #include "jump/debug/exception.hpp"
 #include "jump/utility/types.hpp"
 
-namespace Jump::experimental {
+namespace jump::experimental {
 /// \brief An augmented number type that can be used to automatically
 /// differentiate numerical expressions in which it appears. Primarily used to
 /// effect an automatic linearisation of equation systems for an iterated
@@ -25,10 +25,10 @@ struct Dual {
 
     /// \brief Construct a `Dual` with a given (real) leading-order part and
     /// vanishing dual components.
-    Dual(const Jump::Real& x = 0.);
+    Dual(const Real& x = 0.);
     /// \brief Construct a `Dual` with a given (complex) leading-order part and
     /// vanishing dual components.
-    Dual(const Jump::Complex& x);
+    Dual(const Complex& x);
     /// \brief Construct a `Dual` with given leading-order and dual parts.
     Dual(const T& x, const std::array<T, N>& d);
     /// \brief Construct a `Dual` with a given leading-order part and a single
@@ -37,7 +37,7 @@ struct Dual {
 
     /// \brief Conversion operator to promote a real-valued `Dual` to a
     /// complex-valued one.
-    operator Dual<N, Jump::Complex>() const;
+    operator Dual<N, Complex>() const;
 
     /// \brief No operation on `Dual`.
     Dual operator+() const;
@@ -52,7 +52,7 @@ struct Dual {
     /// \brief Divide one `Dual` by another in place.
     Dual& operator/=(const Dual& rhs);
 };
-}   // namespace Jump::experimental
+}   // namespace jump::experimental
 
 #endif  // JUMP_DUAL_DECL_HPP
 

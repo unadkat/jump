@@ -1,9 +1,12 @@
 // This file forms part of Jump (Jay's Utilities and Mathematical Primitives)
 // Copyright (C) Jay Unadkat 2024. Released under GPL-3.0-or-later (see COPYING)
 
+#ifndef JUMP_DUAL_HPP
+#define JUMP_DUAL_HPP
+
 #include "jump/experimental/autodiff/dual_decl.hpp"
 
-namespace Jump::experimental {
+namespace jump::experimental {
 /// \class Dual
 /// Denote a dual number (with a single dual component) as
 /// \f$\h{x}=x+x'\epsilon\f$, where \f$x\f$ is the leading-order part and
@@ -322,5 +325,7 @@ inline Os& operator<<(Os& out, const Dual<N, T>& rhs) {
     }
     return out << "})";
 }
-}   // namespace Jump::experimental
+}   // namespace jump::experimental
+
+#endif  // JUMP_DUAL_HPP
 

@@ -6,7 +6,7 @@
 
 #include "jump/data/eigendata_decl.hpp"
 
-namespace Jump::Eigendata {
+namespace jump::eigendata {
 /// After the population with the new eigenvalue/eigenvector pairs, the data is
 /// left unsorted with respect to the eigenvalues. It is up to the user to sort
 /// the data as required for their purposes.
@@ -43,7 +43,7 @@ inline bool by_imaginary_part(const Complex& lhs, const Complex& rhs) {
     return lhs.real() < rhs.real() ? true :
         (lhs.real() == rhs.real() ? lhs.imag() < rhs.imag() : false);
 }
-}   // namespace Jump::Eigendata
+}   // namespace jump::eigendata
 
 #endif  // JUMP_EIGENDATA_HPP
 

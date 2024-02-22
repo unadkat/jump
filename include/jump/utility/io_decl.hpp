@@ -9,15 +9,15 @@
 
 #include "jump/debug/exception.hpp"
 
-namespace Jump {
+namespace jump {
 /// \brief A collection of free functions to manipulate data between files and
 /// data structures.
-namespace IO {
+namespace io {
     /// \brief Read all the content of the given fstream into a std::string.
     template <typename Fstream>
     std::string read_file_contents(Fstream&& in);
-}   // namespace IO
-}   // namespace Jump
+}   // namespace io
+}   // namespace jump
 
 #endif  // JUMP_IO_DECL_HPP
 

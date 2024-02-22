@@ -6,7 +6,7 @@
 
 #include "jump/data/vector_decl.hpp"
 
-namespace Jump {
+namespace jump {
 /// \class Vector
 /// Most operations are simply passed through to the underlying `std::vector`
 /// storage, but arithmetic operations are implemented in two forms. Generally,
@@ -503,7 +503,7 @@ inline double Vector<Complex>::L2_norm() const {
     return cblas_dznrm2(storage.size(), storage.data(), 1);
 }
 #endif  // JUMP_HAS_CBLAS
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_VECTOR_HPP
 

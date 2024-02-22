@@ -6,7 +6,7 @@
 
 #include "jump/data/matrix_base_decl.hpp"
 
-namespace Jump {
+namespace jump {
 template <typename T>
 inline void MatrixBase<T>::initialise(std::size_t size) {
     m_num_rows = m_num_columns = size;
@@ -53,7 +53,7 @@ template <typename T>
 inline std::ostream& operator<<(std::ostream& out, const MatrixBase<T>& rhs) {
     return out << rhs.as_string();
 }
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_MATRIX_BASE_HPP
 

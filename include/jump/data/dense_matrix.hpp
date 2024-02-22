@@ -6,7 +6,7 @@
 
 #include "jump/data/dense_matrix_decl.hpp"
 
-namespace Jump {
+namespace jump {
 /// \class DenseMatrix
 /// Implements the internal storage of a dense matrix by storing all elements of
 /// an \f$m\f$ by \f$n\f$ matrix as a contiguous `Vector` of length \f$nm\f$. In
@@ -654,7 +654,7 @@ inline double DenseMatrix<Complex>::column_L2_norm(std::size_t column) const {
             &(*(m_storage.begin() + this->m_num_rows*column)), 1);
 }
 #endif  // JUMP_HAS_CBLAS
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_DENSE_MATRIX_HPP
 

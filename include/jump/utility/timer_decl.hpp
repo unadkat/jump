@@ -8,7 +8,7 @@
 #include <format>
 #include <string>
 
-namespace Jump {
+namespace jump {
 /// \brief Enables timing of function calls and the calculation of average and
 /// total time taken.
 class Timer {
@@ -65,7 +65,7 @@ class Timer {
         template <typename Os> friend
         Os& operator<<(Os& out, const Timer& rhs);
 };
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_TIMER_DECL_HPP
 

@@ -10,7 +10,7 @@
 
 #include "jump/utility/external.hpp"
 
-namespace Jump {
+namespace jump {
 /// \brief General matrix interface.
 template <typename T>
 class MatrixBase {
@@ -51,7 +51,7 @@ class MatrixBase {
         /// \brief Interface for matrix serialisation to a `std::string`.
         virtual std::string as_string() const = 0;
 };
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_MATRIX_BASE_DECL_HPP
 

@@ -12,7 +12,7 @@
 #include "jump/data/vector.hpp"
 #include "jump/debug/exception.hpp"
 
-namespace Jump {
+namespace jump {
 /// \brief Banded square matrix for use with LAPACKE.
 template <typename T>
 class BandedMatrix : public MatrixBase<T> {
@@ -66,7 +66,7 @@ class BandedMatrix : public MatrixBase<T> {
         /// \brief Matrix serialisation to a string.
         std::string as_string() const override;
 };
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_BANDED_MATRIX_HPP
 

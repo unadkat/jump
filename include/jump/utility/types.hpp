@@ -6,10 +6,10 @@
 
 #include <complex>
 
-namespace Jump {
+namespace jump {
 using Real = double;
 using Complex = std::complex<double>;
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_TYPES_HPP
 

@@ -6,7 +6,7 @@
 
 #include "jump/utility/io_decl.hpp"
 
-namespace Jump::IO {
+namespace jump::io {
 template <typename FStream>
 std::string read_file_contents(FStream&& in) {
     // Reset in::gcount in case the file has been read from before. If this
@@ -33,7 +33,7 @@ std::string read_file_contents(FStream&& in) {
 
     return contents;
 }
-}   // namespace Jump::IO
+}   // namespace jump::io
 
 #endif  // JUMP_IO_HPP
 

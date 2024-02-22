@@ -6,7 +6,7 @@
 
 #include "jump/linear_algebra/banded_linear_system_decl.hpp"
 
-namespace Jump {
+namespace jump {
 template <typename T>
 inline BandedLinearSystem<T>::BandedLinearSystem(BandedMatrix<T>& A,
         Vector<T>& b) :
@@ -100,7 +100,7 @@ template <typename T>
 inline std::size_t BandedLinearSystem<T>::order() const {
     return m_A.num_rows();
 }
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_BANDED_LINEAR_SYSTEM_HPP
 

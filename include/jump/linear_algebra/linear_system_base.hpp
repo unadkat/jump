@@ -8,7 +8,7 @@
 
 #include "../debug/exception.hpp"
 
-namespace Jump {
+namespace jump {
 /// \brief Interface for linear system solvers.
 class LinearSystemBase
 {
@@ -18,7 +18,7 @@ class LinearSystemBase
         /// \brief Return the number of equations in the linear system.
         virtual std::size_t order() const = 0;
 };
-}   // namespace Jump
+}   // namespace jump
 
 #endif  // JUMP_LINEAR_SYSTEM_BASE
 
