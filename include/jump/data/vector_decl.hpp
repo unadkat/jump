@@ -103,6 +103,8 @@ struct Vector {
     /// \brief Populate with data in a `std::string`. Continue to read data
     /// until a `std::stringstream` fails to read a new value.
     void operator<<(std::string data);
+
+    #include "jump/data/vector_friends.hpp"
 };
 }   // namespace jump
 
