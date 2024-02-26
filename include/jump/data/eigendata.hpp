@@ -22,8 +22,7 @@ inline std::vector<Eigendatum> combine(const std::vector<Complex>& eigenvalues,
     // TODO: rewrite when std::ranges::to is available to convert from view
     std::vector<Eigendatum> result;
     for (std::size_t i{0}, size{eigenvalues.size()}; i < size; ++i) {
-        result.push_back(std::move(Eigendatum{eigenvalues[i],
-                    eigenvectors[i]}));
+        result.push_back(Eigendatum{eigenvalues[i], eigenvectors[i]});
     }
     return result;
 }

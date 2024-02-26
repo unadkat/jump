@@ -42,7 +42,7 @@ inline Vector<Real>::operator Vector<Complex>() const {
     const std::size_t N{size()};
     Vector<Complex> result(N);
     for (std::size_t i{0}; i < N; ++i) {
-        result[i] = {storage[i]};
+        result[i] = Complex{storage[i]};
     }
     return result;
 }

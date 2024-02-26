@@ -118,6 +118,8 @@ class DenseMatrix : public MatrixBase<T> {
 
         /// \brief Return identity matrix of specified size.
         static DenseMatrix identity(std::size_t size);
+
+        #include "jump/data/dense_matrix_friends.hpp"
 };
 }   // namespace jump
 

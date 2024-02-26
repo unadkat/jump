@@ -384,114 +384,10 @@ inline std::string DenseMatrix<T>::as_string() const {
 template <typename T>
 inline DenseMatrix<T> DenseMatrix<T>::identity(std::size_t size) {
     DenseMatrix<T> I{size};
-    for (std::size_t i{0}; i < size; ++i)
+    for (std::size_t i{0}; i < size; ++i) {
         I[i, i] = T{1};
+    }
     return I;
-}
-
-// ========================================================================
-// Non-member functions
-// ========================================================================
-
-/// \relates DenseMatrix
-/// \brief Addition of two DenseMatrices.
-///
-/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
-/// return. Also handles the case that lhs is given an rvalue (NRVO).
-template <typename T>
-inline DenseMatrix<T> operator+(DenseMatrix<T> lhs, const DenseMatrix<T>& rhs) {
-    lhs += rhs;
-    return lhs;
-}
-
-/// \relates DenseMatrix
-/// \brief Addition of two DenseMatrices.
-///
-/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
-/// reference parameter (NRVO).
-template <typename T>
-inline DenseMatrix<T> operator+(const DenseMatrix<T>& lhs,
-        DenseMatrix<T>&& rhs) {
-    rhs += lhs;
-    return rhs;
-}
-
-/// \relates DenseMatrix
-/// \brief Difference of two DenseMatrices.
-///
-/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
-/// return. Also handles the case that lhs is given an rvalue (NRVO).
-template <typename T>
-inline DenseMatrix<T> operator-(DenseMatrix<T> lhs, const DenseMatrix<T>& rhs) {
-    lhs -= rhs;
-    return lhs;
-}
-
-/// \relates DenseMatrix
-/// \brief Difference of two DenseMatrices.
-///
-/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
-/// reference parameter (NRVO).
-template <typename T>
-inline DenseMatrix<T> operator-(const DenseMatrix<T>& lhs,
-        DenseMatrix<T>&& rhs) {
-    rhs *= T{-1};
-    rhs += lhs;
-    return rhs;
-}
-
-/// \relates DenseMatrix
-/// \brief Right-hand-side multiplication by vector.
-template <typename T>
-inline Vector<T> operator*(const DenseMatrix<T>& lhs, const Vector<T>& rhs) {
-#ifndef NDEBUG
-    if (lhs.num_columns() != rhs.size()) {
-        throw RuntimeError{Mismatch2DError{.size1 = lhs.size(), .name2 = "rhs",
-            .size2 = {rhs.size(), 0}}};
-    }
-#endif  // NDEBUG
-
-    std::size_t N{rhs.size()}, X{lhs.num_columns()};
-    Vector<T> result(N);
-    for (std::size_t row{0}; row < N; ++row) {
-        for (std::size_t i{0}; i < X; ++i) {
-            result[row] += lhs[row, i]*rhs[i];
-        }
-    }
-
-    return result;
-}
-
-/// \relates DenseMatrix
-/// \brief Left-hand multiplication by scalar.
-template <typename T>
-inline DenseMatrix<T> operator*(const T& lhs, DenseMatrix<T> rhs) {
-    rhs *= lhs;
-    return rhs;
-}
-
-/// \relates DenseMatrix
-/// \brief Right-hand multiplication by scalar.
-template <typename T>
-inline DenseMatrix<T> operator*(DenseMatrix<T> lhs, const T& rhs) {
-    lhs *= rhs;
-    return lhs;
-}
-
-/// \relates DenseMatrix
-/// \brief Multiplication of two DenseMatrices.
-template <typename T>
-inline DenseMatrix<T> operator*(DenseMatrix<T> lhs, const DenseMatrix<T>& rhs) {
-    lhs *= rhs;
-    return lhs;
-}
-
-/// \relates DenseMatrix
-/// \brief Division by a scalar.
-template <typename T>
-DenseMatrix<T> operator/(DenseMatrix<T> lhs, const T& rhs) {
-    lhs /= rhs;
-    return lhs;
 }
 
 // ========================================================================
@@ -499,47 +395,6 @@ DenseMatrix<T> operator/(DenseMatrix<T> lhs, const T& rhs) {
 // ========================================================================
 
 #ifdef JUMP_HAS_CBLAS
-/// \relates DenseMatrix
-/// \brief Specialisation of multiplication of a real `DenseMatrix` by a real
-/// Vector, using CBLAS.
-inline Vector<Real> operator*(const DenseMatrix<Real>& lhs,
-        const Vector<Real>& rhs) {
-#ifndef NDEBUG
-    if (lhs.num_columns() != rhs.size()) {
-        throw RuntimeError{Mismatch2DError{.size1 = lhs.size(), .name2 = "rhs",
-            .size2 = {rhs.size(), 0}}};
-    }
-#endif  // NDEBUG
-
-    // Computes 1.*lhs*rhs + 0. (with a pointer shift of 1 between elements)
-    Vector<Real> result(lhs.num_rows());
-    cblas_dgemv(CblasColMajor, CblasNoTrans, lhs.num_rows(), lhs.num_columns(),
-            1., lhs.data(), lhs.num_rows(), rhs.data(), 1, 0., result.data(),
-            1);
-    return result;
-}
-
-/// \relates DenseMatrix
-/// \brief Specialisation of multiplication of a complex `DenseMatrix` by a
-/// complex Vector, using CBLAS.
-inline Vector<Complex> operator*(const DenseMatrix<Complex>& lhs,
-        const Vector<Complex>& rhs) {
-#ifndef NDEBUG
-    if (lhs.num_columns() != rhs.size()) {
-        throw RuntimeError{Mismatch2DError{.size1 = lhs.size(), .name2 = "rhs",
-            .size2 = {rhs.size(), 0}}};
-    }
-#endif  // NDEBUG
-
-    // Computes 1.*lhs*rhs + 0. (with a pointer shift of 1 between elements)
-    Vector<Complex> result(lhs.num_rows());
-    Complex alpha{1.}, beta{0.};
-    cblas_zgemv(CblasColMajor, CblasNoTrans, lhs.num_rows(), lhs.num_columns(),
-            &alpha, lhs.data(), lhs.num_rows(), rhs.data(), 1, &beta,
-            result.data(), 1);
-    return result;
-}
-
 /// \brief Specialisation of multiplication of two real DenseMatrices, using
 /// CBLAS.
 template <>
