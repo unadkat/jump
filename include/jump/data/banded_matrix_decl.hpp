@@ -32,6 +32,10 @@ class BandedMatrix : public MatrixBase<T> {
         BandedMatrix(std::size_t size, std::size_t num_bands,
                 Vector<T> underlying_data);
 
+        /// \brief Conversion operator to promote a real-valued `BandedMatrix`
+        /// to a complex-valued one.
+        operator BandedMatrix<Complex>() const;
+
         /// \brief Initialise matrix with the given size and number of
         /// off-leading diagonal diagonals.
         void assign(std::size_t size = 0, std::size_t num_bands = 0);
@@ -49,8 +53,23 @@ class BandedMatrix : public MatrixBase<T> {
         /// \brief Mutable element access.
         T& operator[](std::size_t row, std::size_t column);
 
+        /// \brief Fill matrix with given value.
+        void fill(const T& value);
         /// \brief Zero the matrix.
         void zero() override;
+
+        /// \brief No operation on matrix.
+        const BandedMatrix& operator+() const;
+        /// \brief Negate matrix.
+        BandedMatrix operator-() const;
+        /// \brief Add two matrices together in place.
+        BandedMatrix& operator+=(const BandedMatrix& rhs);
+        /// \brief Subtract a matrix from another in place.
+        BandedMatrix& operator-=(const BandedMatrix& rhs);
+        /// \brief Multiply matrix by scalar in place.
+        BandedMatrix& operator*=(const T& k);
+        /// \brief Divide matrix by scalar in place.
+        BandedMatrix& operator/=(const T& k);
 
         /// \brief Pointer to underlying data, for use with external libraries.
         T* data();
@@ -65,6 +84,8 @@ class BandedMatrix : public MatrixBase<T> {
         void operator<<(std::string data) override;
         /// \brief Matrix serialisation to a string.
         std::string as_string() const override;
+
+        #include "jump/data/banded_matrix_friends.hpp"
 };
 }   // namespace jump
 

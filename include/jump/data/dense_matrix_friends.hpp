@@ -57,15 +57,15 @@ friend DenseMatrix operator-(const DenseMatrix& lhs, DenseMatrix&& rhs) {
 friend Vector<T> operator*(const DenseMatrix& lhs, const Vector<T>& rhs) {
 #ifndef NDEBUG
     if (lhs.num_columns() != rhs.size()) {
-        throw RuntimeError{Mismatch2DError{.size1 = lhs.size(), .name2 = "rhs",
-            .size2 = {rhs.size(), 1}}};
+        throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = {rhs.size(), 1}}};
     }
 #endif  // NDEBUG
 
     std::size_t N{rhs.size()}, X{lhs.num_columns()};
     Vector<T> result(N);
-    for (std::size_t row{0}; row < N; ++row) {
-        for (std::size_t i{0}; i < X; ++i) {
+    for (std::size_t i{0}; i < X; ++i) {
+        for (std::size_t row{0}; row < N; ++row) {
             result[row] += lhs[row, i]*rhs[i];
         }
     }
@@ -113,8 +113,8 @@ friend Vector<Real> operator*(const DenseMatrix<Real>& lhs,
         const Vector<Real>& rhs) {
 #ifndef NDEBUG
     if (lhs.num_columns() != rhs.size()) {
-        throw RuntimeError{Mismatch2DError{.size1 = lhs.size(), .name2 = "rhs",
-            .size2 = {rhs.size(), 1}}};
+        throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = {rhs.size(), 1}}};
     }
 #endif  // NDEBUG
 
@@ -133,8 +133,8 @@ friend Vector<Complex> operator*(const DenseMatrix<Complex>& lhs,
         const Vector<Complex>& rhs) {
 #ifndef NDEBUG
     if (lhs.num_columns() != rhs.size()) {
-        throw RuntimeError{Mismatch2DError{.size1 = lhs.size(), .name2 = "rhs",
-            .size2 = {rhs.size(), 1}}};
+        throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = {rhs.size(), 1}}};
     }
 #endif  // NDEBUG
 

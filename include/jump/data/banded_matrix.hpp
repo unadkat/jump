@@ -40,6 +40,15 @@ inline BandedMatrix<T>::BandedMatrix(std::size_t size, std::size_t num_bands,
     }
 }
 
+/// Initialises a complex-valued `DenseMatrix` of the correct size and delegates
+/// conversion of elements to the underlying `Vector`.
+template <>
+inline BandedMatrix<Real>::operator BandedMatrix<Complex>() const {
+    BandedMatrix<Complex> result;
+    result.assign(num_rows(), num_bands(), m_storage);
+    return result;
+}
+
 /// Note that the internal storage takes the form of a dense matrix with
 /// `num_columns()` columns and `1 + 3*#num_bands()` rows.
 template <typename T>
@@ -131,8 +140,75 @@ inline T& BandedMatrix<T>::operator[](std::size_t row, std::size_t column) {
 }
 
 template <typename T>
+inline void BandedMatrix<T>::fill(const T& value) {
+    m_storage.fill(value);
+}
+
+template <typename T>
 inline void BandedMatrix<T>::zero() {
     m_storage.zero();
+}
+
+template <typename T>
+inline const BandedMatrix<T>& BandedMatrix<T>::operator+() const {
+    return *this;
+}
+
+template <typename T>
+inline BandedMatrix<T> BandedMatrix<T>::operator-() const {
+    BandedMatrix<T> result(*this);
+    result *= T{-1};
+    return result;
+}
+
+template <typename T>
+inline BandedMatrix<T>& BandedMatrix<T>::operator+=(
+        const BandedMatrix<T>& rhs) {
+#ifndef NDEBUG
+    if (this->size() != rhs.size()) {
+        throw RuntimeError{Mismatch2DError{.size1 = this->size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+    if (num_bands() != rhs.num_bands()) {
+        throw RuntimeError{InvalidArgumentError{.argument = "rhs.num_bands()",
+            .value = std::format("{}", rhs.num_bands()),
+            .expected = std::format("{}", num_bands())}};
+    }
+#endif  // NDEBUG
+
+    m_storage += rhs.m_storage;
+    return *this;
+}
+
+template <typename T>
+inline BandedMatrix<T>& BandedMatrix<T>::operator-=(
+        const BandedMatrix<T>& rhs) {
+#ifndef NDEBUG
+    if (this->size() != rhs.size()) {
+        throw RuntimeError{Mismatch2DError{.size1 = this->size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+    if (num_bands() != rhs.num_bands()) {
+        throw RuntimeError{InvalidArgumentError{.argument = "rhs.num_bands()",
+            .value = std::format("{}", rhs.num_bands()),
+            .expected = std::format("{}", num_bands())}};
+    }
+#endif  // NDEBUG
+
+    m_storage -= rhs.m_storage;
+    return *this;
+}
+
+template <typename T>
+inline BandedMatrix<T>& BandedMatrix<T>::operator*=(const T& k) {
+    m_storage *= k;
+    return *this;
+}
+
+template <typename T>
+inline BandedMatrix<T>& BandedMatrix<T>::operator/=(const T& k) {
+    m_storage /= k;
+    return *this;
 }
 
 template <typename T>

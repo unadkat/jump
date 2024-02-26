@@ -62,7 +62,7 @@ inline DenseMatrix<T>::DenseMatrix(std::size_t num_rows,
 template <>
 inline DenseMatrix<Real>::operator DenseMatrix<Complex>() const {
     DenseMatrix<Complex> result;
-    result.assign(num_rows(), num_columns(), {m_storage});
+    result.assign(num_rows(), num_columns(), m_storage);
     return result;
 }
 
@@ -207,7 +207,7 @@ inline void DenseMatrix<T>::fill(const T& value) {
 
 template <typename T>
 inline void DenseMatrix<T>::zero() {
-    fill(T{0});
+    m_storage.zero();
 }
 
 template <typename T>
@@ -217,9 +217,9 @@ inline const DenseMatrix<T>& DenseMatrix<T>::operator+() const {
 
 template <typename T>
 inline DenseMatrix<T> DenseMatrix<T>::operator-() const {
-    DenseMatrix<T> temp{*this};
-    temp *= -1;
-    return temp;
+    DenseMatrix<T> result{*this};
+    result *= T{-1};
+    return result;
 }
 
 template <typename T>
