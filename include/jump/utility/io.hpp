@@ -6,9 +6,9 @@
 
 #include "jump/utility/io_decl.hpp"
 
-namespace jump::io {
-template <typename FStream>
-std::string read_file_contents(FStream&& in) {
+namespace jump {
+template <typename Fs>
+std::string read_file_contents(Fs&& in) {
     // Reset in::gcount in case the file has been read from before. If this
     // fails for any reason we should have not goodbit
     in.peek();
@@ -33,7 +33,7 @@ std::string read_file_contents(FStream&& in) {
 
     return contents;
 }
-}   // namespace jump::io
+}   // namespace jump
 
 #endif  // JUMP_IO_HPP
 

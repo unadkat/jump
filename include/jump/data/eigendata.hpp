@@ -6,11 +6,12 @@
 
 #include "jump/data/eigendata_decl.hpp"
 
-namespace jump::eigendata {
+namespace jump {
 /// After the population with the new eigenvalue/eigenvector pairs, the data is
 /// left unsorted with respect to the eigenvalues. It is up to the user to sort
 /// the data as required for their purposes.
-inline std::vector<Eigendatum> combine(const std::vector<Complex>& eigenvalues,
+inline std::vector<Eigendatum> combine_eigendata(
+        const std::vector<Complex>& eigenvalues,
         const std::vector<Vector<Complex>>& eigenvectors) {
 #ifndef NDEBUG
     if (eigenvalues.size() != eigenvectors.size())
@@ -30,7 +31,7 @@ inline std::vector<Eigendatum> combine(const std::vector<Complex>& eigenvalues,
 /// If Re(w) < Re(z), or Re(w) = Re(z) and Im(w) < Im(z), we assert that w < z.
 /// This sets up a strict weak ordering in line with the requirements for
 /// `std::sort`.
-inline bool by_real_part(const Complex& lhs, const Complex& rhs) {
+inline bool sort_eigendata_real(const Complex& lhs, const Complex& rhs) {
     return lhs.real() < rhs.real() ? true :
         (lhs.real() == rhs.real() ? lhs.imag() < rhs.imag() : false);
 }
@@ -38,11 +39,11 @@ inline bool by_real_part(const Complex& lhs, const Complex& rhs) {
 /// If Im(w) < Im(z), or Im(w) = Im(z) and Re(w) < Re(z), we assert that w < z.
 /// This sets up a strict weak ordering in line with the requirements for
 /// `std::sort`.
-inline bool by_imaginary_part(const Complex& lhs, const Complex& rhs) {
+inline bool sort_eigendata_imag(const Complex& lhs, const Complex& rhs) {
     return lhs.real() < rhs.real() ? true :
         (lhs.real() == rhs.real() ? lhs.imag() < rhs.imag() : false);
 }
-}   // namespace jump::eigendata
+}   // namespace jump
 
 #endif  // JUMP_EIGENDATA_HPP
 

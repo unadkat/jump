@@ -20,20 +20,17 @@ struct Eigendatum {
     Vector<Complex> vector;
 };
 
-/// \brief Collection of eigendata-related helpers.
-namespace eigendata {
-    /// \brief Combine separate eigenvalue/eigenvector data from external
-    /// solvers into a single vector.
-    std::vector<Eigendatum> combine(const std::vector<Complex>& eigenvalues,
-            const std::vector<Vector<Complex>>& eigenvectors);
+/// \brief Combine separate eigenvalue/eigenvector data from external solvers
+/// into a single vector.
+std::vector<Eigendatum> combine_eigendata(const std::vector<Complex>& eigenvalues,
+        const std::vector<Vector<Complex>>& eigenvectors);
 
-    /// \brief Predicate for sorting eigendata by real part of associated
-    /// eigenvalue.
-    bool by_real_part(const Complex& lhs, const Complex& rhs);
-    /// \brief Predicate for sorting eigendata by imaginary part of associated
-    /// eigenvalue.
-    bool by_imaginary_part(const Complex& lhs, const Complex& rhs);
-}   // namespace eigendata
+/// \brief Predicate for sorting eigendata by real part of associated
+/// eigenvalue.
+bool sort_eigendata_real(const Complex& lhs, const Complex& rhs);
+/// \brief Predicate for sorting eigendata by imaginary part of associated
+/// eigenvalue.
+bool sort_eigendata_imag(const Complex& lhs, const Complex& rhs);
 }   // namespace jump
 
 #endif  // JUMP_EIGENDATA_DECL_HPP

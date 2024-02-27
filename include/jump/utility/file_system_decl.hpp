@@ -13,26 +13,6 @@
 #include "jump/debug/exception.hpp"
 
 namespace jump {
-/// \brief Repackage standard library flags from `std::ios_base` for
-/// input/output file access methods.
-///
-/// Any time we open a file (be it for input or output), we must supply an
-/// explicit access specifier so that no files are accidentally overwritten or
-/// written to instead of read from, etc. Files can be opened for input or
-/// output (or both), and in the case of output they can be opened for appending
-/// data or truncation (overwriting). This gives the five different options:
-/// input, output (truncation), output(append), input/output (truncation), and
-/// input/output (append).
-namespace FileMode {
-    const std::ios_base::openmode in{std::ios_base::in};
-    const std::ios_base::openmode out_trunc{std::ios_base::out
-        | std::ios_base::trunc};
-    const std::ios_base::openmode out_app{std::ios_base::out
-        | std::ios_base::app};
-    const std::ios_base::openmode random_trunc{in | out_trunc};
-    const std::ios_base::openmode random_app{in | out_app};
-}   // namespace FileMode
-
 /// \brief Deals with the storage of input and output file streams, and ensures
 /// that files are closed appropriately when finished with.
 class FileSystem {
@@ -44,6 +24,8 @@ class FileSystem {
         std::filesystem::path m_root;
 
     public:
+        using FileMode = std::ios_base::openmode;
+
         /// \brief Use current working directory as root folder for all input
         /// and output files opened by this object, optionally take a
         /// subdirectory location to be used.
@@ -61,8 +43,7 @@ class FileSystem {
         FileSystem& operator=(FileSystem&& rhs) = default;
 
         /// \brief Open file with a specified filename (relative to the root
-        /// directory), with a given handle, and an access specifier taken from
-        /// the FileMode namespace. Output precision may also optionally be set.
+        /// directory), with a given handle, and an explicit access specifier.
         void open(const std::string& key, const std::string& filename,
                 const std::ios_base::openmode& mode);
         /// \brief Close file with the given handle.
@@ -82,6 +63,21 @@ class FileSystem {
         /// \brief Return file stream corresponding to the supplied handle, if
         /// it exists, otherwise throw an exception.
         std::fstream& operator()(const std::string& key);
+
+        /// \brief File mode for input.
+        static constexpr FileMode mode_in{std::ios_base::in};
+        /// \brief File mode for output (truncation).
+        static constexpr FileMode mode_out_trunc{std::ios_base::out
+            | std::ios_base::trunc};
+        /// \brief File mode for output (append).
+        static constexpr FileMode mode_out_app{std::ios_base::out
+            | std::ios_base::app};
+        /// \brief File mode for input and output (truncation).
+        static constexpr FileMode mode_random_trunc{std::ios_base::in
+            | std::ios_base::out | std::ios_base::trunc};
+        /// \brief File mode for input and output (append).
+        static constexpr FileMode mode_random_app{std::ios_base::in
+            | std::ios_base::out | std::ios_base::app};
 };
 }   // namespace jump
 

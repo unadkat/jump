@@ -10,13 +10,11 @@
 #include "jump/debug/exception.hpp"
 
 namespace jump {
-/// \brief A collection of free functions to manipulate data between files and
-/// data structures.
-namespace io {
-    /// \brief Read all the content of the given fstream into a std::string.
-    template <typename Fstream>
-    std::string read_file_contents(Fstream&& in);
-}   // namespace io
+/// \brief Read all the content of the given fstream into a std::string. Note:
+/// parameter is a universal reference to be able to bind to both lvalue- and
+/// rvalue-references.
+template <typename Fs>
+std::string read_file_contents(Fs&& in);
 }   // namespace jump
 
 #endif  // JUMP_IO_DECL_HPP

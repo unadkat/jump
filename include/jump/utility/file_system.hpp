@@ -17,6 +17,14 @@ inline FileSystem::FileSystem(const std::string& path) :
     }
 }
 
+/// Any time we open a file (be it for input or output), we must supply an
+/// explicit access specifier so that no files are accidentally overwritten or
+/// written to instead of read from, etc. Files can be opened for input or
+/// output (or both), and in the case of output they can be opened for appending
+/// data or truncation (overwriting). This gives the five different options:
+/// input, output (truncation), output(append), input/output (truncation), and
+/// input/output (append).
+///
 /// Check to see if the specified handle is already registered, and throw an
 /// error if this is the case. If it is not already registered, attempt to open
 /// a file with the requested access mode at the provided file location. Throw
@@ -52,7 +60,7 @@ inline void FileSystem::close_all() {
 }
 
 inline std::fstream FileSystem::quick_write(const std::string& filename) const {
-    std::fstream file{m_root/filename, FileMode::out_trunc};
+    std::fstream file{m_root/filename, mode_out_trunc};
     if (!(file.is_open() && file.good())) {
         throw RuntimeError{FileIOError{
             .resource = (m_root/filename).native()}};
@@ -61,7 +69,7 @@ inline std::fstream FileSystem::quick_write(const std::string& filename) const {
 }
 
 inline std::fstream FileSystem::quick_read(const std::string& filename) const {
-    std::fstream file{m_root/filename, FileMode::in};
+    std::fstream file{m_root/filename, mode_in};
     if (!(file.is_open() && file.good())) {
         throw RuntimeError{FileIOError{
             .resource = (m_root/filename).native()}};
