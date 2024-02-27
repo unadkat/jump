@@ -8,7 +8,6 @@
 #include <cmath>
 #include <initializer_list>
 #include <numeric>
-#include <ostream>
 #include <sstream>
 #include <string>
 #include <utility>

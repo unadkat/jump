@@ -23,12 +23,9 @@ struct Dual {
     /// leading-order part (Real or Complex).
     std::array<T, N> dual;
 
-    /// \brief Construct a `Dual` with a given (real) leading-order part and
-    /// vanishing dual components.
-    Dual(const Real& x = 0.);
-    /// \brief Construct a `Dual` with a given (complex) leading-order part and
-    /// vanishing dual components.
-    Dual(const Complex& x);
+    /// \brief Construct a `Dual` with a given leading-order part and vanishing
+    /// dual components.
+    Dual(const T& x = T{0});
     /// \brief Construct a `Dual` with given leading-order and dual parts.
     Dual(const T& x, const std::array<T, N>& d);
     /// \brief Construct a `Dual` with a given leading-order part and a single
@@ -51,6 +48,8 @@ struct Dual {
     Dual& operator*=(const Dual& rhs);
     /// \brief Divide one `Dual` by another in place.
     Dual& operator/=(const Dual& rhs);
+
+    #include "jump/experimental/autodiff/dual_friends.hpp"
 };
 }   // namespace jump::experimental
 

@@ -59,6 +59,14 @@ inline void Timer::reset() {
     m_delta_t = Clock::duration::zero();
 }
 
+inline const std::string& Timer::task() const {
+    return m_task;
+}
+
+inline bool Timer::stopped() const {
+    return m_stopped;
+}
+
 inline const long& Timer::lap_count() const {
     return m_counter;
 }
@@ -87,13 +95,15 @@ inline std::string Timer::formatted_average_time() const {
     return formatted_time(average_time());
 }
 
+/// \relates Timer
+/// \brief Print summary of timing results to a stream.
 template <typename Os>
 inline Os& operator<<(Os& out, const Timer& rhs) {
-    if (rhs.m_task != "") {
-        out << rhs.m_task << std::endl;
+    if (rhs.task() != "") {
+        out << rhs.task() << '\n';
     }
     out << "Total elapsed time: " << rhs.formatted_running_time();
-    if (rhs.m_stopped && rhs.m_counter > 1) {
+    if (rhs.stopped() && rhs.lap_count() > 1) {
         out << ", average time: " << rhs.formatted_average_time();
     }
     return out;

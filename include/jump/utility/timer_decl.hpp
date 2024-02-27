@@ -48,6 +48,10 @@ class Timer {
         /// elapsed time.
         void reset();
 
+        /// \brief Return task string.
+        const std::string& task() const;
+        /// \brief Return current running state.
+        bool stopped() const;
         /// \brief Return the number of completed start/stop cycles.
         const long& lap_count() const;
         /// \brief Return the total elapsed time of the timing sessions.
@@ -60,10 +64,6 @@ class Timer {
         /// \brief Return the average time of completed timing sessions in the
         /// format provided by formatted_time.
         std::string formatted_average_time() const;
-
-        /// \brief Print summary of timing results to a stream.
-        template <typename Os> friend
-        Os& operator<<(Os& out, const Timer& rhs);
 };
 }   // namespace jump
 

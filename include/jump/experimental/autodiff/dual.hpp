@@ -144,13 +144,7 @@ namespace jump::experimental {
 /// `Dual`).
 
 template <std::size_t N, typename T>
-inline Dual<N, T>::Dual(const Real& x) :
-    value{x} {
-    dual.fill(T{0});
-}
-
-template <std::size_t N, typename T>
-inline Dual<N, T>::Dual(const Complex& x) :
+inline Dual<N, T>::Dual(const T& x) :
     value{x} {
     dual.fill(T{0});
 }
@@ -182,9 +176,9 @@ inline Dual<N, T>::Dual(const T& x, std::size_t index, const T& d) :
 /// Complex types.
 template <std::size_t N, typename T>
 inline Dual<N, T>::operator Dual<N, Complex>() const {
-    Dual<N, Complex> result{Complex {value}};
+    Dual<N, Complex> result{value};
     for (std::size_t i{0}; i < N; ++i) {
-        result.dual[i] = {dual[i]};
+        result.dual[i] = Complex{dual[i]};
     }
     return result;
 }
@@ -199,7 +193,7 @@ inline Dual<N, T> Dual<N, T>::operator+() const {
 template <std::size_t N, typename T>
 inline Dual<N, T> Dual<N, T>::operator-() const {
     std::array<T, N> temp{dual};
-    for (auto&& x : temp) {
+    for (auto& x : temp) {
         x *= T{-1};
     }
     return {-value, temp};
@@ -265,51 +259,6 @@ inline Dual<N, T>& Dual<N, T>::operator/=(const Dual<N, T>& rhs) {
     return *this;
 }
 
-/// \relates Jump::Dual
-template <std::size_t N, typename T>
-inline Dual<N, T> operator+(Dual<N, T> lhs, const Dual<N, T>& rhs) {
-    lhs += rhs;
-    return lhs;
-}
-
-/// \relates Jump::Dual
-template <std::size_t N, typename T>
-inline Dual<N, T> operator-(Dual<N, T> lhs, const Dual<N, T>& rhs) {
-    lhs -= rhs;
-    return lhs;
-}
-
-/// \relates Jump::Dual
-template <std::size_t N, typename T>
-inline Dual<N, T> operator*(Dual<N, T> lhs, const Dual<N, T>& rhs) {
-    lhs *= rhs;
-    return lhs;
-}
-
-template <std::size_t N, typename T>
-inline Dual<N, T> operator*(const Dual<N, T>& lhs, Dual<N, T>&& rhs) {
-    rhs *= lhs;
-    return rhs;
-}
-
-/// \relates Jump::Dual
-template <std::size_t N, typename T>
-inline Dual<N, T> operator/(Dual<N, T> lhs, const Dual<N, T>& rhs) {
-    lhs /= rhs;
-    return lhs;
-}
-
-/// \relates Jump::Dual
-template <std::size_t N, typename T>
-inline bool operator==(const Dual<N, T>& lhs, const Dual<N, T>& rhs) {
-    return lhs.value == rhs.value && lhs.dual == rhs.dual;
-}
-
-/// \relates Jump::Dual
-template <std::size_t N, typename T>
-inline bool operator!=(const Dual<N, T>& lhs, const Dual<N, T>& rhs) {
-    return !(lhs == rhs);
-}
 
 /// \relates Jump::Dual
 template <std::size_t N, typename T, typename Os>

@@ -4,7 +4,6 @@
 #ifndef JUMP_MATRIX_BASE_DECL_HPP
 #define JUMP_MATRIX_BASE_DECL_HPP
 
-#include <ostream>
 #include <string>
 #include <utility>
 

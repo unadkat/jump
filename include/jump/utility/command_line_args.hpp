@@ -117,7 +117,7 @@ inline Os& operator<<(Os& out, const CommandLineArgs& rhs) {
     }
 
     if (flags_text.size() > 0) {
-        out << "Recognised flags:" << flags_text << std::endl;
+        out << "Recognised flags:" << flags_text << '\n';
     }
     if (options_text.size() > 0) {
         out << "Recognised options(value):" << options_text;

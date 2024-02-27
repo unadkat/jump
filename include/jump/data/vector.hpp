@@ -226,6 +226,16 @@ inline void Vector<T>::operator<<(std::string data) {
     storage = std::move(new_data);
 }
 
+/// \relates Vector
+/// \brief Outputs `Vector` data to output stream in a single line with spaces.
+template <typename T, typename Os>
+inline Os& operator<<(Os& out, const Vector<T>& rhs) {
+    for (const auto& x : rhs) {
+        out << x << ' ';
+    }
+    return out;
+}
+
 // ========================================================================
 // CBLAS
 // ========================================================================
