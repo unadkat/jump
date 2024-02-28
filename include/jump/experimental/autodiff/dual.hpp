@@ -259,7 +259,6 @@ inline Dual<N, T>& Dual<N, T>::operator/=(const Dual<N, T>& rhs) {
     return *this;
 }
 
-
 /// \relates Jump::Dual
 template <std::size_t N, typename T, typename Os>
 inline Os& operator<<(Os& out, const Dual<N, T>& rhs) {
