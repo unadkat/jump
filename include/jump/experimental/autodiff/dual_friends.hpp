@@ -47,13 +47,99 @@ friend Dual operator/(Dual lhs, const Dual& rhs) {
     return lhs;
 }
 
+// ========================================================================
+// Exponentiation
+// ========================================================================
+
 /// \relates Dual
-friend Dual pow(Dual lhs, Real p) {
-    for (std::size_t i{0}; i < N; ++i) {
-        lhs.dual[i] *= p*std::pow(lhs.value, p - 1.);
+friend Dual exp(Dual x) {
+    x.value = std::exp(x.value);
+    for (auto& d : x.dual) {
+        d *= x.value;
     }
-    lhs.value = std::pow(lhs.value, p);
-    return lhs;
+    return x;
+}
+
+/// \relates Dual
+friend Dual log(Dual x) {
+    for (auto& d : x.dual) {
+        d /= x.value;
+    }
+    x.value = std::log(x.value);
+    return x;
+}
+
+/// \relates Dual
+friend Dual pow(Dual x, Dual p) {
+    return exp(log(x)*p);
+}
+
+// ========================================================================
+// Trigonometry
+// ========================================================================
+
+/// \relates Dual
+friend Dual sin(Dual x) {
+    auto derivative{std::cos(x.value)};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::sin(x.value);
+    return x;
+}
+
+/// \relates Dual
+friend Dual cos(Dual x) {
+    auto derivative{-std::sin(x.value)};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::cos(x.value);
+    return x;
+}
+
+/// \relates Dual
+friend Dual tan(Dual x) {
+    auto derivative{1./(std::pow(std::cos(x.value), 2.))};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::tan(x.value);
+    return  x;
+}
+
+// ========================================================================
+// Hyperbolics
+// ========================================================================
+
+/// \relates Dual
+friend Dual sinh(Dual x) {
+    auto derivative{std::cosh(x.value)};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::sinh(x.value);
+    return x;
+}
+
+/// \relates Dual
+friend Dual cosh(Dual x) {
+    auto derivative{std::sinh(x.value)};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::cosh(x.value);
+    return x;
+}
+
+/// \relates Dual
+friend Dual tanh(Dual x) {
+    auto derivative{1./(std::pow(std::cosh(x.value), 2.))};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::tanh(x.value);
+    return  x;
 }
 
 #endif  // JUMP_DUAL_FRIENDS_HPP

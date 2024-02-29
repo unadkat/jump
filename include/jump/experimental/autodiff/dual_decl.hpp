@@ -5,6 +5,7 @@
 #define JUMP_DUAL_DECL_HPP
 
 #include <array>
+#include <cmath>
 
 #include "jump/debug/exception.hpp"
 #include "jump/utility/types.hpp"
@@ -21,7 +22,7 @@ struct Dual {
     T value{0};
     /// \brief The array of `N` distinct dual components of matching type to the
     /// leading-order part (Real or Complex).
-    std::array<T, N> dual;
+    std::array<T, N> dual{};
 
     /// \brief Construct a `Dual` with a given leading-order part and vanishing
     /// dual components.
@@ -30,7 +31,7 @@ struct Dual {
     Dual(const T& x, const std::array<T, N>& d);
     /// \brief Construct a `Dual` with a given leading-order part and a single
     /// non-zero dual part.
-    Dual(const T& x, std::size_t index, const T& d);
+    Dual(const T& x, std::size_t index, const T& d = T{1});
 
     /// \brief Conversion operator to promote a real-valued `Dual` to a
     /// complex-valued one.
@@ -51,6 +52,13 @@ struct Dual {
 
     #include "jump/experimental/autodiff/dual_friends.hpp"
 };
+
+using d1f64 = Dual<1, Real>;
+using d2f64 = Dual<2, Real>;
+using d3f64 = Dual<3, Real>;
+using d1z64 = Dual<1, Complex>;
+using d2z64 = Dual<2, Complex>;
+using d3z64 = Dual<3, Complex>;
 }   // namespace jump::experimental
 
 #endif  // JUMP_DUAL_DECL_HPP

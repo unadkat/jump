@@ -146,7 +146,6 @@ namespace jump::experimental {
 template <std::size_t N, typename T>
 inline Dual<N, T>::Dual(const T& x) :
     value{x} {
-    dual.fill(T{0});
 }
 
 template <std::size_t N, typename T>
@@ -165,7 +164,6 @@ inline Dual<N, T>::Dual(const T& x, std::size_t index, const T& d) :
     }
 #endif  // NDEBUG
 
-    dual.fill(T{0});
     dual[index] = d;
 }
 
