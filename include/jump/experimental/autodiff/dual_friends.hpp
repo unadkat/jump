@@ -108,6 +108,36 @@ friend Dual tan(Dual x) {
     return  x;
 }
 
+/// \relates Dual
+friend Dual asin(Dual x) {
+    auto derivative{1./std::sqrt(1. - std::pow(x.value, 2.))};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::asin(x.value);
+    return x;
+}
+
+/// \relates Dual
+friend Dual acos(Dual x) {
+    auto derivative{-1./std::sqrt(1. - std::pow(x.value, 2.))};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::acos(x.value);
+    return x;
+}
+
+/// \relates Dual
+friend Dual atan(Dual x) {
+    auto derivative{1./(1. + std::pow(x.value, 2.))};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::atan(x.value);
+    return x;
+}
+
 // ========================================================================
 // Hyperbolics
 // ========================================================================
@@ -140,6 +170,36 @@ friend Dual tanh(Dual x) {
     }
     x.value = std::tanh(x.value);
     return  x;
+}
+
+/// \relates Dual
+friend Dual asinh(Dual x) {
+    auto derivative{1./std::sqrt(1 + std::pow(x.value, 2.))};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::asinh(x.value);
+    return x;
+}
+
+/// \relates Dual
+friend Dual acosh(Dual x) {
+    auto derivative{1./std::sqrt(std::pow(x.value, 2.) - 1.)};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::acosh(x.value);
+    return x;
+}
+
+/// \relates Dual
+friend Dual atanh(Dual x) {
+    auto derivative{1./(1 - std::pow(x.value, 2.))};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::atanh(x.value);
+    return x;
 }
 
 #endif  // JUMP_DUAL_FRIENDS_HPP
