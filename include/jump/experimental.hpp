@@ -5,6 +5,7 @@
 #define JUMP_EXPERIMENTAL_HPP
 
 #include "jump/experimental/autodiff/dual.hpp"
+#include "jump/experimental/testing/test.hpp"
 
 #endif  // JUMP_EXPERIMENTAL_HPP
 
