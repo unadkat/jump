@@ -131,8 +131,8 @@ inline T& BandedMatrix<T>::operator[](std::size_t row, std::size_t column) {
         throw RuntimeError{InvalidArgumentError{.argument = "(row, column)",
             .value = std::format("({}, {}) with num_bands() = {}", row, column,
                     num_bands()),
-            .expected = "row <= column + num_bands() && "
-                "column <= row + 2*num_bands()"}};
+            .expected = "row <= column + num_bands() "
+                "&& column <= row + 2*num_bands()"}};
     }
 #endif  // NDEBUG
 

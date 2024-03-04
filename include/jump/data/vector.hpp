@@ -181,21 +181,37 @@ inline Vector<T>& Vector<T>::operator/=(const T& rhs) {
 
 template <typename T>
 inline Real Vector<T>::L1_norm() const {
-    auto F{[](Real acc, const T& x) { return acc + std::abs(x); }};
-    return std::ranges::fold_left(storage, Real{0}, F);
+    if constexpr (experimental::is_dual_v<T>) {
+        auto F{[](Real acc, const T& x) { return acc + abs(x).value; }};
+        return std::ranges::fold_left(storage, Real{0}, F);
+    } else {
+        auto F{[](Real acc, const T& x) { return acc + std::abs(x); }};
+        return std::ranges::fold_left(storage, Real{0}, F);
+    }
 }
 
 template <typename T>
 inline Real Vector<T>::L2_norm() const {
-    auto F{[](Real acc, const T& x) { return acc + std::pow(std::abs(x),
-            2.); }};
-    return std::sqrt(std::ranges::fold_left(storage, Real{0}, F));
+    if constexpr (experimental::is_dual_v<T>) {
+        auto F{[](Real acc, const T& x) {
+            return acc + pow(abs(x), 2.).value; }};
+        return std::sqrt(std::ranges::fold_left(storage, Real{0}, F));
+    } else {
+        auto F{[](Real acc, const T& x) { return acc + std::pow(std::abs(x),
+                2.); }};
+        return std::sqrt(std::ranges::fold_left(storage, Real{0}, F));
+    }
 }
 
 template <typename T>
 inline Real Vector<T>::Linf_norm() const {
-    auto F{[](const T& x) { return std::abs(x); }};
-    return std::abs(std::ranges::max(storage, {}, F));
+    if constexpr (experimental::is_dual_v<T>) {
+        auto F{[](const T& x) { return abs(x).value; }};
+        return F(std::ranges::max(storage, {}, F));
+    } else {
+        auto F{[](const T& x) { return std::abs(x); }};
+        return F(std::ranges::max(storage, {}, F));
+    }
 }
 
 template <typename T>

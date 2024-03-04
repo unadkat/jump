@@ -294,8 +294,13 @@ inline Real DenseMatrix<T>::column_L1_norm(std::size_t column) const {
 #endif  // NDEBUG
 
     auto it{column_iterators(column)};
-    auto F{[](Real acc, const T& x) { return acc + std::abs(x); }};
-    return std::ranges::fold_left(it.first, it.second, Real{0}, F);
+    if constexpr (experimental::is_dual_v<T>) {
+        auto F{[](Real acc, const T& x) { return acc + abs(x).value; }};
+        return std::ranges::fold_left(it.first, it.second, Real{0}, F);
+    } else {
+        auto F{[](Real acc, const T& x) { return acc + std::abs(x); }};
+        return std::ranges::fold_left(it.first, it.second, Real{0}, F);
+    }
 }
 
 template <typename T>
@@ -308,9 +313,17 @@ inline Real DenseMatrix<T>::column_L2_norm(std::size_t column) const {
 #endif  // NDEBUG
 
     auto it{column_iterators(column)};
-    auto F{[](Real acc, const T& x) {
-        return acc + std::pow(std::abs(x), 2.); }};
-    return std::sqrt(std::ranges::fold_left(it.first, it.second, Real{0}, F));
+    if constexpr (experimental::is_dual_v<T>) {
+        auto F{[](Real acc, const T& x) {
+            return acc + pow(abs(x), 2.).value; }};
+        return std::sqrt(std::ranges::fold_left(it.first, it.second, Real{0},
+                    F));
+    } else {
+        auto F{[](Real acc, const T& x) {
+            return acc + std::pow(std::abs(x), 2.); }};
+        return std::sqrt(std::ranges::fold_left(it.first, it.second, Real{0},
+                    F));
+    }
 }
 
 template <typename T>
@@ -323,8 +336,13 @@ inline Real DenseMatrix<T>::column_Linf_norm(std::size_t column) const {
 #endif  // NDEBUG
 
     auto it{column_iterators(column)};
-    auto F{[](const T& x) { return std::abs(x); }};
-    return std::abs(std::ranges::max(it.first, it.second, {}, F));
+    if constexpr (experimental::is_dual_v<T>) {
+        auto F{[](const T& x) { return abs(x).value; }};
+        return F(std::ranges::max(it.first, it.second, {}, F));
+    } else {
+        auto F{[](const T& x) { return std::abs(x); }};
+        return F(std::ranges::max(it.first, it.second, {}, F));
+    }
 }
 
 template <typename T>

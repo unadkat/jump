@@ -202,5 +202,27 @@ friend Dual atanh(Dual x) {
     return x;
 }
 
+// ========================================================================
+// Miscellaneous
+// ========================================================================
+
+/// \relates Dual
+friend Dual abs(Dual x) {
+    using std::abs;
+    if constexpr (std::is_convertible_v<T, Real>) {
+        auto derivative{x.value < 0. ? -1. : 1.};
+        for (auto& d : x.dual) {
+            d *= derivative;
+        }
+        x.value = abs(x.value);
+    } else {
+        for (auto& d : x.dual) {
+            d = std::numeric_limits<T>::quiet_NaN();
+        }
+        x.value = abs(x.value);
+    }
+    return x;
+}
+
 #endif  // JUMP_DUAL_FRIENDS_HPP
 
