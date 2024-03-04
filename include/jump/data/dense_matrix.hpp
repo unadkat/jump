@@ -324,7 +324,7 @@ inline Real DenseMatrix<T>::column_Linf_norm(std::size_t column) const {
 
     auto it{column_iterators(column)};
     auto F{[](const T& x) { return std::abs(x); }};
-    return std::ranges::max(it.first, it.second, {}, F);
+    return std::abs(std::ranges::max(it.first, it.second, {}, F));
 }
 
 template <typename T>

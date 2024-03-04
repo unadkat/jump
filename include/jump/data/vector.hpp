@@ -195,7 +195,7 @@ inline Real Vector<T>::L2_norm() const {
 template <typename T>
 inline Real Vector<T>::Linf_norm() const {
     auto F{[](const T& x) { return std::abs(x); }};
-    return std::ranges::max(storage, {}, F);
+    return std::abs(std::ranges::max(storage, {}, F));
 }
 
 template <typename T>
