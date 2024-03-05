@@ -13,44 +13,74 @@
 #include <utility>
 #include <vector>
 
+#include "jump/utility/utility.hpp"
+
 namespace jump::experimental {
 struct TestResult {
     std::size_t passed{};
     std::size_t failed{};
+    std::size_t skipped{};
+    std::vector<std::string> failed_tests;
+
+    void append(const TestResult& result, const std::string& fail_prefix = "");
+
+    static TestResult pass();
+    static TestResult fail(std::string name = "");
+    static TestResult skip();
+};
+
+class AtomicTest {
+    private:
+        std::string m_name;
+        std::vector<std::string> m_tags;
+        std::function<TestResult()> m_func;
+
+    public:
+        AtomicTest(std::string_view name, std::vector<std::string> tags,
+                const std::function<TestResult()>& func);
+
+        TestResult run() const;
+
+        const std::string& name() const;
+        const std::vector<std::string>& tags() const;
 };
 
 class Test {
     private:
         std::string m_name;
         std::vector<std::string> m_tags;
-        std::function<TestResult()> m_func;
-        TestResult m_result;
+        std::vector<AtomicTest> m_atomic_tests;
+        std::vector<std::string> m_skip;
 
     public:
-        Test(std::string_view name, std::vector<std::string> tags,
-                const std::function<TestResult()>& func);
+        Test(std::string_view name, std::vector<std::string> tags);
+
+        void register_atomic_test(AtomicTest test);
+        void register_atomic_tests(std::vector<AtomicTest> tests);
+        void skip(const std::vector<std::string>& skip_tags);
+        TestResult run(const std::vector<std::string>& skip_tags) const;
 
         const std::string& name() const;
         const std::vector<std::string>& tags() const;
-        bool skip_test(const std::vector<std::string>& skip_tags) const;
-        const TestResult& run();
-        const TestResult& result() const;
+        const std::vector<AtomicTest>& tests() const;
 };
 
 class TestSuite {
     private:
         std::string m_name;
-        std::vector<std::string> m_tags;
         std::vector<Test> m_tests;
         std::vector<std::string> m_skip;
 
     public:
-        TestSuite(std::string_view name, std::vector<std::string> tags);
+        TestSuite(std::string_view name);
 
-        void register_test(const Test& test);
-        void register_test(Test&& test);
-        void skip_tests(const std::vector<std::string>& skip_tags);
-        void run();
+        void register_test(Test test);
+        void register_tests(std::vector<Test> tests);
+        void skip(const std::vector<std::string>& skip_tags);
+        void run() const;
+
+        const std::string& name() const;
+        const std::vector<Test>& tests() const;
 };
 }   // namespace jump::experimental
 
