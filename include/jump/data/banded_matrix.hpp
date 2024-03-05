@@ -40,8 +40,8 @@ inline BandedMatrix<T>::BandedMatrix(std::size_t size, std::size_t num_bands,
     }
 }
 
-/// Initialises a complex-valued `DenseMatrix` of the correct size and delegates
-/// conversion of elements to the underlying `Vector`.
+/// Initialises a complex-valued `BandedMatrix` of the correct size and
+/// delegates conversion of elements to the underlying `Vector`.
 template <>
 inline BandedMatrix<Real>::operator BandedMatrix<Complex>() const {
     BandedMatrix<Complex> result;
@@ -71,6 +71,16 @@ inline void BandedMatrix<T>::assign(std::size_t size, std::size_t num_bands,
             .expected = std::format(
                     "Vector of size num_columns*(3*num_bands + 1) = {}x{} = {}",
                     size, 3*num_bands + 1, size*(3*num_bands + 1))}};
+    } else {
+        m_storage = std::move(underlying_data);
+    }
+}
+
+template <typename T>
+inline void BandedMatrix<T>::assign(Vector<T> underlying_data) {
+    if (underlying_data.size() != m_storage.size()) {
+        throw RuntimeError{Mismatch1DError{.size1 = m_storage.size(),
+            .name2 = "underlying_data", .size2 = underlying_data.size()}};
     } else {
         m_storage = std::move(underlying_data);
     }
@@ -140,6 +150,26 @@ inline T& BandedMatrix<T>::operator[](std::size_t row, std::size_t column) {
 }
 
 template <typename T>
+inline typename BandedMatrix<T>::ConstIterator BandedMatrix<T>::begin() const {
+    return m_storage.begin();
+}
+
+template <typename T>
+inline typename BandedMatrix<T>::ConstIterator BandedMatrix<T>::end() const {
+    return m_storage.end();
+}
+
+template <typename T>
+inline typename BandedMatrix<T>::Iterator BandedMatrix<T>::begin() {
+    return m_storage.begin();
+}
+
+template <typename T>
+inline typename BandedMatrix<T>::Iterator BandedMatrix<T>::end() {
+    return m_storage.end();
+}
+
+template <typename T>
 inline void BandedMatrix<T>::fill(const T& value) {
     m_storage.fill(value);
 }
@@ -147,6 +177,12 @@ inline void BandedMatrix<T>::fill(const T& value) {
 template <typename T>
 inline void BandedMatrix<T>::zero() {
     m_storage.zero();
+}
+
+template <typename T>
+template <typename Rng>
+inline void BandedMatrix<T>::randomise(Rng& rng) {
+    m_storage.randomise(rng);
 }
 
 template <typename T>

@@ -52,6 +52,9 @@ class DenseMatrix : public MatrixBase<T> {
         /// consistent size.
         void assign(std::size_t num_rows, std::size_t num_columns,
                 Vector<T> underlying_data);
+        /// \brief Set matrix storage with the given Vector data, which must
+        /// match the existing container size.
+        void assign(Vector<T> underlying_data);
         /// \brief Set data via a pair of iterators.
         template <class InputIt>
         void assign(InputIt first, InputIt last);
@@ -81,6 +84,9 @@ class DenseMatrix : public MatrixBase<T> {
         void fill(const T& value);
         /// \brief Zero the matrix.
         void zero() override;
+        /// \brief Fill matrix with random values.
+        template <typename Rng>
+        void randomise(Rng& rng);
 
         /// \brief No operation on matrix.
         const DenseMatrix& operator+() const;

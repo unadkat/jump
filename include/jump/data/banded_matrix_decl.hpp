@@ -24,6 +24,11 @@ class BandedMatrix : public MatrixBase<T> {
         Vector<T> m_storage;
 
     public:
+        /// \brief Iterator for algorithms.
+        using Iterator = typename Vector<T>::Iterator;
+        /// \brief Iterator for algorithms.
+        using ConstIterator = typename Vector<T>::ConstIterator;
+
         /// \brief Construct a square matrix with the given number of diagonals
         /// on each side of the leading diagonal.
         BandedMatrix(std::size_t size = 0, std::size_t num_bands = 0);
@@ -43,6 +48,9 @@ class BandedMatrix : public MatrixBase<T> {
         /// consistent size.
         void assign(std::size_t size, std::size_t num_bands,
                 Vector<T> underlying_data);
+        /// \brief Set matrix storage with the given Vector data, which must
+        /// match the existing container size.
+        void assign(Vector<T> underlying_data);
         /// \brief Return number of off-leading diagonal diagonals.
         std::size_t num_bands() const;
         /// \brief Return size of internal storage.
@@ -53,10 +61,22 @@ class BandedMatrix : public MatrixBase<T> {
         /// \brief Mutable element access.
         T& operator[](std::size_t row, std::size_t column);
 
+        /// \brief Const iterator for algorithms.
+        ConstIterator begin() const;
+        /// \brief Const iterator for algorithms.
+        ConstIterator end() const;
+        /// \brief Iterator for algorithms.
+        Iterator begin();
+        /// \brief Iterator for algorithms.
+        Iterator end();
+
         /// \brief Fill matrix with given value.
         void fill(const T& value);
         /// \brief Zero the matrix.
         void zero() override;
+        /// \brief Fill matrix with random values.
+        template <typename Rng>
+        void randomise(Rng& rng);
 
         /// \brief No operation on matrix.
         const BandedMatrix& operator+() const;

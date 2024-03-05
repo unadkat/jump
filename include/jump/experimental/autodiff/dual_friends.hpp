@@ -214,12 +214,12 @@ friend Dual abs(Dual x) {
         for (auto& d : x.dual) {
             d *= derivative;
         }
-        x.value = abs(x.value);
+        x.value = std::abs(x.value);
     } else {
         for (auto& d : x.dual) {
             d = std::numeric_limits<T>::quiet_NaN();
         }
-        x.value = abs(x.value);
+        x.value = std::abs(x.value);
     }
     return x;
 }

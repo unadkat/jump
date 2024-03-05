@@ -75,6 +75,9 @@ struct Vector {
     void fill(const T& value);
     /// \brief Fill vector with zeroes.
     void zero();
+    /// \brief Fill vector with random values.
+    template <typename Rng>
+    void randomise(Rng& rng);
 
     /// \brief No operation on `Vector`.
     const Vector& operator+() const;

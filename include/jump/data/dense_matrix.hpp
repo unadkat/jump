@@ -97,6 +97,16 @@ inline void DenseMatrix<T>::assign(std::size_t num_rows,
 }
 
 template <typename T>
+inline void DenseMatrix<T>::assign(Vector<T> underlying_data) {
+    if (underlying_data.size() != m_storage.size()) {
+        throw RuntimeError{Mismatch1DError{.size1 = m_storage.size(),
+            .name2 = "underlying_data", .size2 = underlying_data.size()}};
+    } else {
+        m_storage = std::move(underlying_data);
+    }
+}
+
+template <typename T>
 template <class InputIt>
 inline void DenseMatrix<T>::assign(InputIt first, InputIt last) {
 #ifndef NDEBUG
@@ -208,6 +218,12 @@ inline void DenseMatrix<T>::fill(const T& value) {
 template <typename T>
 inline void DenseMatrix<T>::zero() {
     m_storage.zero();
+}
+
+template <typename T>
+template <typename Rng>
+inline void DenseMatrix<T>::randomise(Rng& rng) {
+    m_storage.randomise(rng);
 }
 
 template <typename T>
