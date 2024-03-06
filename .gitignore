@@ -2,7 +2,6 @@
 build/
 # Test code (early development only, to be replaced with proper testing framework
 tests/
-external/
 
 # clangd config
 .clangd
