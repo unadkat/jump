@@ -10,11 +10,11 @@ This software (optionally) uses the following external libraries:
     Copyright (c) 1992-2023 The University of Tennessee and The University of Tennessee Research Foundation.  All rights reserved.  
     Copyright (c) 2000-2023 The University of California Berkeley. All rights reserved.  
     Copyright (c) 2006-2023 The University of Colorado Denver.  All rights reserved.  
-    Licensed under BSD-3-Clause, see external/LICENSE.BSD-3_Clause for details.  
-    Website: https://www.netlib.org/blas/
+    Licensed under BSD-3-Clause, see [license](external/LICENSE.BSD-3-Clause) for details.  
+    Website: [Netlib BLAS](https://www.netlib.org/blas/)
 - LAPACKE:  
     Copyright (c) 1992-2023 The University of Tennessee and The University of Tennessee Research Foundation.  All rights reserved.  
     Copyright (c) 2000-2023 The University of California Berkeley. All rights reserved.  
     Copyright (c) 2006-2023 The University of Colorado Denver.  All rights reserved.  
-    Licensed under BSD-3-Clause, see external/LICENSE.BSD-3_Clause for details.  
-    Website: https://www.netlib.org/lapack/lapacke/
+    Licensed under BSD-3-Clause, see [license](external/LICENSE.BSD-3-Clause) for details.  
+    Website: [Netlib LAPACKE](https://www.netlib.org/lapack/lapacke/)
