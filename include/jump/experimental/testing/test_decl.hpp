@@ -82,6 +82,10 @@ class TestSuite {
         const std::string& name() const;
         const std::vector<Test>& tests() const;
 };
+
+/// \brief Helper function to append result tracker with success or fail (with
+/// name of failed test).
+void check(bool expression, TestResult& result, const std::string& fail_name);
 }   // namespace jump::experimental
 
 #endif  // JUMP_TEST_DECL_HPP

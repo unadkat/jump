@@ -140,6 +140,10 @@ inline void TestSuite::skip(const std::vector<std::string>& skip_tags) {
 }
 
 inline void TestSuite::run() const {
+    auto suite_title{std::format("Test suite \"{}\"", m_name)};
+    std::clog << std::format("{}\n{}\n", suite_title,
+            std::string(suite_title.size(), '-'));
+
     TestResult all_results;
     for (const auto& test : m_tests) {
         if (std::ranges::find(m_skip, test.name()) != m_skip.end()
@@ -174,6 +178,10 @@ inline const std::string& TestSuite::name() const {
 
 inline const std::vector<Test>& TestSuite::tests() const {
     return m_tests;
+}
+
+inline void check(bool expr, TestResult& result, const std::string& fail_name) {
+    result.append(expr ? TestResult::pass() : TestResult::fail(fail_name));
 }
 }   // namespace jump::experimental
 
