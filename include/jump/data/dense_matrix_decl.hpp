@@ -32,7 +32,7 @@ class DenseMatrix : public MatrixBase<T> {
         using ConstIterator = typename Vector<T>::ConstIterator;
 
         /// \brief Construct square matrix with the given size.
-        DenseMatrix(std::size_t size = 0);
+        explicit DenseMatrix(std::size_t size = 0);
         /// \brief Construct a general matrix with the given size.
         DenseMatrix(std::size_t num_rows, std::size_t num_columns);
         /// \brief Constuct a matrix with the given Vector data, specifying a

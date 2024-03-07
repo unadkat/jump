@@ -31,7 +31,7 @@ class BandedMatrix : public MatrixBase<T> {
 
         /// \brief Construct a square matrix with the given number of diagonals
         /// on each side of the leading diagonal.
-        BandedMatrix(std::size_t size = 0, std::size_t num_bands = 0);
+        explicit BandedMatrix(std::size_t size = 0, std::size_t num_bands = 0);
         /// \brief Constuct a matrix with the given Vector data, specifying a
         /// consistent size.
         BandedMatrix(std::size_t size, std::size_t num_bands,
@@ -43,7 +43,7 @@ class BandedMatrix : public MatrixBase<T> {
 
         /// \brief Initialise matrix with the given size and number of
         /// off-leading diagonal diagonals.
-        void assign(std::size_t size = 0, std::size_t num_bands = 0);
+        void assign(std::size_t size, std::size_t num_bands);
         /// \brief Initialise a matrix with the given Vector data, specifying a
         /// consistent size.
         void assign(std::size_t size, std::size_t num_bands,

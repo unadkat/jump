@@ -32,9 +32,9 @@ struct Vector {
     /// \brief Iterator for algorithms.
     using ConstIterator = typename std::vector<T>::const_iterator;
 
-    /// \brief Construct a zero `Vector` with a given size (empty by default)
-    /// filled with the given item (`T{}` by default).
-    Vector(std::size_t size = 0, const T& value = T{0});
+    /// \brief Construct a `Vector` with a given size (empty by default) filled
+    /// with the given item (`T{0}` by default).
+    explicit Vector(std::size_t size = 0, const T& value = T{0});
     /// \brief Construct a `Vector` from a brace-enclosed list.
     Vector(std::initializer_list<T>&& list);
     /// \brief Construct a `Vector` via a pair of iterators.
