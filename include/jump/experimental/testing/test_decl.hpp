@@ -22,7 +22,13 @@ struct TestResult {
     std::size_t skipped{};
     std::vector<std::string> failed_tests;
 
+    /// \brief Add new set of results to existing set, either directly appending
+    /// the failed name list (i.e. the results come from the same test), or with
+    /// a prefix (i.e. the results come from a sub-test).
     void append(const TestResult& result, const std::string& fail_prefix = "");
+    /// \brief Helper function to append result tracker with success or fail
+    /// (with name of failed test), for adding results to an existing set.
+    void add_check(bool expr, std::string fail_name);
 
     static TestResult pass();
     static TestResult fail(std::string name = "");
@@ -82,10 +88,6 @@ class TestSuite {
         const std::string& name() const;
         const std::vector<Test>& tests() const;
 };
-
-/// \brief Helper function to append result tracker with success or fail (with
-/// name of failed test).
-void check(bool expression, TestResult& result, const std::string& fail_name);
 }   // namespace jump::experimental
 
 #endif  // JUMP_TEST_DECL_HPP

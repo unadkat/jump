@@ -28,6 +28,15 @@ inline void TestResult::append(const TestResult& rhs,
     }
 }
 
+inline void TestResult::add_check(bool expr, std::string fail_name) {
+    if (expr) {
+        ++passed;
+    } else {
+        ++failed;
+        failed_tests.push_back(std::move(fail_name));
+    }
+}
+
 inline TestResult TestResult::pass() {
     return {.passed = 1, .failed = 0, .skipped = 0, .failed_tests = {}};
 }
@@ -178,10 +187,6 @@ inline const std::string& TestSuite::name() const {
 
 inline const std::vector<Test>& TestSuite::tests() const {
     return m_tests;
-}
-
-inline void check(bool expr, TestResult& result, const std::string& fail_name) {
-    result.append(expr ? TestResult::pass() : TestResult::fail(fail_name));
 }
 }   // namespace jump::experimental
 
