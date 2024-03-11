@@ -21,8 +21,10 @@
 #include "jump/utility/external.hpp"
 #include "jump/utility/file_system.hpp"
 #include "jump/utility/io.hpp"
+#include "jump/utility/logging.hpp"
 #include "jump/utility/random.hpp"
 #include "jump/utility/timer.hpp"
+#include "jump/utility/utility.hpp"
 #include "jump/utility/types.hpp"
 
 #endif  // JUMP_JUMP_HPP

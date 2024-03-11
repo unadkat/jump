@@ -6,8 +6,6 @@
 
 #include "jump/utility/utility_decl.hpp"
 
-#include <iostream>
-
 namespace jump {
 template <typename T>
 bool has_intersection(const std::vector<T>& A, const std::vector<T>& B) {
