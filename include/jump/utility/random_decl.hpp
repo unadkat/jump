@@ -6,6 +6,11 @@
 
 #include <random>
 
+#include "jump/data/banded_matrix.hpp"
+#include "jump/data/dense_matrix.hpp"
+#include "jump/data/vector.hpp"
+#include "jump/utility/types.hpp"
+
 namespace jump {
 /// \brief Supplies easy random number generation capabilities, with a templated
 /// type for the random numbers and underlying distribution.
@@ -29,6 +34,15 @@ class RandomNumbers {
         /// distribution.
         T generate();
 };
+
+template <typename Rng, typename T>
+void randomise(Rng& rng, T& item);
+
+template <typename Rng, typename... Ts>
+void randomise(Rng& rng, Ts& ...items);
+
+template <typename Rng, template <typename> typename Container, typename T>
+void randomise(Rng& rng, Container<T>& container);
 }   // namespace jump
 
 #endif  // JUMP_RANDOM_DECL_HPP

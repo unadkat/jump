@@ -84,9 +84,6 @@ class DenseMatrix : public MatrixBase<T> {
         void fill(const T& value);
         /// \brief Zero the matrix.
         void zero() override;
-        /// \brief Fill matrix with random values.
-        template <typename Rng>
-        void randomise(Rng& rng);
 
         /// \brief No operation on matrix.
         const DenseMatrix& operator+() const;

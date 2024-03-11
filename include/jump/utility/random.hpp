@@ -20,6 +20,42 @@ template <typename T, template <typename> typename Distribution>
 inline T RandomNumbers<T, Distribution>::generate() {
     return m_distribution(m_engine);
 }
+
+template <typename Rng, typename T>
+inline void randomise(Rng& rng, T& item) {
+    item = rng.generate();
+}
+
+template <typename Rng, typename... Ts>
+inline void randomise(Rng& rng, Ts& ...items) {
+    (..., randomise(rng, items));
+}
+
+template <typename Rng, typename T>
+inline void randomise(Rng& rng, std::complex<T>& item) {
+    item = {T{rng.generate()}, T{rng.generate()}};
+}
+
+template <typename Rng, typename T>
+inline void randomise(Rng& rng, Vector<T>& container) {
+    for (auto& x : container.storage) {
+        randomise(rng, x);
+    }
+}
+
+template <typename Rng, typename T>
+inline void randomise(Rng& rng, BandedMatrix<T>& container) {
+    Vector<T> values(container.num_elements());
+    randomise(rng, values);
+    container.assign(std::move(values));
+}
+
+template <typename Rng, typename T>
+inline void randomise(Rng& rng, DenseMatrix<T>& container) {
+    Vector<T> values(container.num_elements());
+    randomise(rng, values);
+    container.assign(std::move(values));
+}
 }   // namespace jump
 
 #endif  // JUMP_RANDOM_HPP

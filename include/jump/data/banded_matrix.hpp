@@ -180,12 +180,6 @@ inline void BandedMatrix<T>::zero() {
 }
 
 template <typename T>
-template <typename Rng>
-inline void BandedMatrix<T>::randomise(Rng& rng) {
-    m_storage.randomise(rng);
-}
-
-template <typename T>
 inline const BandedMatrix<T>& BandedMatrix<T>::operator+() const {
     return *this;
 }

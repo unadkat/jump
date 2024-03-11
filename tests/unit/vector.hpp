@@ -47,9 +47,9 @@ inline TestResult test_vector_arithmetic_basic() {
     TestResult result;
     RandomNumbers rng(0., 10.);
 
-    Real ar{rng.generate()}, br{rng.generate()};
-    Complex az{rng.generate(), rng.generate()},
-            bz{rng.generate(), rng.generate()};
+    Real ar, br;
+    Complex az, bz;
+    randomise(rng, ar, br, az, bz);
 
     Vector<Real> var(5, ar), vbr(5, br);
     Vector<Complex> vaz(5, az), vbz(5, bz);
@@ -94,20 +94,12 @@ inline TestResult test_vector_arithmetic_compound() {
     auto size{static_cast<std::size_t>(rng_int.generate())};
     Vector<Real> ar(size), br(size), cr(size);
     Vector<Complex> az(size), bz(size), cz(size);
-
-    ar.randomise(rng_real);
-    br.randomise(rng_real);
-    cr.randomise(rng_real);
-    az.randomise(rng_real);
-    bz.randomise(rng_real);
-    cz.randomise(rng_real);
-
-    Real kr1{rng_real.generate()}, kr2{rng_real.generate()};
-    Complex kz1{rng_real.generate(), rng_real.generate()},
-            kz2{rng_real.generate(), rng_real.generate()};
+    Real kr1, kr2;
+    Complex kz1, kz2;
+    randomise(rng_real, ar, br, cr, az, bz, cz, kr1, kr2, kz1, kz2);
 
     while (std::abs(kz2) < epsilon) {
-        kz2 = {rng_real.generate(), rng_real.generate()};
+        randomise(rng_real, kz2);
     }
 
     {

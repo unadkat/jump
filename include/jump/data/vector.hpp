@@ -126,20 +126,6 @@ inline void Vector<T>::zero() {
 }
 
 template <typename T>
-template <typename Rng>
-inline void Vector<T>::randomise(Rng& rng) {
-   if constexpr (is_complex_v<T>) {
-       for (auto& x : storage) {
-           x = T{rng.generate(), rng.generate()};
-       }
-   } else {
-       for (auto& x : storage) {
-           x = rng.generate();
-       }
-   }
-}
-
-template <typename T>
 inline const Vector<T>& Vector<T>::operator+() const {
     return *this;
 }

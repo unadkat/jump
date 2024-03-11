@@ -221,12 +221,6 @@ inline void DenseMatrix<T>::zero() {
 }
 
 template <typename T>
-template <typename Rng>
-inline void DenseMatrix<T>::randomise(Rng& rng) {
-    m_storage.randomise(rng);
-}
-
-template <typename T>
 inline const DenseMatrix<T>& DenseMatrix<T>::operator+() const {
     return *this;
 }
