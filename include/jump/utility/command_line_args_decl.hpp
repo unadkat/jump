@@ -4,11 +4,15 @@
 #ifndef JUMP_COMMAND_LINE_ARGS_DECL_HPP
 #define JUMP_COMMAND_LINE_ARGS_DECL_HPP
 
+#include <algorithm>
+#include <cctype>
 #include <format>
 #include <ranges>
 #include <string>
 #include <sstream>
 #include <vector>
+
+#include "jump/utility/logging.hpp"
 
 namespace jump {
 /// \brief Parses and stores information supplied at runtime via command-line
@@ -19,7 +23,7 @@ class CommandLineArgs {
         /// has been extracted by the user.
         struct Flag {
             char flag{0};
-            bool recognised{false};
+            bool read{false};
         };
 
         /// \brief Stores an option (both name and value) and whether this
@@ -27,7 +31,7 @@ class CommandLineArgs {
         struct Option {
             std::string option{""};
             std::string value{""};
-            bool recognised{false};
+            bool read{false};
         };
 
         /// \brief Collection of flags read from the command line.
