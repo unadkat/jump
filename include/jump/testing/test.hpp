@@ -4,9 +4,9 @@
 #ifndef JUMP_TEST_HPP
 #define JUMP_TEST_HPP
 
-#include "jump/experimental/testing/test_decl.hpp"
+#include "jump/testing/test_decl.hpp"
 
-namespace jump::experimental {
+namespace jump {
 inline void TestResult::append(const TestResult& rhs,
         const std::string& prefix) {
     passed += rhs.passed;
@@ -230,7 +230,7 @@ inline const std::string& TestSuite::name() const {
 inline const std::vector<Test>& TestSuite::tests() const {
     return m_tests;
 }
-}   // namespace jump::experimental
+}   // namespace jump
 
 #endif  // JUMP_TEST_HPP
 

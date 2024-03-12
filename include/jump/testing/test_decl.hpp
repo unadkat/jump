@@ -16,7 +16,7 @@
 #include "jump/utility/logging.hpp"
 #include "jump/utility/utility.hpp"
 
-namespace jump::experimental {
+namespace jump {
 struct TestResult {
     std::size_t passed{};
     std::size_t failed{};
@@ -90,7 +90,7 @@ class TestSuite {
         const std::string& name() const;
         const std::vector<Test>& tests() const;
 };
-}   // namespace jump::experimental
+}   // namespace jump
 
 #endif  // JUMP_TEST_DECL_HPP
 

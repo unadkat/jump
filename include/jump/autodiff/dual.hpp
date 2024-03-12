@@ -4,9 +4,9 @@
 #ifndef JUMP_DUAL_HPP
 #define JUMP_DUAL_HPP
 
-#include "jump/experimental/autodiff/dual_decl.hpp"
+#include "jump/autodiff/dual_decl.hpp"
 
-namespace jump::experimental {
+namespace jump {
 /// \class Dual
 /// Denote a dual number (with a single dual component) as
 /// \f$\h{x}=x+x'\epsilon\f$, where \f$x\f$ is the leading-order part and
@@ -271,7 +271,7 @@ inline Os& operator<<(Os& out, const Dual<N, T>& rhs) {
     }
     return out << "})";
 }
-}   // namespace jump::experimental
+}   // namespace jump
 
 #endif  // JUMP_DUAL_HPP
 

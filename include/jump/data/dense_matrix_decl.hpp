@@ -9,12 +9,11 @@
 #include <sstream>
 #include <string>
 
+#include "jump/autodiff/dual.hpp"
 #include "jump/data/matrix_base.hpp"
 #include "jump/data/vector.hpp"
 #include "jump/debug/exception.hpp"
 #include "jump/utility/types.hpp"
-
-#include "jump/experimental/autodiff/dual.hpp"
 
 namespace jump {
 /// \brief Stores all elements of a general \f$m\f$ by \f$n\f$ matrix, with

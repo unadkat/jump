@@ -11,7 +11,7 @@
 #include "jump/debug/exception.hpp"
 #include "jump/utility/types.hpp"
 
-namespace jump::experimental {
+namespace jump {
 /// \brief An augmented number type that can be used to automatically
 /// differentiate numerical expressions in which it appears. Primarily used to
 /// effect an automatic linearisation of equation systems for an iterated
@@ -51,7 +51,7 @@ struct Dual {
     /// \brief Divide one `Dual` by another in place.
     Dual& operator/=(const Dual& rhs);
 
-    #include "jump/experimental/autodiff/dual_friends.hpp"
+    #include "jump/autodiff/dual_friends.hpp"
 };
 
 template <typename>
@@ -71,7 +71,7 @@ using d3f64 = Dual<3, Real>;
 using d1z64 = Dual<1, Complex>;
 using d2z64 = Dual<2, Complex>;
 using d3z64 = Dual<3, Complex>;
-}   // namespace jump::experimental
+}   // namespace jump
 
 #endif  // JUMP_DUAL_DECL_HPP
 

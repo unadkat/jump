@@ -13,11 +13,10 @@
 #include <utility>
 #include <vector>
 
+#include "jump/autodiff/dual.hpp"
 #include "jump/debug/exception.hpp"
 #include "jump/utility/external.hpp"
 #include "jump/utility/types.hpp"
-
-#include "jump/experimental/autodiff/dual.hpp"
 
 namespace jump {
 /// \brief Permissive encapulation of `std::vector` with arithmetic
