@@ -8,21 +8,29 @@
 
 namespace jump::experimental {
 inline void TestResult::append(const TestResult& rhs,
-        const std::string& fail_prefix) {
+        const std::string& prefix) {
     passed += rhs.passed;
     failed += rhs.failed;
     skipped += rhs.skipped;
 
-    if (fail_prefix == "") {
+    if (prefix == "") {
         failed_tests.insert(failed_tests.end(), rhs.failed_tests.begin(),
                 rhs.failed_tests.end());
+        skipped_tests.insert(skipped_tests.end(), rhs.skipped_tests.begin(),
+                rhs.skipped_tests.end());
     } else {
         for (const auto& failure : rhs.failed_tests) {
             if (failure != "") {
-                failed_tests.push_back(std::format("{}: {}", fail_prefix,
-                            failure));
+                failed_tests.push_back(std::format("{}: {}", prefix, failure));
             } else {
-                failed_tests.push_back(fail_prefix);
+                failed_tests.push_back(prefix);
+            }
+        }
+        for (const auto& skipped : rhs.skipped_tests) {
+            if (skipped != "") {
+                skipped_tests.push_back(std::format("{}: {}", prefix, skipped));
+            } else {
+                skipped_tests.push_back(prefix);
             }
         }
     }
@@ -38,15 +46,18 @@ inline void TestResult::add_check(bool expr, std::string fail_name) {
 }
 
 inline TestResult TestResult::pass() {
-    return {.passed = 1, .failed = 0, .skipped = 0, .failed_tests = {}};
+    return {.passed = 1, .failed = 0, .skipped = 0, .failed_tests = {},
+        .skipped_tests = {}};
 }
 
 inline TestResult TestResult::fail(std::string name) {
-    return {.passed = 0, .failed = 1, .skipped = 0, .failed_tests = {name}};
+    return {.passed = 0, .failed = 1, .skipped = 0, .failed_tests = {name},
+        .skipped_tests = {}};
 }
 
-inline TestResult TestResult::skip() {
-    return {.passed = 0, .failed = 0, .skipped = 1, .failed_tests = {}};
+inline TestResult TestResult::skip(std::string name) {
+    return {.passed = 0, .failed = 0, .skipped = 1, .failed_tests = {},
+        .skipped_tests = {name}};
 }
 
 inline AtomicTest::AtomicTest(std::string_view name,
@@ -100,7 +111,7 @@ inline TestResult Test::run(const std::vector<std::string>& skip_tags) const {
     for (const auto& test: m_atomic_tests) {
         if (std::ranges::find(skip_tags, test.name()) != skip_tags.end()
                 || has_intersection(test.tags(), skip_tags)) {
-            result.append(TestResult::skip());
+            result.append(TestResult::skip(test.name()));
             continue;
         }
 
@@ -155,27 +166,58 @@ inline void TestSuite::run() const {
 
     TestResult all_results;
     for (const auto& test : m_tests) {
+        TestResult result;
+
         if (std::ranges::find(m_skip, test.name()) != m_skip.end()
                 || has_intersection(test.tags(), m_skip)) {
-            all_results.skipped += test.tests().size();
-            continue;
+            for (const auto& atomic_test : test.tests()) {
+                result.append(TestResult::skip(atomic_test.name()));
+            }
+        } else {
+            result = test.run(m_skip);
         }
 
-        auto result = test.run(m_skip);
-        std::clog << std::format(
-                "Test \"{}\": {}/{} tests passed, {} skipped\n", test.name(),
-                result.passed, result.passed + result.failed, result.skipped);
+        auto passes{std::format("{}/{} tests passed", result.passed,
+                result.passed + result.failed)};
+        auto skips{std::format("{} skipped", result.skipped)};
+
+        if (result.failed > 0) {
+            passes = Log::red(passes);
+        } else if (result.passed > 0) {
+            passes = Log::green(passes);
+        }
+        if (result.skipped > 0) {
+            skips = Log::yellow(skips);
+        }
+
+        std::clog << std::format("Test \"{}\": {}, {}\n", test.name(), passes,
+                skips);
         all_results.append(result, test.name());
     }
 
-    std::clog << std::format(
-            "Overall results: {}/{} tests passed, {} skipped\n",
-            all_results.passed, all_results.passed + all_results.failed,
-            all_results.skipped);
+    auto passes{std::format("{}/{} tests passed", all_results.passed,
+            all_results.passed + all_results.failed)};
+    auto skips{std::format("{} skipped", all_results.skipped)};
 
+    if (all_results.failed > 0) {
+        passes = Log::red(passes);
+    } else if (all_results.passed > 0) {
+        passes = Log::green(passes);
+    }
+    if (all_results.skipped > 0) {
+        skips = Log::yellow(skips);
+    }
+
+    std::clog << std::format("Overall results: {}, {}\n", passes, skips);
     if (all_results.failed_tests.size() > 0) {
-        std::clog << "Failed tests:\n";
+        std::clog << Log::red("Failed tests:") << '\n';
         for (const auto& name : all_results.failed_tests) {
+            std::clog << '\"' << name << "\"\n";
+        }
+    }
+    if (all_results.skipped_tests.size() > 0) {
+        std::clog << Log::yellow("Skipped tests:") << '\n';
+        for (const auto& name : all_results.skipped_tests) {
             std::clog << '\"' << name << "\"\n";
         }
     }

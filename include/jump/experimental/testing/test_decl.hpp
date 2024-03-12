@@ -13,6 +13,7 @@
 #include <utility>
 #include <vector>
 
+#include "jump/utility/logging.hpp"
 #include "jump/utility/utility.hpp"
 
 namespace jump::experimental {
@@ -21,18 +22,19 @@ struct TestResult {
     std::size_t failed{};
     std::size_t skipped{};
     std::vector<std::string> failed_tests;
+    std::vector<std::string> skipped_tests;
 
     /// \brief Add new set of results to existing set, either directly appending
-    /// the failed name list (i.e. the results come from the same test), or with
-    /// a prefix (i.e. the results come from a sub-test).
-    void append(const TestResult& result, const std::string& fail_prefix = "");
+    /// the failed/skipped name lists (i.e. the results come from the same
+    /// test), or with a prefix (i.e. the results come from a sub-test).
+    void append(const TestResult& result, const std::string& prefix = "");
     /// \brief Helper function to append result tracker with success or fail
     /// (with name of failed test), for adding results to an existing set.
     void add_check(bool expr, std::string fail_name);
 
     static TestResult pass();
     static TestResult fail(std::string name = "");
-    static TestResult skip();
+    static TestResult skip(std::string name = "");
 };
 
 class AtomicTest {
