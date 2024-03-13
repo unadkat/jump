@@ -19,7 +19,7 @@
 #include "jump/linear_algebra/generalised_eigenvalue_system.hpp"
 #include "jump/linear_algebra/linear_system_base.hpp"
 
-#include "jump/testing/test.hpp"
+#include "jump/testing/testing.hpp"
 
 #include "jump/utility/command_line_args.hpp"
 #include "jump/utility/external.hpp"
