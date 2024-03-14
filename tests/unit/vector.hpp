@@ -13,8 +13,8 @@ TestResult test_vector_norms();
 TestResult test_vector_access_in_range();
 TestResult test_vector_access_out_of_range();
 
-inline TestSuite vector_tests() {
-    TestSuite vector_suite("vector");
+inline TestSuite<Test> vector_tests() {
+    TestSuite<Test> vector_suite("vector");
     std::vector<Test> tests;
 
     tests.push_back({{"arithmetic"}, {"vector", "data", "arithmetic"}});

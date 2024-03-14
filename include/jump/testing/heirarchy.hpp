@@ -77,21 +77,29 @@ inline const std::vector<AtomicTest>& Test::tests() const {
     return m_atomic_tests;
 }
 
-inline TestSuite::TestSuite(std::string_view name) :
-    m_name{name} {
+template <typename T>
+inline TestSuite<T>::TestSuite(std::string_view name,
+        std::vector<std::string> tags) :
+    m_name{name},
+    m_tags{std::move(tags)} {
+    std::ranges::sort(m_tags);
 }
 
-inline void TestSuite::register_test(Test test) {
+template <typename T>
+inline void TestSuite<T>::register_test(T test) {
     m_tests.push_back(std::move(test));
 }
 
-inline void TestSuite::register_tests(std::vector<Test> tests) {
+template <typename T>
+inline void TestSuite<T>::register_tests(std::vector<T> tests) {
     for (auto& test : tests) {
         register_test(std::move(test));
     }
 }
 
-inline TestResult TestSuite::run(const std::vector<std::string>& skip_tags) const {
+template <typename T>
+inline TestResult TestSuite<T>::run(
+        const std::vector<std::string>& skip_tags) const {
     TestResult all_results;
     all_results.name = name();
     for (const auto& test : m_tests) {
@@ -106,11 +114,18 @@ inline TestResult TestSuite::run(const std::vector<std::string>& skip_tags) cons
     return all_results;
 }
 
-inline const std::string& TestSuite::name() const {
+template <typename T>
+inline const std::string& TestSuite<T>::name() const {
     return m_name;
 }
 
-inline const std::vector<Test>& TestSuite::tests() const {
+template <typename T>
+inline const std::vector<std::string>& TestSuite<T>::tags() const {
+    return m_tags;
+}
+
+template <typename T>
+inline const std::vector<T>& TestSuite<T>::tests() const {
     return m_tests;
 }
 }   // namespace jump

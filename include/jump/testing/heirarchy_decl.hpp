@@ -55,7 +55,7 @@ class Test {
     public:
         /// \brief Constructor for a test unit requires name and tags to be
         /// supplied at the outset, to keep all information local.
-        Test(std::string_view name, std::vector<std::string> tags);
+        Test(std::string_view name, std::vector<std::string> tags = {});
 
         /// \brief Register a single atomic test to be run with this test unit.
         void register_atomic_test(AtomicTest test);
@@ -74,23 +74,27 @@ class Test {
         const std::vector<AtomicTest>& tests() const;
 };
 
+template <typename T = Test>
 class TestSuite {
     private:
         /// \brief Name of the test suite.
         std::string m_name;
+        /// \brief List of tags for which this test suite (and hence all
+        /// subtests) can be skipped.
+        std::vector<std::string> m_tags;
         /// \brief Collection of tests making up this test suite.
-        std::vector<Test> m_tests;
+        std::vector<T> m_tests;
 
     public:
         /// \brief Constructor for a test suite requires name to be supplied at
         /// the outset, to keep all information local.
-        TestSuite(std::string_view name);
+        TestSuite(std::string_view name, std::vector<std::string> tags = {});
 
         /// \brief Register a test unit to be run with this test suite.
-        void register_test(Test test);
+        void register_test(T test);
         /// \brief Register a collection of test units to be run with this test
         /// suite.
-        void register_tests(std::vector<Test> tests);
+        void register_tests(std::vector<T> tests);
         /// \brief Run registered tests, skipping any whose name or tags
         /// intersects with the supplied skip_tags list. Forward this list on
         /// when running a valid test so that subtests can be further filtered.
@@ -98,8 +102,10 @@ class TestSuite {
 
         /// \brief Accessor for the test suite name.
         const std::string& name() const;
+        /// \brief Accessor for the list of tags for this test suite.
+        const std::vector<std::string>& tags() const;
         /// \brief Accessor for the collection of registered tests.
-        const std::vector<Test>& tests() const;
+        const std::vector<T>& tests() const;
 };
 }   // namespace jump
 
