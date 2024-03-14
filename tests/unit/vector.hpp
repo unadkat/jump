@@ -13,23 +13,21 @@ TestResult test_vector_norms();
 TestResult test_vector_access_in_range();
 TestResult test_vector_access_out_of_range();
 
-inline std::vector<Test> vector_tests() {
+inline TestSuite vector_tests() {
+    TestSuite vector_suite("vector");
     std::vector<Test> tests;
 
-    tests.push_back({{"vector arithmetic"},
-            {"vector", "data", "arithmetic"}});
+    tests.push_back({{"arithmetic"}, {"vector", "data", "arithmetic"}});
     tests.back().register_atomic_test({"basic", {},
             &test_vector_arithmetic_basic});
     tests.back().register_atomic_test({"compound", {},
             &test_vector_arithmetic_compound});
 
-    tests.push_back({{"vector summary"},
-            {"vector", "data", "summary"}});
+    tests.push_back({{"summary"}, {"vector", "data", "summary"}});
     tests.back().register_atomic_test({"norms", {},
             &test_vector_norms});
 
-    tests.push_back({{"vector access"},
-            {"vector", "data", "access"}});
+    tests.push_back({{"access"}, {"vector", "data", "access"}});
     tests.back().register_atomic_test({"in range", {},
             &test_vector_access_in_range});
 
@@ -39,7 +37,8 @@ inline std::vector<Test> vector_tests() {
             &test_vector_access_out_of_range});
 #endif  // NDEBUG
 
-    return tests;
+    vector_suite.register_tests(tests);
+    return vector_suite;
 }
 
 inline TestResult test_vector_arithmetic_basic() {

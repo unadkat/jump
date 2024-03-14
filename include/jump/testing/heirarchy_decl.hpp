@@ -11,11 +11,8 @@
 #include <utility>
 #include <vector>
 
-#include <iostream>
-
 #include "jump/debug/exception.hpp"
 #include "jump/testing/test_result.hpp"
-#include "jump/utility/logging.hpp"
 #include "jump/utility/utility.hpp"
 
 namespace jump {
@@ -49,7 +46,7 @@ class Test {
     private:
         /// \brief Name of the test.
         std::string m_name;
-        /// \brief List of tags for which this test (and hence all sub-tests)
+        /// \brief List of tags for which this test (and hence all subtests)
         /// can be skipped.
         std::vector<std::string> m_tags;
         /// \brief List of atomic tests that will be run by this test unit.
@@ -96,8 +93,8 @@ class TestSuite {
         void register_tests(std::vector<Test> tests);
         /// \brief Run registered tests, skipping any whose name or tags
         /// intersects with the supplied skip_tags list. Forward this list on
-        /// when running a valid test so that sub-tests can be further filtered.
-        void run(const std::vector<std::string>& skip_tags = {}) const;
+        /// when running a valid test so that subtests can be further filtered.
+        TestResult run(const std::vector<std::string>& skip_tags = {}) const;
 
         /// \brief Accessor for the test suite name.
         const std::string& name() const;

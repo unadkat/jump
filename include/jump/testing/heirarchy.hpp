@@ -17,7 +17,9 @@ inline AtomicTest::AtomicTest(std::string_view name,
 }
 
 inline TestResult AtomicTest::run() const {
-    return m_func();
+    TestResult result{m_func()};
+    result.name = name();
+    return result;
 }
 
 inline const std::string& AtomicTest::name() const {
@@ -46,17 +48,18 @@ inline void Test::register_atomic_tests(std::vector<AtomicTest> tests) {
 
 inline TestResult Test::run(const std::vector<std::string>& skip_tags) const {
     TestResult result;
+    result.name = name();
     for (const auto& test: m_atomic_tests) {
         if (std::ranges::find(skip_tags, test.name()) != skip_tags.end()
                 || has_intersection(test.tags(), skip_tags)) {
-            result.append(TestResult::skip(test.name()));
+            result += TestResult::skip(test.name());
             continue;
         }
 
         try {
-            result.append(test.run(), test.name());
+            result.sub_results.push_back(test.run());
         } catch (std::exception& e) {
-            result.append(TestResult::fail(test.name()));
+            result += TestResult::fail(test.name());
         }
     }
     return result;
@@ -88,68 +91,19 @@ inline void TestSuite::register_tests(std::vector<Test> tests) {
     }
 }
 
-inline void TestSuite::run(const std::vector<std::string>& skip_tags) const {
-    auto suite_title{std::format("Test suite \"{}\"", m_name)};
-    std::clog << std::format("{}\n{}\n", suite_title,
-            std::string(suite_title.size(), '-'));
-
+inline TestResult TestSuite::run(const std::vector<std::string>& skip_tags) const {
     TestResult all_results;
+    all_results.name = name();
     for (const auto& test : m_tests) {
-        TestResult result;
-
         if (std::ranges::find(skip_tags, test.name()) != skip_tags.end()
                 || has_intersection(test.tags(), skip_tags)) {
-            for (const auto& atomic_test : test.tests()) {
-                result.append(TestResult::skip(atomic_test.name()));
-            }
+            all_results += TestResult::skip(test.name());
         } else {
-            result = test.run(skip_tags);
-        }
-
-        auto passes{std::format("{}/{} tests passed", result.passed,
-                result.passed + result.failed)};
-        auto skips{std::format("{} skipped", result.skipped)};
-
-        if (result.failed > 0) {
-            passes = Log::red(passes);
-        } else if (result.passed > 0) {
-            passes = Log::green(passes);
-        }
-        if (result.skipped > 0) {
-            skips = Log::yellow(skips);
-        }
-
-        std::clog << std::format("Test \"{}\": {}, {}\n", test.name(), passes,
-                skips);
-        all_results.append(result, test.name());
-    }
-
-    auto passes{std::format("{}/{} tests passed", all_results.passed,
-            all_results.passed + all_results.failed)};
-    auto skips{std::format("{} skipped", all_results.skipped)};
-
-    if (all_results.failed > 0) {
-        passes = Log::red(passes);
-    } else if (all_results.passed > 0) {
-        passes = Log::green(passes);
-    }
-    if (all_results.skipped > 0) {
-        skips = Log::yellow(skips);
-    }
-
-    std::clog << std::format("Overall results: {}, {}\n", passes, skips);
-    if (all_results.failed_tests.size() > 0) {
-        std::clog << Log::red("Failed tests:") << '\n';
-        for (const auto& name : all_results.failed_tests) {
-            std::clog << '\"' << name << "\"\n";
+            all_results.sub_results.push_back(test.run(skip_tags));
         }
     }
-    if (all_results.skipped_tests.size() > 0) {
-        std::clog << Log::yellow("Skipped tests:") << '\n';
-        for (const auto& name : all_results.skipped_tests) {
-            std::clog << '\"' << name << "\"\n";
-        }
-    }
+
+    return all_results;
 }
 
 inline const std::string& TestSuite::name() const {
