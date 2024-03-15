@@ -35,7 +35,7 @@ inline void BandedLinearSystem<T>::solve() {
 #ifdef JUMP_HAS_LAPACKE
 /// Call the external solver for a real-valued problem.
 template <>
-inline void BandedLinearSystem<double>::solve_lapacke() {
+inline void BandedLinearSystem<Real>::solve_lapacke() {
 #ifndef NDEBUG
     if (m_A.num_columns() != m_b.size()) {
         throw RuntimeError{Mismatch2DError{.name1 = "m_A", .size1 = m_A.size(),

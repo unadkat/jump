@@ -364,7 +364,7 @@ inline Vector<Complex>& Vector<Complex>::operator/=(const Complex& rhs) {
 /// \brief Specialisation of the L1-norm calculation for a real `Vector`, using
 /// CBLAS.
 template <>
-inline double Vector<Real>::L1_norm() const {
+inline Real Vector<Real>::L1_norm() const {
     // Computes sum of absolute element values (with a pointer shift of 1
     // between elements)
     return cblas_dasum(storage.size(), storage.data(), 1);
@@ -373,7 +373,7 @@ inline double Vector<Real>::L1_norm() const {
 /// \brief Specialisation of the L1-norm calculation for a complex `Vector`,
 /// using CBLAS.
 template <>
-inline double Vector<Complex>::L1_norm() const {
+inline Real Vector<Complex>::L1_norm() const {
     // Computes sum of absolute real and imaginary element values (with a
     // pointer shift of 1 between elements). Note: this is not the same as the
     // usual definition of this norm
@@ -383,7 +383,7 @@ inline double Vector<Complex>::L1_norm() const {
 /// \brief Specialisation of the L2-norm calculation for a real `Vector`, using
 /// CBLAS.
 template <>
-inline double Vector<Real>::L2_norm() const {
+inline Real Vector<Real>::L2_norm() const {
     // Computes the Euclidean norm of the `Vector` (with a pointer shift of 1
     // between elements)
     return cblas_dnrm2(storage.size(), storage.data(), 1);
@@ -392,7 +392,7 @@ inline double Vector<Real>::L2_norm() const {
 /// \brief Specialisation of the L2-norm calculation for a complex `Vector`,
 /// using CBLAS.
 template <>
-inline double Vector<Complex>::L2_norm() const {
+inline Real Vector<Complex>::L2_norm() const {
     // Computes the Euclidean norm of the `Vector` (with a pointer shift of 1
     // between elements)
     return cblas_dznrm2(storage.size(), storage.data(), 1);

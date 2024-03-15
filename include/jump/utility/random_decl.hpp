@@ -14,7 +14,7 @@
 namespace jump {
 /// \brief Supplies easy random number generation capabilities, with a templated
 /// type for the random numbers and underlying distribution.
-template <typename T = double, template <typename> typename Distribution
+template <typename T = Real, template <typename> typename Distribution
     = std::uniform_real_distribution>
 class RandomNumbers {
     private:

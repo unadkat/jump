@@ -8,6 +8,8 @@
 #include <format>
 #include <string>
 
+#include "jump/utility/types.hpp"
+
 namespace jump {
 /// \brief Enables timing of function calls and the calculation of average and
 /// total time taken.

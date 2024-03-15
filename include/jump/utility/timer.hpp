@@ -14,11 +14,12 @@ namespace jump {
 /// Failing both of these, the time is returned in the format ss.sss with a
 /// trailing 's' to denote seconds.
 inline std::string Timer::formatted_time(Clock::duration time) const {
-    long minutes{0}, hours{0};
-    double seconds{0.};
-
     auto ms{std::chrono::duration_cast<std::chrono::milliseconds>(
             time).count()};
+
+    decltype(ms) minutes{0}, hours{0};
+    Real seconds{0.};
+
     hours = ms/(1000*60*60);
     ms %= 1000*60*60;
     minutes = ms/(1000*60);

@@ -471,7 +471,7 @@ inline DenseMatrix<Complex>& DenseMatrix<Complex>::operator*=(
 /// \brief Specialisation of the column L1-norm calculation for a real
 /// `DenseMatrix`, using CBLAS.
 template <>
-inline double DenseMatrix<Real>::column_L1_norm(std::size_t column) const {
+inline Real DenseMatrix<Real>::column_L1_norm(std::size_t column) const {
 #ifndef NDEBUG
     if (column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {0, column},
@@ -488,7 +488,7 @@ inline double DenseMatrix<Real>::column_L1_norm(std::size_t column) const {
 /// \brief Specialisation of the column L1-norm calculation for a complex
 /// `DenseMatrix`, using CBLAS.
 template <>
-inline double DenseMatrix<Complex>::column_L1_norm(std::size_t column) const {
+inline Real DenseMatrix<Complex>::column_L1_norm(std::size_t column) const {
 #ifndef NDEBUG
     if (column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {0, column},
@@ -506,7 +506,7 @@ inline double DenseMatrix<Complex>::column_L1_norm(std::size_t column) const {
 /// \brief Specialisation of the column L2-norm calculation for a real
 /// `DenseMatrix`, using CBLAS.
 template <>
-inline double DenseMatrix<Real>::column_L2_norm(std::size_t column) const {
+inline Real DenseMatrix<Real>::column_L2_norm(std::size_t column) const {
 #ifndef NDEBUG
     if (column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {0, column},
@@ -523,7 +523,7 @@ inline double DenseMatrix<Real>::column_L2_norm(std::size_t column) const {
 /// \brief Specialisation of the column L2-norm calculation for a complex
 /// `DenseMatrix`, using CBLAS.
 template <>
-inline double DenseMatrix<Complex>::column_L2_norm(std::size_t column) const {
+inline Real DenseMatrix<Complex>::column_L2_norm(std::size_t column) const {
 #ifndef NDEBUG
     if (column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {0, column},
