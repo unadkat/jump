@@ -58,10 +58,10 @@ class Test {
         Test(std::string_view name, std::vector<std::string> tags = {});
 
         /// \brief Register a single atomic test to be run with this test unit.
-        void register_atomic_test(AtomicTest test);
+        void register_item(AtomicTest test);
         /// \brief Register a collection of atomic tests to be run with this
         /// test unit.
-        void register_atomic_tests(std::vector<AtomicTest> tests);
+        void register_items(std::vector<AtomicTest> tests);
         /// \brief Run registered tests, skipping any whose name or tags
         /// intersects with the supplied skip_tags list.
         TestResult run(const std::vector<std::string>& skip_tags = {}) const;
@@ -91,10 +91,10 @@ class TestSuite {
         TestSuite(std::string_view name, std::vector<std::string> tags = {});
 
         /// \brief Register a test unit to be run with this test suite.
-        void register_test(T test);
+        void register_item(T test);
         /// \brief Register a collection of test units to be run with this test
         /// suite.
-        void register_tests(std::vector<T> tests);
+        void register_items(std::vector<T> tests);
         /// \brief Run registered tests, skipping any whose name or tags
         /// intersects with the supplied skip_tags list. Forward this list on
         /// when running a valid test so that subtests can be further filtered.
@@ -107,6 +107,10 @@ class TestSuite {
         /// \brief Accessor for the collection of registered tests.
         const std::vector<T>& tests() const;
 };
+
+using TestSuiteL1 = TestSuite<Test>;
+using TestSuiteL2 = TestSuite<TestSuite<Test>>;
+using TestSuiteL3 = TestSuite<TestSuite<TestSuite<Test>>>;
 }   // namespace jump
 
 #endif  // JUMP_TEST_HEIRARCHY_DECL_HPP

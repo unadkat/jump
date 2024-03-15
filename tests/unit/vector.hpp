@@ -13,31 +13,31 @@ TestResult test_vector_norms();
 TestResult test_vector_access_in_range();
 TestResult test_vector_access_out_of_range();
 
-inline TestSuite<Test> vector_tests() {
-    TestSuite<Test> vector_suite("vector");
+inline TestSuiteL1 vector_tests() {
+    TestSuiteL1 vector_suite("vector");
     std::vector<Test> tests;
 
-    tests.push_back({{"arithmetic"}, {"vector", "data", "arithmetic"}});
-    tests.back().register_atomic_test({"basic", {},
+    tests.push_back({"arithmetic"});
+    tests.back().register_item({"basic", {},
             &test_vector_arithmetic_basic});
-    tests.back().register_atomic_test({"compound", {},
+    tests.back().register_item({"compound", {},
             &test_vector_arithmetic_compound});
 
-    tests.push_back({{"summary"}, {"vector", "data", "summary"}});
-    tests.back().register_atomic_test({"norms", {},
+    tests.push_back({"summary"});
+    tests.back().register_item({"norms", {},
             &test_vector_norms});
 
-    tests.push_back({{"access"}, {"vector", "data", "access"}});
-    tests.back().register_atomic_test({"in range", {},
+    tests.push_back({"access"});
+    tests.back().register_item({"in range", {},
             &test_vector_access_in_range});
 
     // These tests should throw exceptions which are disabled by the NDEBUG flag
 #ifndef NDEBUG
-    tests.back().register_atomic_test({"out of range", {},
+    tests.back().register_item({"out of range", {},
             &test_vector_access_out_of_range});
 #endif  // NDEBUG
 
-    vector_suite.register_tests(tests);
+    vector_suite.register_items(tests);
     return vector_suite;
 }
 

@@ -1,8 +1,11 @@
 # All build artefacts and object code
 build/
 
-# clangd config
-.clangd
+# Cached files
+.cache/
+
+# compile commands emitted by cmake for clangd
+compile_commands.json
 
 # Lock/swap/temporary files
 *.swp

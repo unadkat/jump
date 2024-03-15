@@ -36,13 +36,13 @@ inline Test::Test(std::string_view name, std::vector<std::string> tags) :
     std::ranges::sort(m_tags);
 }
 
-inline void Test::register_atomic_test(AtomicTest test) {
+inline void Test::register_item(AtomicTest test) {
     m_atomic_tests.push_back(std::move(test));
 }
 
-inline void Test::register_atomic_tests(std::vector<AtomicTest> tests) {
+inline void Test::register_items(std::vector<AtomicTest> tests) {
     for (auto& test: tests) {
-        register_atomic_test(std::move(test));
+        register_item(std::move(test));
     }
 }
 
@@ -86,14 +86,14 @@ inline TestSuite<T>::TestSuite(std::string_view name,
 }
 
 template <typename T>
-inline void TestSuite<T>::register_test(T test) {
+inline void TestSuite<T>::register_item(T test) {
     m_tests.push_back(std::move(test));
 }
 
 template <typename T>
-inline void TestSuite<T>::register_tests(std::vector<T> tests) {
+inline void TestSuite<T>::register_items(std::vector<T> tests) {
     for (auto& test : tests) {
-        register_test(std::move(test));
+        register_item(std::move(test));
     }
 }
 

@@ -7,10 +7,13 @@ using namespace jump;
 int main(int argc, char** argv) {
     CommandLineArgs args(argc, argv);
 
-    TestSuite<TestSuite<Test>> jump_tests{"jump"};
-    jump_tests.register_test(vector_tests());
-    auto all_results = jump_tests.run();
+    TestSuiteL3 jump_tests{"jump"};
 
+    TestSuiteL2 data_tests{"data"};
+    data_tests.register_item(vector_tests());
+    jump_tests.register_item(data_tests);
+
+    auto all_results{jump_tests.run()};
     TestReporter report;
     report.trace(all_results);
     report.summarise(all_results);
