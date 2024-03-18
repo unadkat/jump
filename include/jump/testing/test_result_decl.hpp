@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+#include "jump/autodiff/dual.hpp"
+
 namespace jump {
 struct TestResult {
     /// \brief Stores name of test entity.
@@ -44,6 +46,18 @@ struct TestResult {
     /// \brief Generate a skipped test and pass the skipped test name on.
     static TestResult skip(std::string name = "");
 };
+
+static Real epsilon_rel{1e-4};
+static Real epsilon_abs{1e-6};
+
+template <typename T>
+bool approx_rel(const T& lhs, const T& rhs);
+
+template <typename T>
+bool approx_abs(const T& lhs, const T& rhs);
+
+template <typename T>
+bool vanishes(const T& x);
 }   // namespace jump
 
 #endif  // JUMP_TEST_RESULT_DECL_HPP

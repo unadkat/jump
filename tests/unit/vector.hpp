@@ -5,8 +5,6 @@
 
 using namespace jump;
 
-constexpr double epsilon{1e-12};
-
 TestResult test_vector_arithmetic_basic();
 TestResult test_vector_arithmetic_compound();
 TestResult test_vector_norms();
@@ -58,8 +56,8 @@ inline TestResult test_vector_arithmetic_basic() {
         Complex ans_z{az + bz};
         Vector<Complex> vans_z(5, ans_z), vcz{vaz + vbz};
 
-        result.add_check((vans_r - vcr).L2_norm() < epsilon, "add real");
-        result.add_check((vans_z - vcz).L2_norm() < epsilon, "add complex");
+        result.add_check(vanishes((vans_r - vcr).L2_norm()), "add real");
+        result.add_check(vanishes((vans_z - vcz).L2_norm()), "add complex");
     }
     {
         Real ans_r{ar - br};
@@ -67,8 +65,8 @@ inline TestResult test_vector_arithmetic_basic() {
         Complex ans_z{az - bz};
         Vector<Complex> vans_z(5, ans_z), vcz{vaz - vbz};
 
-        result.add_check((vans_r - vcr).L2_norm() < epsilon, "subtract real");
-        result.add_check((vans_z - vcz).L2_norm() < epsilon,
+        result.add_check(vanishes((vans_r - vcr).L2_norm()), "subtract real");
+        result.add_check(vanishes((vans_z - vcz).L2_norm()),
                 "subtract complex");
     }
     {
@@ -77,8 +75,8 @@ inline TestResult test_vector_arithmetic_basic() {
         Complex ans_z{az*bz};
         Vector<Complex> vans_z(5, ans_z), vcz{vaz*bz};
 
-        result.add_check((vans_r - vcr).L2_norm() < epsilon, "scale real");
-        result.add_check((vans_z - vcz).L2_norm() < epsilon, "scale complex");
+        result.add_check(vanishes((vans_r - vcr).L2_norm()), "scale real");
+        result.add_check(vanishes((vans_z - vcz).L2_norm()), "scale complex");
     }
 
     return result;
@@ -96,16 +94,15 @@ inline TestResult test_vector_arithmetic_compound() {
     Complex kz1, kz2;
     randomise(rng_real, ar, br, cr, az, bz, cz, kr1, kr2, kz1, kz2);
 
-    while (std::abs(kz2) < epsilon) {
+    while (vanishes(std::abs(kz2))) {
         randomise(rng_real, kz2);
     }
 
     {
-        result.add_check(((ar + kr1*br)*(cr/kr2) - (1./kr2)*(ar*cr + kr1*cr*br))
-                < epsilon, "real");
-        result.add_check(std::abs((az + kz1*bz)*(cz/kz2)
-                    - (1./kz2)*(az*cz + kz1*cz*bz)) < epsilon,
-                "complex");
+        result.add_check(vanishes((ar + kr1*br)*(cr/kr2)
+                    - (1./kr2)*(ar*cr + kr1*cr*br)), "real");
+        result.add_check(vanishes(std::abs((az + kz1*bz)*(cz/kz2)
+                    - (1./kz2)*(az*cz + kz1*cz*bz))), "complex");
     }
 
     return result;
@@ -129,13 +126,14 @@ inline TestResult test_vector_norms() {
 inline TestResult test_vector_access_in_range() {
     TestResult result;
 
-    Vector<Real> a(10, 1.);
+    Vector<Real> a(10);
     Real acc{0.};
     for (std::size_t i{0}, N{a.size()}; i < N; ++i) {
+        a[i] = i + 1;
         acc += a[i];
     }
 
-    result.add_check((acc - 55.) < epsilon, "all indices");
+    result.add_check(approx_abs(acc, 55.), "all indices");
 
     return result;
 }

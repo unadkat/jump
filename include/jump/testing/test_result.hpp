@@ -44,6 +44,39 @@ inline TestResult TestResult::skip(std::string name) {
     return {.name = {}, .sub_results = {}, .passed = 0, .failed = 0,
         .skipped = 1, .failed_tests = {}, .skipped_tests = {name}};
 }
+
+template <typename T>
+inline bool approx_rel(const T& lhs, const T& rhs) {
+    if constexpr (is_dual_v<T>) {
+        auto a{abs(lhs).value}, b{abs(rhs).value};
+        if (a > b) {
+            return abs(a - b)/b < epsilon_rel;
+        } else {
+            return abs(b - a)/a < epsilon_rel;
+        }
+    } else {
+        auto a{std::abs(lhs)}, b{std::abs(rhs)};
+        if (a > b) {
+            return std::abs(a - b)/b < epsilon_rel;
+        } else {
+            return std::abs(b - a)/a < epsilon_rel;
+        }
+    }
+}
+
+template <typename T>
+inline bool approx_abs(const T& lhs, const T& rhs) {
+    if constexpr (is_dual_v<T>) {
+        return abs(lhs - rhs).value < epsilon_abs;
+    } else {
+        return std::abs(lhs - rhs) < epsilon_abs;
+    }
+}
+
+template <typename T>
+inline bool vanishes(const T& x) {
+    return approx_abs(x, T{0});
+}
 }   // namespace jump
 
 #endif  // JUMP_TEST_RESULT_HPP
