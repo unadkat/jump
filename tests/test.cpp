@@ -1,5 +1,6 @@
 #include "jump/jump.hpp"
 
+#include "unit/matrix.hpp"
 #include "unit/vector.hpp"
 
 using namespace jump;
@@ -11,6 +12,7 @@ int main(int argc, char** argv) {
 
     TestSuiteL2 data_tests{"data"};
     data_tests.register_item(vector_tests());
+    data_tests.register_item(matrix_tests());
     jump_tests.register_item(data_tests);
 
     auto all_results{jump_tests.run()};
