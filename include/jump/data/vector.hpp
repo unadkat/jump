@@ -183,10 +183,10 @@ template <typename T>
 inline Real Vector<T>::L1_norm() const {
     if constexpr (is_dual_v<T>) {
         auto F{[](Real acc, const T& x) { return acc + abs(x).value; }};
-        return std::ranges::fold_left(storage, Real{0}, F);
+        return std::accumulate(storage.begin(), storage.end(), Real{0}, F);
     } else {
         auto F{[](Real acc, const T& x) { return acc + std::abs(x); }};
-        return std::ranges::fold_left(storage, Real{0}, F);
+        return std::accumulate(storage.begin(), storage.end(), Real{0}, F);
     }
 }
 
@@ -195,11 +195,13 @@ inline Real Vector<T>::L2_norm() const {
     if constexpr (is_dual_v<T>) {
         auto F{[](Real acc, const T& x) {
             return acc + pow(abs(x), 2.).value; }};
-        return std::sqrt(std::ranges::fold_left(storage, Real{0}, F));
+        return std::sqrt(std::accumulate(storage.begin(), storage.end(),
+                    Real{0}, F));
     } else {
         auto F{[](Real acc, const T& x) { return acc + std::pow(std::abs(x),
                 2.); }};
-        return std::sqrt(std::ranges::fold_left(storage, Real{0}, F));
+        return std::sqrt(std::accumulate(storage.begin(), storage.end(),
+                    Real{0}, F));
     }
 }
 

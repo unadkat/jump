@@ -306,10 +306,10 @@ inline Real DenseMatrix<T>::column_L1_norm(std::size_t column) const {
     auto it{column_iterators(column)};
     if constexpr (is_dual_v<T>) {
         auto F{[](Real acc, const T& x) { return acc + abs(x).value; }};
-        return std::ranges::fold_left(it.first, it.second, Real{0}, F);
+        return std::accumulate(it.first, it.second, Real{0}, F);
     } else {
         auto F{[](Real acc, const T& x) { return acc + std::abs(x); }};
-        return std::ranges::fold_left(it.first, it.second, Real{0}, F);
+        return std::accumulate(it.first, it.second, Real{0}, F);
     }
 }
 
@@ -326,13 +326,11 @@ inline Real DenseMatrix<T>::column_L2_norm(std::size_t column) const {
     if constexpr (is_dual_v<T>) {
         auto F{[](Real acc, const T& x) {
             return acc + pow(abs(x), 2.).value; }};
-        return std::sqrt(std::ranges::fold_left(it.first, it.second, Real{0},
-                    F));
+        return std::sqrt(std::accumulate(it.first, it.second, Real{0}, F));
     } else {
         auto F{[](Real acc, const T& x) {
             return acc + std::pow(std::abs(x), 2.); }};
-        return std::sqrt(std::ranges::fold_left(it.first, it.second, Real{0},
-                    F));
+        return std::sqrt(std::accumulate(it.first, it.second, Real{0}, F));
     }
 }
 

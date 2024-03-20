@@ -5,7 +5,7 @@
 #define JUMP_DENSE_MATRIX_DECL_HPP
 
 #include <algorithm>
-#include <ranges>
+#include <numeric>
 #include <sstream>
 #include <string>
 
