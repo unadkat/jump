@@ -56,6 +56,9 @@ class BandedMatrix : public MatrixBase<T> {
         /// \brief Return size of internal storage.
         std::size_t num_elements() const override;
 
+        /// \brief Defaulted spaceship operator.
+        auto operator<=>(const BandedMatrix&) const = default;
+
         /// \brief Const element access.
         T operator[](std::size_t row, std::size_t column) const;
         /// \brief Mutable element access.

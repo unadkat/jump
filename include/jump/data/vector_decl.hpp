@@ -56,6 +56,9 @@ struct Vector {
     /// \brief Return number of elements.
     std::size_t size() const;
 
+    /// \brief Defaulted spaceship operator.
+    auto operator<=>(const Vector&) const = default;
+
     /// \brief Const element access.
     const T& operator[](std::size_t index) const;
     /// \brief Mutable element access.

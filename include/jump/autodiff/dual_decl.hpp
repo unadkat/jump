@@ -34,6 +34,9 @@ struct Dual {
     /// non-zero dual part.
     Dual(const T& x, std::size_t index, const T& d = T{1});
 
+    /// \brief Defaulted spaceship operator.
+    auto operator<=>(const Dual&) const = default;
+
     /// \brief Conversion operator to promote a real-valued `Dual` to a
     /// complex-valued one.
     operator Dual<N, Complex>() const;
