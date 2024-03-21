@@ -87,6 +87,20 @@ inline void BandedMatrix<T>::assign(Vector<T> underlying_data) {
 }
 
 template <typename T>
+template <class InputIt>
+inline void BandedMatrix<T>::assign(InputIt first, InputIt last) {
+#ifndef NDEBUG
+    if (last != first + m_storage.size()) {
+        throw RuntimeError{InvalidArgumentError{.argument = "last",
+            .value = std::format("first + {}", last - first),
+            .expected = "first - last == m_storage.size()"}};
+    }
+#endif  // NDEBUG
+
+    m_storage.assign(std::move(first), std::move(last));
+}
+
+template <typename T>
 inline std::size_t BandedMatrix<T>::num_bands() const {
     return m_num_bands;
 }

@@ -51,6 +51,9 @@ class BandedMatrix : public MatrixBase<T> {
         /// \brief Set matrix storage with the given Vector data, which must
         /// match the existing container size.
         void assign(Vector<T> underlying_data);
+        /// \brief Set data via a pair of iterators.
+        template <class InputIt>
+        void assign(InputIt first, InputIt last);
         /// \brief Return number of off-leading diagonal diagonals.
         std::size_t num_bands() const;
         /// \brief Return size of internal storage.
