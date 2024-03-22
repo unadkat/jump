@@ -1,6 +1,7 @@
 #include "jump/data/banded_matrix.hpp"
 #include "jump/data/dense_matrix.hpp"
 #include "jump/data/vector.hpp"
+#include "jump/debug/exception_decl.hpp"
 #include "jump/testing/testing.hpp"
 #include "jump/utility/random.hpp"
 
@@ -263,6 +264,163 @@ inline TestResult test_matrix_initialise_chained() {
 
 inline TestResult test_matrix_initialise_fail() {
     TestResult result;
+
+    RandomNumbers<int, std::uniform_int_distribution> rng_int(10, 15);
+    std::size_t bands{3};
+    auto size1{static_cast<std::size_t>(rng_int.generate())};
+    auto size2{static_cast<std::size_t>(rng_int.generate())};
+    auto underlying_size_banded1{size1*(3*bands + 1) + 1};
+    auto underlying_size_banded2{size1*(3*bands + 1) - 1};
+    auto underlying_size_dense1{size1*size2 + 1};
+    auto underlying_size_dense2{size1*size2 - 1};
+
+    Vector<Real> vbr(underlying_size_banded1), vdr(underlying_size_dense1);
+    Vector<Complex> vbz(underlying_size_banded2), vdz(underlying_size_dense2);
+
+    {
+        bool real_caught{false};
+        bool complex_caught{false};
+
+        try {
+            [[maybe_unused]] BandedMatrix<Real> br{size1, bands, vbr};
+        } catch (RuntimeError<InvalidArgumentError>& e) {
+            real_caught = true;
+        }
+        try {
+            [[maybe_unused]] BandedMatrix<Complex> bz{size1, bands, vbz};
+        } catch (RuntimeError<InvalidArgumentError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "banded real underlying");
+        result.add_check(complex_caught, "banded complex underlying");
+    }
+    {
+        bool real_caught{false};
+        bool complex_caught{false};
+
+        BandedMatrix<Real> br;
+        BandedMatrix<Complex> bz;
+
+        try {
+            br.assign(size1, bands, vbr);
+        } catch (RuntimeError<InvalidArgumentError>& e) {
+            real_caught = true;
+        }
+        try {
+            bz.assign(size1, bands, vbz);
+        } catch (RuntimeError<InvalidArgumentError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "banded real assign underlying");
+        result.add_check(complex_caught, "banded complex assign underlying");
+
+        real_caught = complex_caught = false;
+
+        try {
+            br.assign(vbr);
+        } catch (RuntimeError<Mismatch1DError>& e) {
+            real_caught = true;
+        }
+        try {
+            bz.assign(vbz);
+        } catch (RuntimeError<Mismatch1DError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "banded real assign underlying only");
+        result.add_check(complex_caught,
+                "banded complex assign underlying only");
+
+        real_caught = complex_caught = false;
+
+        try {
+            br.assign(vbr.begin(), vbr.end());
+        } catch (RuntimeError<InvalidArgumentError>& e) {
+            real_caught = true;
+        }
+        try {
+            bz.assign(vbz.begin(), vbz.end());
+        } catch (RuntimeError<InvalidArgumentError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "banded real assign iterators");
+        result.add_check(complex_caught, "banded complex assign iterators");
+    }
+    {
+        bool real_caught{false};
+        bool complex_caught{false};
+
+        try {
+            [[maybe_unused]] DenseMatrix<Real> dr{size1, size2, vdr};
+        } catch (RuntimeError<InvalidArgumentError>& e) {
+            real_caught = true;
+        }
+        try {
+            [[maybe_unused]] DenseMatrix<Complex> bz{size1, size2, vdz};
+        } catch (RuntimeError<InvalidArgumentError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "dense real underlying");
+        result.add_check(complex_caught, "dense complex underlying");
+    }
+    {
+        bool real_caught{false};
+        bool complex_caught{false};
+
+        DenseMatrix<Real> dr;
+        DenseMatrix<Complex> dz;
+
+        try {
+            dr.assign(size1, size2, vdr);
+        } catch (RuntimeError<InvalidArgumentError>& e) {
+            real_caught = true;
+        }
+        try {
+            dz.assign(size1, size2, vdz);
+        } catch (RuntimeError<InvalidArgumentError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "dense real assign underlying");
+        result.add_check(complex_caught, "dense complex assign underlying");
+
+        real_caught = complex_caught = false;
+
+        try {
+            dr.assign(vdr);
+        } catch (RuntimeError<Mismatch1DError>& e) {
+            real_caught = true;
+        }
+        try {
+            dz.assign(vdz);
+        } catch (RuntimeError<Mismatch1DError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "dense real assign underlying only");
+        result.add_check(complex_caught,
+                "dense complex assign underlying only");
+
+        real_caught = complex_caught = false;
+
+        try {
+            dr.assign(vdr.begin(), vdr.end());
+        } catch (RuntimeError<InvalidArgumentError>& e) {
+            real_caught = true;
+        }
+        try {
+            dz.assign(vdz.begin(), vdz.end());
+        } catch (RuntimeError<InvalidArgumentError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "dense real assign iterators");
+        result.add_check(complex_caught, "dense complex assign iterators");
+    }
 
     return result;
 }
