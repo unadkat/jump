@@ -62,7 +62,7 @@ friend Vector<T> operator*(const DenseMatrix& lhs, const Vector<T>& rhs) {
     }
 #endif  // NDEBUG
 
-    std::size_t N{rhs.size()}, X{lhs.num_columns()};
+    std::size_t N{lhs.num_rows()}, X{lhs.num_columns()};
     Vector<T> result(N);
     for (std::size_t i{0}; i < X; ++i) {
         for (std::size_t row{0}; row < N; ++row) {
