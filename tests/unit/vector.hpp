@@ -52,34 +52,56 @@ inline TestResult test_vector_arithmetic_basic() {
     randomise(rng, ar, br, az, bz);
 
     Vector<Real> var(5, ar), vbr(5, br);
+    Vector<Complex> varZ{var}, vbrZ{vbr};
     Vector<Complex> vaz(5, az), vbz(5, bz);
 
     {
         Real ans_r{ar + br};
         Vector<Real> vans_r(5, ans_r), vcr{var + vbr};
+        Vector<Complex> vans_rZ{vans_r};
+        Vector<Complex> vcrZ1{var + vbrZ}, vcrZ2{varZ + vbr};
         Complex ans_z{az + bz};
         Vector<Complex> vans_z(5, ans_z), vcz{vaz + vbz};
 
         result.add_check(vanishes((vans_r - vcr).L2_norm()), "add real");
+        result.add_check(vanishes((vans_rZ - vcrZ1).L2_norm()),
+                "add real-complex");
+        result.add_check(vanishes((vans_rZ - vcrZ2).L2_norm()),
+                "add complex-real");
         result.add_check(vanishes((vans_z - vcz).L2_norm()), "add complex");
     }
     {
         Real ans_r{ar - br};
         Vector<Real> vans_r(5, ans_r), vcr{var - vbr};
+        Vector<Complex> vans_rZ{vans_r};
+        Vector<Complex> vcrZ1{var - vbrZ}, vcrZ2{varZ - vbr};
         Complex ans_z{az - bz};
         Vector<Complex> vans_z(5, ans_z), vcz{vaz - vbz};
 
         result.add_check(vanishes((vans_r - vcr).L2_norm()), "subtract real");
+        result.add_check(vanishes((vans_rZ - vcrZ1).L2_norm()),
+                "subtract real-complex");
+        result.add_check(vanishes((vans_rZ - vcrZ2).L2_norm()),
+                "subtract complex-real");
         result.add_check(vanishes((vans_z - vcz).L2_norm()),
                 "subtract complex");
     }
     {
+        // TODO: Real vector multiplication by complex scalar
         Real ans_r{ar*br};
         Vector<Real> vans_r(5, ans_r), vcr{var*br};
+        Complex brZ{br};
+        Vector<Complex> vans_rZ{vans_r};
+//        Vector<Complex> vcrZ1{var*brZ};
+//        Vector<Complex> vcrZ2{brZ*var};
         Complex ans_z{az*bz};
         Vector<Complex> vans_z(5, ans_z), vcz{vaz*bz};
 
         result.add_check(vanishes((vans_r - vcr).L2_norm()), "scale real");
+//        result.add_check(vanishes((vans_rZ - vcrZ1).L2_norm()),
+//                "scale real-complex");
+//        result.add_check(vanishes((vans_rZ - vcrZ2).L2_norm()),
+//                "scale complex-real");
         result.add_check(vanishes((vans_z - vcz).L2_norm()), "scale complex");
     }
 
@@ -122,6 +144,7 @@ inline TestResult test_vector_inner_prod() {
     auto N{static_cast<std::size_t>(rng_int.generate())};
     Vector<Real> ar(N), br(N);
     std::iota(ar.begin(), ar.end(), 1);
+    Vector<Complex> arZ{ar};
 
     Vector<Complex> az(N);
     for (std::size_t i{0}; i < N; ++i) {
@@ -132,10 +155,12 @@ inline TestResult test_vector_inner_prod() {
     auto res_complex{az*az};
 
     result.add_check(approx_abs(ar*ar, real_ans), "inner product real");
-    result.add_check(approx_abs(res_complex.real(), 0.75*real_ans),
-            "inner product complex (real part)");
-    result.add_check(approx_abs(res_complex.imag(), real_ans),
-            "inner product complex (imaginary part)");
+    result.add_check(approx_abs(ar*arZ, {real_ans, 0.}),
+            "inner product real-complex");
+    result.add_check(approx_abs(arZ*ar, {real_ans, 0.}),
+            "inner product complex-real");
+    result.add_check(approx_abs(res_complex, {0.75*real_ans, real_ans}),
+            "inner product complex");
 
     return result;
 }
