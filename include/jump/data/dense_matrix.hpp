@@ -5,6 +5,7 @@
 #define JUMP_DENSE_MATRIX_HPP
 
 #include "jump/data/dense_matrix_decl.hpp"
+#include <algorithm>
 
 namespace jump {
 /// \class DenseMatrix
@@ -346,10 +347,10 @@ inline Real DenseMatrix<T>::column_Linf_norm(std::size_t column) const {
     auto it{column_iterators(column)};
     if constexpr (is_dual_v<T>) {
         auto F{[](const T& x) { return abs(x).value; }};
-        return F(std::ranges::max(it.first, it.second, {}, F));
+        return F(*std::ranges::max_element(it.first, it.second, {}, F));
     } else {
         auto F{[](const T& x) { return std::abs(x); }};
-        return F(std::ranges::max(it.first, it.second, {}, F));
+        return F(*std::ranges::max_element(it.first, it.second, {}, F));
     }
 }
 
