@@ -1,4 +1,5 @@
 #include "jump/data/banded_matrix.hpp"
+#include "jump/data/banded_matrix_decl.hpp"
 #include "jump/data/dense_matrix.hpp"
 #include "jump/data/vector.hpp"
 #include "jump/debug/exception_decl.hpp"
@@ -11,8 +12,8 @@ TestResult test_matrix_initialise_basic();
 TestResult test_matrix_initialise_chained();
 TestResult test_matrix_initialise_fail();
 TestResult test_matrix_arithmetic_basic();
-TestResult test_matrix_arithmetic_compound();
 TestResult test_matrix_multiply();
+TestResult test_matrix_arithmetic_compound();
 TestResult test_matrix_arithmetic_fail();
 TestResult test_matrix_norms();
 TestResult test_matrix_access_in_range();
@@ -34,9 +35,9 @@ inline TestSuiteL1 matrix_tests() {
 
     tests.push_back({"arithmetic"});
     tests.back().register_item({"basic", {}, &test_matrix_arithmetic_basic});
+    tests.back().register_item({"multiply", {}, &test_matrix_multiply});
     tests.back().register_item({"compound", {},
             &test_matrix_arithmetic_compound});
-    tests.back().register_item({"multiply", {}, &test_matrix_multiply});
     // These tests should throw exceptions which are disabled by the NDEBUG flag
 #ifndef NDEBUG
     tests.back().register_item({"fail", {}, &test_matrix_arithmetic_fail});
@@ -509,12 +510,6 @@ inline TestResult test_matrix_arithmetic_basic() {
     return result;
 }
 
-inline TestResult test_matrix_arithmetic_compound() {
-    TestResult result;
-
-    return result;
-}
-
 inline TestResult test_matrix_multiply() {
     TestResult result;
 
@@ -740,8 +735,252 @@ inline TestResult test_matrix_multiply() {
     return result;
 }
 
+inline TestResult test_matrix_arithmetic_compound() {
+    TestResult result;
+    RandomNumbers rng_real(0., 10.);
+    RandomNumbers<int, std::uniform_int_distribution> rng_int(10, 15);
+
+    auto size{static_cast<std::size_t>(rng_int.generate())};
+    Real kr1, kr2, kr3;
+    Complex kz1, kz2, kz3;
+    randomise(rng_real, kr1, kr2, kr3, kz1, kz2, kz3);
+
+    while (vanishes(kr3)) {
+        randomise(rng_real, kr3);
+    }
+    while (vanishes(std::abs(kz3))) {
+        randomise(rng_real, kz3);
+    }
+
+    {
+        std::size_t bands{3};
+        BandedMatrix<Real> Ar{size, bands}, Br{Ar}, Cr{Ar};
+        BandedMatrix<Complex> Az{size, bands}, Bz{Az}, Cz{Az};
+        randomise(rng_real, Ar, Br, Cr, Az, Bz, Cz);
+
+        auto lhs_r{kr1*(Ar + Br) + kr2*(Ar - Cr)/kr3};
+        auto rhs_r{(kr1 + kr2/kr3)*Ar + kr1*Br - kr2/kr3*Cr};
+        auto lhs_z{kz1*(Az + Bz) + kz2*(Az - Cz)/kz3};
+        auto rhs_z{(kz1 + kz2/kz3)*Az + kz1*Bz - kz2/kz3*Cz};
+
+        result.add_check(vanishes((lhs_r - rhs_r).as_vector().L2_norm()),
+                "banded real");
+        result.add_check(vanishes((lhs_z - rhs_z).as_vector().L2_norm()),
+                "banded complex");
+    }
+    {
+        std::size_t size2{size + 2};
+        DenseMatrix<Real> Ar{size, size2}, Br{Ar}, Cr{Ar}, Dr{size2, size};
+        DenseMatrix<Complex> Az{size, size2}, Bz{Az}, Cz{Az}, Dz{size2, size};
+        randomise(rng_real, Ar, Br, Cr, Dr, Az, Bz, Cz, Dz);
+
+        auto lhs_r{(kr1*(Ar + Br) + kr2*(Ar - Cr)/kr3)*Dr};
+        auto rhs_r{(kr1*(Ar + Br) + kr2*(Ar - Cr)/kr3)*Dr};
+        auto lhs_z{(kz1 + kz2/kz3)*Az*Dz + kz1*Bz*Dz + kz2/kz3*Cz*Dz};
+        auto rhs_z{(kz1 + kz2/kz3)*Az*Dz + kz1*Bz*Dz + kz2/kz3*Cz*Dz};
+
+        result.add_check(vanishes((lhs_r - rhs_r).as_vector().L2_norm()),
+                "dense real");
+        result.add_check(vanishes((lhs_z - rhs_z).as_vector().L2_norm()),
+                "dense complex");
+    }
+
+    return result;
+}
+
 inline TestResult test_matrix_arithmetic_fail() {
     TestResult result;
+
+    std::size_t size1{10}, size2{11};
+    std::size_t bands1{2}, bands2{3};
+    Vector<Real> vr(size2);
+    Vector<Complex> vz(size2);
+    bool real_caught{false}, complex_caught{false};
+
+    {
+        BandedMatrix<Real> Ar{size1, bands1}, Br{size2, bands1},
+            Cr{size1, bands2};
+        BandedMatrix<Complex> Az{size1, bands1}, Bz{size2, bands1},
+            Cz{size1, bands2};
+
+        try {
+            [[maybe_unused]] auto temp{Ar + Br};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            real_caught = true;
+        }
+        try {
+            [[maybe_unused]] auto temp{Az + Bz};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "add banded real, size diff");
+        result.add_check(complex_caught, "add banded complex, size diff");
+
+        real_caught = complex_caught = false;
+
+        try {
+            [[maybe_unused]] auto temp{Ar + Cr};
+        } catch (RuntimeError<InvalidArgumentError>& e) {
+            real_caught = true;
+        }
+        try {
+            [[maybe_unused]] auto temp{Az + Cz};
+        } catch (RuntimeError<InvalidArgumentError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "add banded real, bands diff");
+        result.add_check(complex_caught, "add banded complex, bands diff");
+
+        real_caught = complex_caught = false;
+
+        try {
+            [[maybe_unused]] auto temp{Ar - Br};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            real_caught = true;
+        }
+        try {
+            [[maybe_unused]] auto temp{Az - Bz};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "subtract banded real, size diff");
+        result.add_check(complex_caught, "subtract banded complex, size diff");
+
+        real_caught = complex_caught = false;
+
+        try {
+            [[maybe_unused]] auto temp{Ar - Cr};
+        } catch (RuntimeError<InvalidArgumentError>& e) {
+            real_caught = true;
+        }
+        try {
+            [[maybe_unused]] auto temp{Az - Cz};
+        } catch (RuntimeError<InvalidArgumentError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "subtract banded real, bands diff");
+        result.add_check(complex_caught, "subtract banded complex, bands diff");
+
+        real_caught = complex_caught = false;
+
+        try {
+            [[maybe_unused]] auto temp{Ar*vr};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            real_caught = true;
+        }
+        try {
+            [[maybe_unused]] auto temp{Az*vz};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "matrix-vector banded real");
+        result.add_check(complex_caught, "matrix-vector banded complex");
+    }
+    {
+        DenseMatrix<Real> Ar{size1, size2}, Br{size2, size2},
+            Cr{size1, size1};
+        DenseMatrix<Complex> Az{size1, size2}, Bz{size2, size2},
+            Cz{size1, size1};
+
+        try {
+            [[maybe_unused]] auto temp{Ar + Br};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            real_caught = true;
+        }
+        try {
+            [[maybe_unused]] auto temp{Az + Bz};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "add dense real, row diff");
+        result.add_check(complex_caught, "add dense complex, row diff");
+
+        real_caught = complex_caught = false;
+
+        try {
+            [[maybe_unused]] auto temp{Ar + Cr};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            real_caught = true;
+        }
+        try {
+            [[maybe_unused]] auto temp{Az + Cz};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "add dense real, col diff");
+        result.add_check(complex_caught, "add dense complex, col diff");
+
+        real_caught = complex_caught = false;
+
+        try {
+            [[maybe_unused]] auto temp{Ar - Br};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            real_caught = true;
+        }
+        try {
+            [[maybe_unused]] auto temp{Az - Bz};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "subtract dense real, row diff");
+        result.add_check(complex_caught, "subtract dense complex, row diff");
+
+        real_caught = complex_caught = false;
+
+        try {
+            [[maybe_unused]] auto temp{Ar - Cr};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            real_caught = true;
+        }
+        try {
+            [[maybe_unused]] auto temp{Az - Cz};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "subtract dense real, col diff");
+        result.add_check(complex_caught, "subtract dense complex, col diff");
+
+        real_caught = complex_caught = false;
+
+        try {
+            [[maybe_unused]] auto temp{Cr*vr};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            real_caught = true;
+        }
+        try {
+            [[maybe_unused]] auto temp{Cz*vz};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "matrix-vector dense real");
+        result.add_check(complex_caught, "matrix-vector dense complex");
+
+        real_caught = complex_caught = false;
+
+        try {
+            [[maybe_unused]] auto temp{Ar*Cr};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            real_caught = true;
+        }
+        try {
+            [[maybe_unused]] auto temp{Az*Cz};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "matrix-matrix dense real");
+        result.add_check(complex_caught, "matrix-matrix dense complex");
+    }
 
     return result;
 }
