@@ -62,10 +62,13 @@ class BandedMatrix : public MatrixBase<T> {
         /// \brief Defaulted spaceship operator.
         auto operator<=>(const BandedMatrix&) const = default;
 
-        /// \brief Const element access.
+        /// \brief Const element access, always returns temporary value.
         T operator[](std::size_t row, std::size_t column) const;
         /// \brief Mutable element access.
-        T& operator[](std::size_t row, std::size_t column);
+        T& get_unsafe(std::size_t row, std::size_t column);
+        /// \brief Element setter, returns flag for success.
+        [[nodiscard]] bool set(std::size_t row, std::size_t column,
+                const T& value);
 
         /// \brief Const iterator for algorithms.
         ConstIterator begin() const;

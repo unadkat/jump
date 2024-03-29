@@ -145,7 +145,7 @@ inline T BandedMatrix<T>::operator[](std::size_t row,
 /// `(i, j)` must be mapped to the element `(1 + 2*#num_bands() + i - j, j)` in
 /// the internal storage.
 template <typename T>
-inline T& BandedMatrix<T>::operator[](std::size_t row, std::size_t column) {
+inline T& BandedMatrix<T>::get_unsafe(std::size_t row, std::size_t column) {
 #ifndef NDEBUG
     if (row >= this->num_rows() || column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {row, column},
@@ -161,6 +161,34 @@ inline T& BandedMatrix<T>::operator[](std::size_t row, std::size_t column) {
 #endif  // NDEBUG
 
     return m_storage[num_bands()*(3*column + 2) + row];
+}
+
+/// Note that the internal storage takes the form of a dense matrix with
+/// `num_columns()` columns and `1 + 3*#num_bands()` rows. Refer to the
+/// <a href="http://www.netlib.org/lapack/lug/node124.html">LAPACK User
+/// Guide</a> for further details about the band storage scheme.
+///
+/// The leading diagonal of the matrix occupies row `1 + 2*#num_bands()` of the
+/// internal storage. Remembering that an element in column `j` in the matrix
+/// remains in column `j` in the internal storage, we see that the element
+/// `(i, j)` must be mapped to the element `(1 + 2*#num_bands() + i - j, j)` in
+/// the internal storage.
+template <typename T>
+inline bool BandedMatrix<T>::set(std::size_t row, std::size_t column,
+        const T& value) {
+#ifndef NDEBUG
+    if (row >= this->num_rows() || column >= this->num_columns()) {
+        throw RuntimeError{Range2DError{.indices = {row, column},
+            .size = this->size()}};
+    }
+#endif  // NDEBUG
+
+    if (row > column + num_bands() || column > row + 2*num_bands()) {
+        return false;
+    } else {
+        m_storage[num_bands()*(3*column + 2) + row] = value;
+        return true;
+    }
 }
 
 template <typename T>
