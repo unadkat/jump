@@ -71,7 +71,7 @@ inline bool CommandLineArgs::get(const char& flag, bool& storage) {
             it != m_flags.end()) {
         return (storage = it->read = true);
     } else {
-        return (storage = false);
+        return false;
     }
 }
 
@@ -107,7 +107,7 @@ inline bool CommandLineArgs::get(const std::string& option, bool& storage) {
             it != m_options.end()) {
         return (storage = it->read = true);
     } else {
-        return (storage = false);
+        return false;
     }
 }
 
