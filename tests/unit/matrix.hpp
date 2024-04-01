@@ -987,24 +987,276 @@ inline TestResult test_matrix_arithmetic_fail() {
 
 inline TestResult test_matrix_norms() {
     TestResult result;
+    RandomNumbers<int, std::uniform_int_distribution> rng_int(10, 15);
+
+    auto size{static_cast<std::size_t>(rng_int.generate())};
+    DenseMatrix<Real> A{size, size + 2};
+    DenseMatrix<Complex> B{size + 2, size};
+
+    for (std::size_t col{0}; col < size + 2; ++col) {
+        for (std::size_t row{0}; row < size; ++row) {
+            const auto val{static_cast<Real>(row + 1)};
+            A[row, col] = (col + 1)*val;
+        }
+    }
+    for (std::size_t col{0}; col < size; ++col) {
+        for (std::size_t row{0}; row < size + 2; ++row) {
+            const auto val{static_cast<Real>(row + 1)};
+            B[row, col] = {(col + 1)*val, (col + 2)*val};
+        }
+    }
+
+    Vector<Real> real_col_1_norm(size + 2);
+    Vector<Real> real_col_2_norm(size + 2);
+    Vector<Real> real_col_inf_norm(size + 2);
+    Vector<Real> complex_col_1_norm(size);
+    Vector<Real> complex_col_2_norm(size);
+    Vector<Real> complex_col_inf_norm(size);
+
+    Real lin{0.5*size*(size + 1)};
+    Real quad{size*(size + 1)*(2*size + 1)/6.};
+    for (std::size_t col{0}; col < size + 2; ++col) {
+        real_col_1_norm[col] = A.column_L1_norm(col) - (col + 1)*lin;
+        real_col_2_norm[col] = A.column_L2_norm(col)
+            - (col + 1)*std::sqrt(quad);
+        real_col_inf_norm[col] = A.column_Linf_norm(col) - (col + 1)*size;
+    }
+
+    lin = 0.5*(size + 2)*(size + 3);
+    quad = (size + 2)*(size + 3)*(2*size + 5)/6.;
+    for (std::size_t col{0}; col < size; ++col) {
+        Real scale{std::sqrt((col + 1)*(col + 1) + (col + 2)*(col + 2))};
+        complex_col_1_norm[col] = B.column_L1_norm(col) - scale*lin;
+        complex_col_2_norm[col] = B.column_L2_norm(col) - scale*std::sqrt(quad);
+        complex_col_inf_norm[col] = B.column_Linf_norm(col) - scale*(size + 2);
+    }
+
+    result.add_check(vanishes(real_col_1_norm.L2_norm()), "real L1 norm");
+    result.add_check(vanishes(real_col_2_norm.L2_norm()), "real L2 norm");
+    result.add_check(vanishes(real_col_inf_norm.L2_norm()), "real Linf norm");
+    result.add_check(vanishes(complex_col_1_norm.L2_norm()), "complex L1 norm");
+    result.add_check(vanishes(complex_col_2_norm.L2_norm()), "complex L2 norm");
+    result.add_check(vanishes(complex_col_inf_norm.L2_norm()),
+            "complex Linf norm");
 
     return result;
 }
 
 inline TestResult test_matrix_access_in_range() {
     TestResult result;
+    RandomNumbers<int, std::uniform_int_distribution> rng_int(10, 15);
+
+    auto size1{static_cast<std::size_t>(rng_int.generate())};
+    auto size2{size1 + 2};
+    std::size_t bands{3};
+
+    auto real_val{[](std::size_t row, std::size_t col) -> Real {
+        return std::sin(row)*std::cos(col);
+    }};
+    auto complex_val{[](std::size_t row, std::size_t col) -> Complex {
+        return {std::sin(row)*std::cos(col), std::cos(row)};
+    }};
+
+    {
+        Real real_sum{0};
+        Complex complex_sum{0};
+
+        BandedMatrix<Real> Ar{size1, bands};
+        BandedMatrix<Complex> Az{size2, bands};
+
+        for (std::size_t col{0}; col < size1; ++col) {
+            for (std::size_t row{0}; row < size1; ++row) {
+                const auto val{real_val(row, col)};
+                if (Ar.set(row, col, val)) {
+                    real_sum += val;
+                }
+            }
+        }
+        for (std::size_t col{0}; col < size2; ++col) {
+            for (std::size_t row{0}; row < size2; ++row) {
+                const auto val{complex_val(row, col)};
+                if (Az.set(row, col, val)) {
+                    complex_sum += val;
+                }
+            }
+        }
+
+        Real real_acc{0};
+        for (std::size_t col{0}; col < size1; ++col) {
+            for (std::size_t row{0}; row < size1; ++row) {
+                real_acc += Ar[row, col];
+            }
+        }
+
+        Complex complex_acc{0};
+        for (std::size_t col{0}; col < size2; ++col) {
+            for (std::size_t row{0}; row < size2; ++row) {
+                complex_acc += Az[row, col];
+            }
+        }
+
+        result.add_check(vanishes(real_sum - real_acc), "banded real");
+        result.add_check(vanishes(complex_sum - complex_acc), "banded complex");
+    }
+    {
+        Real real_sum{0};
+        Complex complex_sum{0};
+
+        DenseMatrix<Real> Ar{size1, size2};
+        DenseMatrix<Complex> Az{size2, size1};
+
+        for (std::size_t col{0}; col < size2; ++col) {
+            for (std::size_t row{0}; row < size1; ++row) {
+                const auto val{real_val(row, col)};
+                Ar[row, col] = val;
+                real_sum += val;
+            }
+        }
+        for (std::size_t col{0}; col < size1; ++col) {
+            for (std::size_t row{0}; row < size2; ++row) {
+                const auto val{complex_val(row, col)};
+                Az[row, col] = val;
+                complex_sum += val;
+            }
+        }
+
+        auto real_acc{std::accumulate(Ar.as_vector().begin(),
+                Ar.as_vector().end(), Real{0})};
+        auto complex_acc{std::accumulate(Az.as_vector().begin(),
+                Az.as_vector().end(), Complex{0})};
+
+        result.add_check(vanishes(real_sum - real_acc), "dense real");
+        result.add_check(vanishes(complex_sum - complex_acc), "dense complex");
+    }
 
     return result;
 }
 
 inline TestResult test_matrix_dense_columns() {
     TestResult result;
+    RandomNumbers rng_real(0., 10.);
+    RandomNumbers<int, std::uniform_int_distribution> rng_int(10, 15);
+
+    auto size1{static_cast<std::size_t>(rng_int.generate())};
+    auto size2{size1 + 2};
+    DenseMatrix<Real> Ar{size1, size2};
+    DenseMatrix<Complex> Az{size1, size2};
+    Vector<Real> vr(size1);
+    Vector<Complex> vz(size1);
+    randomise(rng_real, vr, vz);
+
+    bool real_success{true}, complex_success{true};
+
+    for (std::size_t col{0}; col < size2; ++col) {
+        auto real_it{Ar.column_iterators(col)};
+        std::transform(vr.begin(), vr.end(), real_it.first,
+                [&](const Real& x) -> Real { return (col + 1.)*x; });
+        auto complex_it{Az.column_iterators(col)};
+        std::transform(vz.begin(), vz.end(), complex_it.first,
+                [&](const Complex& z) -> Complex { return (col + 1.)*z; });
+    }
+
+    for (std::size_t col{0}; col < size2; ++col) {
+        if (!vanishes(Ar.column_L2_norm(col) - (col + 1)*vr.L2_norm())) {
+            real_success = false;
+        }
+        if (!vanishes(Az.column_L2_norm(col) - (col + 1)*vz.L2_norm())) {
+            complex_success = false;
+        }
+    }
+
+    result.add_check(real_success, "real");
+    result.add_check(complex_success, "complex");
 
     return result;
 }
 
 inline TestResult test_matrix_access_fail() {
     TestResult result;
+    RandomNumbers<int, std::uniform_int_distribution> rng_int(10, 15);
+
+    auto size1{static_cast<std::size_t>(rng_int.generate())};
+    auto size2{size1 + 2};
+    std::size_t bands{2};
+    bool caught1{false}, caught2{false};
+
+    BandedMatrix<Real> A{size1, bands};
+    DenseMatrix<Real> B{size2, size1};
+
+    try {
+        (void)A.set(0, -1, 1.);
+    } catch (RuntimeError<Range2DError>& e) {
+        caught1 = true;
+    }
+    try {
+        (void)A.set(0, size1, 1.);
+    } catch (RuntimeError<Range2DError>& e) {
+        caught2 = true;
+    }
+
+    result.add_check(caught1, "banded out of bounds column low");
+    result.add_check(caught2, "banded out of bounds column high");
+    caught1 = caught2 = false;
+
+    try {
+        (void)A.set(-1, 0, 1.);
+    } catch (RuntimeError<Range2DError>& e) {
+        caught1 = true;
+    }
+    try {
+        (void)A.set(0, size1, 1.);
+    } catch (RuntimeError<Range2DError>& e) {
+        caught2 = true;
+    }
+
+    result.add_check(caught1, "banded out of bounds row low");
+    result.add_check(caught2, "banded out of bounds row high");
+    caught1 = caught2 = false;
+
+    auto col{size1 - bands - 2};
+    try {
+        A.get_unsafe(col - 2*bands - 1, col) = 1.;
+    } catch (RuntimeError<InvalidArgumentError>& e) {
+        caught1 = true;
+    }
+    try {
+        A.get_unsafe(col + bands + 1, col) = 1.;
+    } catch (RuntimeError<InvalidArgumentError>& e) {
+        caught2 = true;
+    }
+
+    result.add_check(caught1, "banded out of bands low");
+    result.add_check(caught2, "banded out of bands high");
+    caught1 = caught2 = false;
+
+    try {
+        B[0, -1] = 1.;
+    } catch (RuntimeError<Range2DError>& e) {
+        caught1 = true;
+    }
+    try {
+        B[0, size1] = 1.;
+    } catch (RuntimeError<Range2DError>& e) {
+        caught2 = true;
+    }
+
+    result.add_check(caught1, "dense out of bounds column low");
+    result.add_check(caught2, "dense out of bounds column high");
+    caught1 = caught2 = false;
+
+    try {
+        B[-1, 0] = 1.;
+    } catch (RuntimeError<Range2DError>& e) {
+        caught1 = true;
+    }
+    try {
+        B[size2, 0] = 1.;
+    } catch (RuntimeError<Range2DError>& e) {
+        caught2 = true;
+    }
+
+    result.add_check(caught1, "dense out of bounds row low");
+    result.add_check(caught2, "dense out of bounds row high");
 
     return result;
 }
