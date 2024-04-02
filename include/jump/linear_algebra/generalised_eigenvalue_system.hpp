@@ -9,7 +9,8 @@
 namespace jump {
 template <typename T>
 inline GeneralisedEigenvalueSystem<T>::GeneralisedEigenvalueSystem(
-        DenseMatrix<T>& A, DenseMatrix<T>& B, std::vector<Eigendatum>& data) :
+        DenseMatrix<T>& A, DenseMatrix<T>& B,
+        std::vector<Eigendatum<T>>& data) :
     m_A{A},
     m_B{B},
     m_data{data} {

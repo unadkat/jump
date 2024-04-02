@@ -10,9 +10,10 @@ namespace jump {
 /// After the population with the new eigenvalue/eigenvector pairs, the data is
 /// left unsorted with respect to the eigenvalues. It is up to the user to sort
 /// the data as required for their purposes.
-inline std::vector<Eigendatum> combine_eigendata(
-        const std::vector<Complex>& eigenvalues,
-        const std::vector<Vector<Complex>>& eigenvectors) {
+template <typename T>
+inline std::vector<Eigendatum<T>> combine_eigendata(
+        const std::vector<T>& eigenvalues,
+        const std::vector<Vector<T>>& eigenvectors) {
 #ifndef NDEBUG
     if (eigenvalues.size() != eigenvectors.size())
         throw RuntimeError{Mismatch1DError{.name1 = "eigenvalues",
@@ -21,9 +22,9 @@ inline std::vector<Eigendatum> combine_eigendata(
 #endif  // NDEBUG
 
     // TODO: rewrite when std::ranges::to is available to convert from view
-    std::vector<Eigendatum> result;
+    std::vector<Eigendatum<T>> result;
     for (std::size_t i{0}, size{eigenvalues.size()}; i < size; ++i) {
-        result.push_back(Eigendatum{eigenvalues[i], eigenvectors[i]});
+        result.push_back(Eigendatum<T>{eigenvalues[i], eigenvectors[i]});
     }
     return result;
 }

@@ -27,14 +27,14 @@ class GeneralisedEigenvalueSystem : public LinearSystemBase {
         DenseMatrix<T>& m_B;
         /// \brief Reference to the solution data structure, which will store
         /// eigenvalue/eigenvector pairs.
-        std::vector<Eigendatum>& m_data;
+        std::vector<Eigendatum<T>>& m_data;
 
     public:
         /// \brief Initialise the eigenvalue system with references to the
         /// DenseMatrices in \f$A\vec{x}=\lambda*B*\vec{x}\f$ and the solution
         /// data structure.
         GeneralisedEigenvalueSystem(DenseMatrix<T>& A, DenseMatrix<T>& B,
-                std::vector<Eigendatum>& data);
+                std::vector<Eigendatum<T>>& data);
 
         /// \brief Solve the eigenvalue system.
         void solve();
