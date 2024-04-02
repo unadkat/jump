@@ -61,9 +61,9 @@ inline TestSuiteL1 matrix_tests() {
 inline TestResult test_matrix_initialise_basic() {
     TestResult result;
 
-    RandomNumbers<int, std::uniform_int_distribution> rng_int_low(10, 15);
-    RandomNumbers<int, std::uniform_int_distribution> rng_int_high(20, 25);
-    RandomNumbers rng(0., 10.);
+    RandomInt rng_int_low(10, 15);
+    RandomInt rng_int_high(20, 25);
+    RandomReal rng(0., 10.);
 
     auto size1{static_cast<std::size_t>(rng_int_low.generate())};
     auto size2{static_cast<std::size_t>(rng_int_high.generate())};
@@ -146,9 +146,9 @@ inline TestResult test_matrix_initialise_basic() {
 inline TestResult test_matrix_initialise_chained() {
     TestResult result;
 
-    RandomNumbers<int, std::uniform_int_distribution> rng_int_low(10, 15);
-    RandomNumbers<int, std::uniform_int_distribution> rng_int_high(20, 25);
-    RandomNumbers rng(0., 15.);
+    RandomInt rng_int_low(10, 15);
+    RandomInt rng_int_high(20, 25);
+    RandomReal rng(0., 15.);
 
     auto size01{static_cast<std::size_t>(rng_int_low.generate())};
     auto size02{static_cast<std::size_t>(rng_int_low.generate())};
@@ -276,7 +276,7 @@ inline TestResult test_matrix_initialise_chained() {
 inline TestResult test_matrix_initialise_fail() {
     TestResult result;
 
-    RandomNumbers<int, std::uniform_int_distribution> rng_int(10, 15);
+    RandomInt rng_int(10, 15);
     std::size_t bands{3};
     auto size1{static_cast<std::size_t>(rng_int.generate())};
     auto size2{static_cast<std::size_t>(rng_int.generate())};
@@ -438,8 +438,8 @@ inline TestResult test_matrix_initialise_fail() {
 
 inline TestResult test_matrix_arithmetic_basic() {
     TestResult result;
-    RandomNumbers rng_real(0., 10.);
-    RandomNumbers<int, std::uniform_int_distribution> rng_int(10, 15);
+    RandomReal rng_real(0., 10.);
+    RandomInt rng_int(10, 15);
 
     auto size{static_cast<std::size_t>(rng_int.generate())};
     auto size2{size + 2};
@@ -737,8 +737,8 @@ inline TestResult test_matrix_multiply() {
 
 inline TestResult test_matrix_arithmetic_compound() {
     TestResult result;
-    RandomNumbers rng_real(0., 10.);
-    RandomNumbers<int, std::uniform_int_distribution> rng_int(10, 15);
+    RandomReal rng_real(0., 10.);
+    RandomInt rng_int(10, 15);
 
     auto size{static_cast<std::size_t>(rng_int.generate())};
     Real kr1, kr2, kr3;
@@ -987,7 +987,7 @@ inline TestResult test_matrix_arithmetic_fail() {
 
 inline TestResult test_matrix_norms() {
     TestResult result;
-    RandomNumbers<int, std::uniform_int_distribution> rng_int(10, 15);
+    RandomInt rng_int(10, 15);
 
     auto size{static_cast<std::size_t>(rng_int.generate())};
     DenseMatrix<Real> A{size, size + 2};
@@ -1044,7 +1044,7 @@ inline TestResult test_matrix_norms() {
 
 inline TestResult test_matrix_access_in_range() {
     TestResult result;
-    RandomNumbers<int, std::uniform_int_distribution> rng_int(10, 15);
+    RandomInt rng_int(10, 15);
 
     auto size1{static_cast<std::size_t>(rng_int.generate())};
     auto size2{size1 + 2};
@@ -1134,8 +1134,8 @@ inline TestResult test_matrix_access_in_range() {
 
 inline TestResult test_matrix_dense_columns() {
     TestResult result;
-    RandomNumbers rng_real(0., 10.);
-    RandomNumbers<int, std::uniform_int_distribution> rng_int(10, 15);
+    RandomReal rng_real(0., 10.);
+    RandomInt rng_int(10, 15);
 
     auto size1{static_cast<std::size_t>(rng_int.generate())};
     auto size2{size1 + 2};
@@ -1173,7 +1173,7 @@ inline TestResult test_matrix_dense_columns() {
 
 inline TestResult test_matrix_access_fail() {
     TestResult result;
-    RandomNumbers<int, std::uniform_int_distribution> rng_int(10, 15);
+    RandomInt rng_int(10, 15);
 
     auto size1{static_cast<std::size_t>(rng_int.generate())};
     auto size2{size1 + 2};

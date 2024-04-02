@@ -14,8 +14,7 @@
 namespace jump {
 /// \brief Supplies easy random number generation capabilities, with a templated
 /// type for the random numbers and underlying distribution.
-template <typename T = Real, template <typename> typename Distribution
-    = std::uniform_real_distribution>
+template <typename T, template <typename> typename Distribution>
 class RandomNumbers {
     private:
         /// \brief The engine that generates the random seed data which is in
@@ -43,6 +42,9 @@ void randomise(Rng& rng, Ts& ...items);
 
 template <typename Rng, template <typename> typename Container, typename T>
 void randomise(Rng& rng, Container<T>& container);
+
+using RandomReal = RandomNumbers<double, std::uniform_real_distribution>;
+using RandomInt = RandomNumbers<long, std::uniform_int_distribution>;
 }   // namespace jump
 
 #endif  // JUMP_RANDOM_DECL_HPP

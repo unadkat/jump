@@ -45,7 +45,7 @@ inline TestSuiteL1 vector_tests() {
 
 inline TestResult test_vector_arithmetic_basic() {
     TestResult result;
-    RandomNumbers rng(0., 10.);
+    RandomReal rng(0., 10.);
 
     Real ar, br;
     Complex az, bz;
@@ -110,8 +110,8 @@ inline TestResult test_vector_arithmetic_basic() {
 
 inline TestResult test_vector_arithmetic_compound() {
     TestResult result;
-    RandomNumbers rng_real(0., 10.);
-    RandomNumbers<int, std::uniform_int_distribution> rng_int(10, 15);
+    RandomReal rng_real(0., 10.);
+    RandomInt rng_int(10, 15);
 
     auto size{static_cast<std::size_t>(rng_int.generate())};
     Vector<Real> ar(size), br(size), cr(size);
@@ -139,7 +139,7 @@ inline TestResult test_vector_arithmetic_compound() {
 
 inline TestResult test_vector_inner_prod() {
     TestResult result;
-    RandomNumbers<int, std::uniform_int_distribution> rng_int(10, 15);
+    RandomInt rng_int(10, 15);
 
     auto N{static_cast<std::size_t>(rng_int.generate())};
     Vector<Real> ar(N), br(N);
@@ -231,7 +231,7 @@ inline TestResult test_vector_arithmetic_fail() {
 
 inline TestResult test_vector_norms() {
     TestResult result;
-    RandomNumbers<int, std::uniform_int_distribution> rng_int(10, 15);
+    RandomInt rng_int(10, 15);
 
     auto N{static_cast<std::size_t>(rng_int.generate())};
     Vector<Real> ar(N);
@@ -262,7 +262,7 @@ inline TestResult test_vector_norms() {
 
 inline TestResult test_vector_access_in_range() {
     TestResult result;
-    RandomNumbers<int, std::uniform_int_distribution> rng_int(10, 15);
+    RandomInt rng_int(10, 15);
 
     auto size{static_cast<std::size_t>(rng_int.generate())};
     Vector<Real> a(size);
