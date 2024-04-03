@@ -1,5 +1,6 @@
 #include "jump/jump.hpp"
 
+#include "unit/dual.hpp"
 #include "unit/matrix.hpp"
 #include "unit/vector.hpp"
 
@@ -18,6 +19,10 @@ int main(int argc, char** argv) {
     data_tests.register_item(vector_tests());
     data_tests.register_item(matrix_tests());
     jump_tests.register_item(data_tests);
+
+    TestSuiteL2 autodiff_tests{"autodiff"};
+    autodiff_tests.register_item(dual_tests());
+    jump_tests.register_item(autodiff_tests);
 
     auto all_results{jump_tests.run()};
     TestReporter report;
