@@ -2,17 +2,21 @@
 
 #include "jump/autodiff/dual.hpp"
 #include "jump/data/vector.hpp"
+#include "jump/utility/random.hpp"
 #include "jump/testing/testing.hpp"
 
 using namespace jump;
 
 template <std::size_t N, typename T>
-bool vector_compare(const Vector<Dual<N, T>>& lhs, const Vector<T>& rhs) {
-    if (lhs.size() != rhs.size()) {
+bool vector_compare(const Vector<Dual<N, T>>& dual_vector,
+        const Vector<T>& values, const Vector<T>& derivatives) {
+    if (dual_vector.size() != values.size()
+            || dual_vector.size() != derivatives.size()) {
         return false;
     }
-    for (std::size_t i{0}; i < lhs.size(); ++i) {
-        if (!vanishes(lhs[i].value - rhs[i])) {
+    for (std::size_t i{0}; i < dual_vector.size(); ++i) {
+        if (!(vanishes(dual_vector[i].value - values[i])
+                    && vanishes(dual_vector[i].dual[0] - derivatives[i]))) {
             return false;
         }
     }
@@ -49,10 +53,19 @@ inline TestSuiteL1 dual_tests() {
 inline TestResult test_dual_arithmetic_basic() {
     TestResult result;
 
-    const auto& [xdual, x] = populate(0., 5., 101);
-    Vector<Real> dx(101);
+    RandomInt rng_int(91, 111);
+    RandomReal rng_real(5., 10.);
+    auto N{static_cast<std::size_t>(rng_int.generate())};
+    auto xmax{static_cast<Real>(rng_real.generate())};
+    const auto& [xdual, x] = populate(0., xmax, N);
 
-    result.add_check(vector_compare(xdual*2, x*2), "scale real");
+    Vector<Real> dx(N, 1.);
+    result.add_check(vector_compare(xdual + xdual - xdual, x, dx),
+            "add/sub real");
+
+    Real scale{rng_real.generate()};
+    dx = Vector<Real>(N, scale);
+    result.add_check(vector_compare(xdual*scale, x*scale, dx), "scale real");
 
     return result;
 }
