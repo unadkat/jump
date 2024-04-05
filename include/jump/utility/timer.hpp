@@ -97,7 +97,6 @@ inline std::string Timer::formatted_average_time() const {
 }
 
 /// \relates Timer
-/// \brief Print summary of timing results to a stream.
 template <typename Os>
 inline Os& operator<<(Os& out, const Timer& rhs) {
     if (rhs.task() != "") {

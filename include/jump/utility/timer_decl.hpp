@@ -67,6 +67,11 @@ class Timer {
         /// format provided by formatted_time.
         std::string formatted_average_time() const;
 };
+
+/// \relates Timer
+/// \brief Print summary of timing results to a stream.
+template <typename Os>
+inline Os& operator<<(Os& out, const Timer& rhs);
 }   // namespace jump
 
 #endif  // JUMP_TIMER_DECL_HPP

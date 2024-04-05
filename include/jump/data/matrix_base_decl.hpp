@@ -50,6 +50,12 @@ class MatrixBase {
         /// \brief Interface for matrix serialisation to a `std::string`.
         virtual std::string as_string() const = 0;
 };
+
+/// \relates MatrixBase
+/// \brief Send internal representation of the matrix (as a `std::string`) to
+/// the output stream.
+template <typename T, typename Os>
+inline Os& operator<<(Os& out, const MatrixBase<T>& rhs);
 }   // namespace jump
 
 #endif  // JUMP_MATRIX_BASE_DECL_HPP

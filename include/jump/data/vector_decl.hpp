@@ -109,6 +109,11 @@ struct Vector {
 
     #include "jump/data/vector_friends.hpp"
 };
+
+/// \relates Vector
+/// \brief Outputs `Vector` data to output stream in a single line with spaces.
+template <typename T, typename Os>
+Os& operator<<(Os& out, const Vector<T>& rhs);
 }   // namespace jump
 
 #endif  // JUMP_VECTOR_DECL_HPP

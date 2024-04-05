@@ -57,6 +57,94 @@ struct Dual {
     #include "jump/autodiff/dual_friends.hpp"
 };
 
+/// \relates Jump::Dual
+template <std::size_t N, typename T, typename Os>
+inline Os& operator<<(Os& out, const Dual<N, T>& rhs);
+
+// ========================================================================
+// Exponentiation
+// ========================================================================
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> exp(Dual<N, T> x);
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> log(Dual<N, T> x);
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> pow(Dual<N, T> x, Dual<N, T> p);
+
+// ========================================================================
+// Trigonometry
+// ========================================================================
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> sin(Dual<N, T> x);
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> cos(Dual<N, T> x);
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> tan(Dual<N, T> x);
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> asin(Dual<N, T> x);
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> acos(Dual<N, T> x);
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> atan(Dual<N, T> x);
+
+// ========================================================================
+// Hyperbolics
+// ========================================================================
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> sinh(Dual<N, T> x);
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> cosh(Dual<N, T> x);
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> tanh(Dual<N, T> x);
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> asinh(Dual<N, T> x);
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> acosh(Dual<N, T> x);
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> atanh(Dual<N, T> x);
+
+// ========================================================================
+// Miscellaneous
+// ========================================================================
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> abs(Dual<N, T> x);
+
+// ========================================================================
+// Type traits and aliases
+// ========================================================================
+
 template <typename>
 struct is_dual : public std::false_type {
 };

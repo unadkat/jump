@@ -47,8 +47,7 @@ inline std::pair<std::size_t, std::size_t> MatrixBase<T>::size() const {
     return {m_num_rows, m_num_columns};
 }
 
-/// \brief Send internal representation of the matrix (as a `std::string`) to
-/// the output stream.
+/// \relates MatrixBase
 template <typename T, typename Os>
 inline Os& operator<<(Os& out, const MatrixBase<T>& rhs) {
     return out << rhs.as_string();

@@ -271,6 +271,199 @@ inline Os& operator<<(Os& out, const Dual<N, T>& rhs) {
     }
     return out << "})";
 }
+
+// ========================================================================
+// Exponentiation
+// ========================================================================
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> exp(Dual<N, T> x) {
+    x.value = std::exp(x.value);
+    for (auto& d : x.dual) {
+        d *= x.value;
+    }
+    return x;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> log(Dual<N, T> x) {
+    for (auto& d : x.dual) {
+        d /= x.value;
+    }
+    x.value = std::log(x.value);
+    return x;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> pow(Dual<N, T> x, Dual<N, T> p) {
+    return exp(log(x)*p);
+}
+
+// ========================================================================
+// Trigonometry
+// ========================================================================
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> sin(Dual<N, T> x) {
+    auto derivative{std::cos(x.value)};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::sin(x.value);
+    return x;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> cos(Dual<N, T> x) {
+    auto derivative{-std::sin(x.value)};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::cos(x.value);
+    return x;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> tan(Dual<N, T> x) {
+    auto derivative{1./(std::pow(std::cos(x.value), 2.))};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::tan(x.value);
+    return  x;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> asin(Dual<N, T> x) {
+    auto derivative{1./std::sqrt(1. - std::pow(x.value, 2.))};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::asin(x.value);
+    return x;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> acos(Dual<N, T> x) {
+    auto derivative{-1./std::sqrt(1. - std::pow(x.value, 2.))};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::acos(x.value);
+    return x;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> atan(Dual<N, T> x) {
+    auto derivative{1./(1. + std::pow(x.value, 2.))};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::atan(x.value);
+    return x;
+}
+
+// ========================================================================
+// Hyperbolics
+// ========================================================================
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> sinh(Dual<N, T> x) {
+    auto derivative{std::cosh(x.value)};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::sinh(x.value);
+    return x;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> cosh(Dual<N, T> x) {
+    auto derivative{std::sinh(x.value)};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::cosh(x.value);
+    return x;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> tanh(Dual<N, T> x) {
+    auto derivative{1./(std::pow(std::cosh(x.value), 2.))};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::tanh(x.value);
+    return  x;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> asinh(Dual<N, T> x) {
+    auto derivative{1./std::sqrt(1 + std::pow(x.value, 2.))};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::asinh(x.value);
+    return x;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> acosh(Dual<N, T> x) {
+    auto derivative{1./std::sqrt(std::pow(x.value, 2.) - 1.)};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::acosh(x.value);
+    return x;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> atanh(Dual<N, T> x) {
+    auto derivative{1./(1 - std::pow(x.value, 2.))};
+    for (auto& d : x.dual) {
+        d *= derivative;
+    }
+    x.value = std::atanh(x.value);
+    return x;
+}
+
+// ========================================================================
+// Miscellaneous
+// ========================================================================
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> abs(Dual<N, T> x) {
+    using std::abs;
+    if constexpr (std::is_convertible_v<T, Real>) {
+        auto derivative{x.value < 0. ? -1. : 1.};
+        for (auto& d : x.dual) {
+            d *= derivative;
+        }
+        x.value = std::abs(x.value);
+    } else {
+        for (auto& d : x.dual) {
+            d = std::numeric_limits<T>::quiet_NaN();
+        }
+        x.value = std::abs(x.value);
+    }
+    return x;
+}
 }   // namespace jump
 
 #endif  // JUMP_DUAL_HPP
