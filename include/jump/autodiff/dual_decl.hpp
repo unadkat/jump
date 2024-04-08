@@ -6,10 +6,10 @@
 
 #include <array>
 #include <cmath>
-#include <type_traits>
 
 #include "jump/debug/exception.hpp"
 #include "jump/utility/types.hpp"
+#include "jump/utility/utility.hpp"
 
 namespace jump {
 /// \brief An augmented number type that can be used to automatically
@@ -140,6 +140,10 @@ Dual<N, T> atanh(Dual<N, T> x);
 /// \relates Dual
 template <std::size_t N, typename T>
 Dual<N, T> abs(Dual<N, T> x);
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> sgn(Dual<N, T> x);
 
 // ========================================================================
 // Type traits and aliases

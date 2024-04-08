@@ -449,20 +449,19 @@ Dual<N, T> atanh(Dual<N, T> x) {
 /// \relates Dual
 template <std::size_t N, typename T>
 Dual<N, T> abs(Dual<N, T> x) {
-    using std::abs;
-    if constexpr (std::is_convertible_v<T, Real>) {
-        auto derivative{x.value < 0. ? -1. : 1.};
-        for (auto& d : x.dual) {
-            d *= derivative;
-        }
-        x.value = std::abs(x.value);
-    } else {
-        for (auto& d : x.dual) {
-            d = std::numeric_limits<T>::quiet_NaN();
-        }
-        x.value = std::abs(x.value);
+    auto derivative{sgn(x.value)};
+    for (auto& d : x.dual) {
+        d *= derivative;
     }
+    x.value = std::abs(x.value);
     return x;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T>
+Dual<N, T> sgn(Dual<N, T> x) {
+    x.dual.fill(0.);
+    x.value = sgn(x.value);
 }
 }   // namespace jump
 

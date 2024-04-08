@@ -443,6 +443,14 @@ Vector<T> abs(Vector<T> v) {
     return v;
 }
 
+/// \relates Vector
+template <typename T>
+Vector<T> sgn(Vector<T> v) {
+    std::transform(v.begin(), v.end(), v.begin(),
+            [&](const T& x) { return sgn(x); });
+    return v;
+}
+
 // ========================================================================
 // CBLAS
 // ========================================================================

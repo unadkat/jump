@@ -17,6 +17,7 @@
 #include "jump/debug/exception.hpp"
 #include "jump/utility/external.hpp"
 #include "jump/utility/types.hpp"
+#include "jump/utility/utility.hpp"
 
 namespace jump {
 /// \brief Permissive encapulation of `std::vector` with arithmetic
@@ -198,6 +199,10 @@ Vector<T> atanh(Vector<T> v);
 /// \relates Vector
 template <typename T>
 Vector<T> abs(Vector<T> v);
+
+/// \relates Vector
+template <typename T>
+Vector<T> sgn(Vector<T> v);
 }   // namespace jump
 
 #endif  // JUMP_VECTOR_DECL_HPP

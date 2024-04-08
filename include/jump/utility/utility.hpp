@@ -30,6 +30,15 @@ bool has_intersection(const std::vector<T>& A, const std::vector<T>& B) {
     }
     return false;
 }
+
+template <typename T>
+inline int sgn(T val) {
+    if constexpr (std::totally_ordered<T>) {
+        return (T{0} < val) - (val < T{0});
+    } else {
+        return std::numeric_limits<T>::quiet_NaN();
+    }
+}
 }   // namespace jump
 
 #endif  // JUMP_UTILITY_HPP
