@@ -128,10 +128,10 @@ inline TestResult test_vector_arithmetic_compound() {
     }
 
     {
-        result.add_check(vanishes((ar + kr1*br)*(cr/kr2)
-                    - (1./kr2)*(ar*cr + kr1*cr*br)), "real");
-        result.add_check(vanishes(std::abs((az + kz1*bz)*(cz/kz2)
-                    - (1./kz2)*(az*cz + kz1*cz*bz))), "complex");
+        result.add_check(vanishes(dot(ar + kr1*br, cr/kr2)
+                    - (1./kr2)*(dot(ar, cr) + kr1*dot(cr, br))), "real");
+        result.add_check(vanishes(dot(az + kz1*bz, cz/kz2)
+                    - (1./kz2)*(dot(az, cz) + kz1*dot(cz, bz))), "complex");
     }
 
     return result;
@@ -152,12 +152,12 @@ inline TestResult test_vector_inner_prod() {
     }
 
     Real real_ans{(N*(N + 1)*(2*N + 1))/6.};
-    auto res_complex{az*az};
+    auto res_complex{dot(az, az)};
 
-    result.add_check(approx_abs(ar*ar, real_ans), "inner product real");
-    result.add_check(approx_abs(ar*arZ, {real_ans, 0.}),
+    result.add_check(approx_abs(dot(ar, ar), real_ans), "inner product real");
+    result.add_check(approx_abs(dot(ar, arZ), {real_ans, 0.}),
             "inner product real-complex");
-    result.add_check(approx_abs(arZ*ar, {real_ans, 0.}),
+    result.add_check(approx_abs(dot(arZ, ar), {real_ans, 0.}),
             "inner product complex-real");
     result.add_check(approx_abs(res_complex, {0.75*real_ans, real_ans}),
             "inner product complex");

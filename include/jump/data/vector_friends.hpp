@@ -67,8 +67,28 @@ friend Vector operator*(Vector lhs, const T& rhs) {
 }
 
 /// \relates Vector
+/// \brief Elementwise product of two Vectors.
+///
+/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
+/// return. Also handles the case that lhs is given an rvalue (NRVO).
+friend Vector operator*(Vector lhs, const Vector& rhs) {
+    lhs *= rhs;
+    return lhs;
+}
+
+/// \relates Vector
+/// \brief Elementwise product of two Vectors.
+///
+/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
+/// reference parameter (NRVO).
+friend Vector operator*(const Vector& lhs, Vector&& rhs) {
+    rhs *= lhs;
+    return rhs;
+}
+
+/// \relates Vector
 /// \brief Inner product of two Vectors.
-friend T operator*(const Vector& lhs, const Vector& rhs) {
+friend T dot(const Vector& lhs, const Vector& rhs) {
 #ifndef NDEBUG
     if (lhs.size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
@@ -76,16 +96,22 @@ friend T operator*(const Vector& lhs, const Vector& rhs) {
     }
 #endif  // NDEBUG
 
-    T dot_product{0};
-    for (std::size_t i{0}, N{lhs.size()}; i < N; ++i) {
-        dot_product += lhs[i]*rhs[i];
-    }
-    return dot_product;
+    return std::inner_product(lhs.begin(), lhs.end(), rhs.begin(), T{0});
 }
 
 /// \relates Vector
 /// \brief Right-hand division by scalar.
 friend Vector operator/(Vector lhs, const T& rhs) {
+    lhs /= rhs;
+    return lhs;
+}
+
+/// \relates Vector
+/// \brief Elementwise division of two Vectors.
+///
+/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
+/// return. Also handles the case that lhs is given an rvalue (NRVO).
+friend Vector operator/(Vector lhs, const Vector& rhs) {
     lhs /= rhs;
     return lhs;
 }

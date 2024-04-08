@@ -175,8 +175,38 @@ inline Vector<T>& Vector<T>::operator*=(const T& rhs) {
 }
 
 template <typename T>
+inline Vector<T>& Vector<T>::operator*=(const Vector<T>& rhs) {
+#ifndef NDEBUG
+    if (size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
+            .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    for (std::size_t i{0}, N{size()}; i < N; ++i) {
+        storage[i] *= rhs[i];
+    }
+    return *this;
+}
+
+template <typename T>
 inline Vector<T>& Vector<T>::operator/=(const T& rhs) {
     return *this *= (T{1}/rhs);
+}
+
+template <typename T>
+inline Vector<T>& Vector<T>::operator/=(const Vector<T>& rhs) {
+#ifndef NDEBUG
+    if (size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
+            .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    for (std::size_t i{0}, N{size()}; i < N; ++i) {
+        storage[i] /= rhs[i];
+    }
+    return *this;
 }
 
 template <typename T>
@@ -251,6 +281,166 @@ inline Os& operator<<(Os& out, const Vector<T>& rhs) {
         out << x << ' ';
     }
     return out;
+}
+
+// ========================================================================
+// Exponentiation
+// ========================================================================
+
+/// \relates Vector
+template <typename T>
+Vector<T> exp(Vector<T> v) {
+    using std::exp;
+    std::transform(v.begin(), v.end(), v.begin(),
+            [&](const T& x) { return exp(x); });
+    return v;
+}
+
+/// \relates Vector
+template <typename T>
+Vector<T> log(Vector<T> v) {
+    using std::log;
+    std::transform(v.begin(), v.end(), v.begin(),
+            [&](const T& x) { return log(x); });
+    return v;
+}
+
+/// \relates Vector
+template <typename T>
+Vector<T> pow(Vector<T> v, T p) {
+    using std::pow;
+    std::transform(v.begin(), v.end(), v.begin(),
+            [&](const T& x) { return pow(x, p); });
+    return v;
+}
+
+// ========================================================================
+// Trigonometry
+// ========================================================================
+
+/// \relates Vector
+template <typename T>
+Vector<T> sin(Vector<T> v) {
+    using std::sin;
+    std::transform(v.begin(), v.end(), v.begin(),
+            [&](const T& x) { return sin(x); });
+    return v;
+}
+
+/// \relates Vector
+template <typename T>
+Vector<T> cos(Vector<T> v) {
+    using std::cos;
+    std::transform(v.begin(), v.end(), v.begin(),
+            [&](const T& x) { return cos(x); });
+    return v;
+}
+
+/// \relates Vector
+template <typename T>
+Vector<T> tan(Vector<T> v) {
+    using std::tan;
+    std::transform(v.begin(), v.end(), v.begin(),
+            [&](const T& x) { return tan(x); });
+    return v;
+}
+
+/// \relates Vector
+template <typename T>
+Vector<T> asin(Vector<T> v) {
+    using std::asin;
+    std::transform(v.begin(), v.end(), v.begin(),
+            [&](const T& x) { return asin(x); });
+    return v;
+}
+
+/// \relates Vector
+template <typename T>
+Vector<T> acos(Vector<T> v) {
+    using std::acos;
+    std::transform(v.begin(), v.end(), v.begin(),
+            [&](const T& x) { return acos(x); });
+    return v;
+}
+
+/// \relates Vector
+template <typename T>
+Vector<T> atan(Vector<T> v) {
+    using std::atan;
+    std::transform(v.begin(), v.end(), v.begin(),
+            [&](const T& x) { return atan(x); });
+    return v;
+}
+
+// ========================================================================
+// Hyperbolics
+// ========================================================================
+
+/// \relates Vector
+template <typename T>
+Vector<T> sinh(Vector<T> v) {
+    using std::sinh;
+    std::transform(v.begin(), v.end(), v.begin(),
+            [&](const T& x) { return sinh(x); });
+    return v;
+}
+
+/// \relates Vector
+template <typename T>
+Vector<T> cosh(Vector<T> v) {
+    using std::cosh;
+    std::transform(v.begin(), v.end(), v.begin(),
+            [&](const T& x) { return cosh(x); });
+    return v;
+}
+
+/// \relates Vector
+template <typename T>
+Vector<T> tanh(Vector<T> v) {
+    using std::tanh;
+    std::transform(v.begin(), v.end(), v.begin(),
+            [&](const T& x) { return tanh(x); });
+    return v;
+}
+
+/// \relates Vector
+template <typename T>
+Vector<T> asinh(Vector<T> v) {
+    using std::asinh;
+    std::transform(v.begin(), v.end(), v.begin(),
+            [&](const T& x) { return asinh(x); });
+    return v;
+}
+
+/// \relates Vector
+template <typename T>
+Vector<T> acosh(Vector<T> v) {
+    using std::acosh;
+    std::transform(v.begin(), v.end(), v.begin(),
+            [&](const T& x) { return acosh(x); });
+    return v;
+}
+
+/// \relates Vector
+template <typename T>
+Vector<T> atanh(Vector<T> v) {
+    using std::atanh;
+    std::transform(v.begin(), v.end(), v.begin(),
+            [&](const T& x) { return atanh(x); });
+    return v;
+}
+
+// ========================================================================
+// Miscellaneous
+// ========================================================================
+
+/// \relates Vector
+template <typename T>
+Vector<T> abs(Vector<T> v) {
+    using std::abs;
+    std::transform(v.begin(), v.end(), v.begin(),
+            [&](const T& x) { return abs(x); });
+    return v;
 }
 
 // ========================================================================

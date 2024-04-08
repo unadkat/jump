@@ -88,8 +88,12 @@ struct Vector {
     Vector& operator-=(const Vector& rhs);
     /// \brief Multiply by scalar in place.
     Vector& operator*=(const T& rhs);
+    /// \brief Elementwise product by another Vector.
+    Vector& operator*=(const Vector& rhs);
     /// \brief Divide by scalar in place.
     Vector& operator/=(const T& rhs);
+    /// \brief Elementwise division by another Vector.
+    Vector& operator/=(const Vector& rhs);
 
     /// \brief Return sum of element magnitudes.
     Real L1_norm() const;
@@ -114,6 +118,86 @@ struct Vector {
 /// \brief Outputs `Vector` data to output stream in a single line with spaces.
 template <typename T, typename Os>
 Os& operator<<(Os& out, const Vector<T>& rhs);
+
+// ========================================================================
+// Exponentiation
+// ========================================================================
+
+/// \relates Vector
+template <typename T>
+Vector<T> exp(Vector<T> v);
+
+/// \relates Vector
+template <typename T>
+Vector<T> log(Vector<T> v);
+
+/// \relates Vector
+template <typename T>
+Vector<T> pow(Vector<T> v, T p);
+
+// ========================================================================
+// Trigonometry
+// ========================================================================
+
+/// \relates Vector
+template <typename T>
+Vector<T> sin(Vector<T> v);
+
+/// \relates Vector
+template <typename T>
+Vector<T> cos(Vector<T> v);
+
+/// \relates Vector
+template <typename T>
+Vector<T> tan(Vector<T> v);
+
+/// \relates Vector
+template <typename T>
+Vector<T> asin(Vector<T> v);
+
+/// \relates Vector
+template <typename T>
+Vector<T> acos(Vector<T> v);
+
+/// \relates Vector
+template <typename T>
+Vector<T> atan(Vector<T> v);
+
+// ========================================================================
+// Hyperbolics
+// ========================================================================
+
+/// \relates Vector
+template <typename T>
+Vector<T> sinh(Vector<T> v);
+
+/// \relates Vector
+template <typename T>
+Vector<T> cosh(Vector<T> v);
+
+/// \relates Vector
+template <typename T>
+Vector<T> tanh(Vector<T> v);
+
+/// \relates Vector
+template <typename T>
+Vector<T> asinh(Vector<T> v);
+
+/// \relates Vector
+template <typename T>
+Vector<T> acosh(Vector<T> v);
+
+/// \relates Vector
+template <typename T>
+Vector<T> atanh(Vector<T> v);
+
+// ========================================================================
+// Miscellaneous
+// ========================================================================
+
+/// \relates Vector
+template <typename T>
+Vector<T> abs(Vector<T> v);
 }   // namespace jump
 
 #endif  // JUMP_VECTOR_DECL_HPP
