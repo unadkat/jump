@@ -412,7 +412,7 @@ Dual<N, T> tanh(Dual<N, T> x) {
 /// \relates Dual
 template <std::size_t N, typename T>
 Dual<N, T> asinh(Dual<N, T> x) {
-    auto derivative{1./std::sqrt(1 + std::pow(x.value, 2.))};
+    auto derivative{1./std::sqrt(1. + std::pow(x.value, 2.))};
     for (auto& d : x.dual) {
         d *= derivative;
     }
@@ -434,7 +434,7 @@ Dual<N, T> acosh(Dual<N, T> x) {
 /// \relates Dual
 template <std::size_t N, typename T>
 Dual<N, T> atanh(Dual<N, T> x) {
-    auto derivative{1./(1 - std::pow(x.value, 2.))};
+    auto derivative{1./(1. - std::pow(x.value, 2.))};
     for (auto& d : x.dual) {
         d *= derivative;
     }
