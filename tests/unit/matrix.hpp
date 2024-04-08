@@ -463,20 +463,17 @@ inline TestResult test_matrix_arithmetic_basic() {
 
         BandedMatrix<Real> ans_r{size, 3};
         ans_r.fill(sum_r);
-        result.add_check(vanishes(((Ar + Br) - ans_r).as_vector().L2_norm()),
-                "add banded real");
+        result.add_check(approx((Ar + Br), ans_r), "add banded real");
 
         ans_r.fill(diff_r);
-        result.add_check(vanishes(((Ar - Br) - ans_r).as_vector().L2_norm()),
-                "subtract banded real");
+        result.add_check(approx((Ar - Br), ans_r), "subtract banded real");
 
         BandedMatrix<Complex> ans_z{size, 3};
         ans_z.fill(sum_z);
-        result.add_check(vanishes(((Az + Bz) - ans_z).as_vector().L2_norm()),
-                "add banded complex");
+        result.add_check(approx((Az + Bz), ans_z), "add banded complex");
 
         ans_z.fill(diff_z);
-        result.add_check(vanishes(((Az - Bz) - ans_z).as_vector().L2_norm()),
+        result.add_check(approx((Az - Bz), ans_z),
                 "subtract banded complex");
     }
     {
@@ -490,20 +487,17 @@ inline TestResult test_matrix_arithmetic_basic() {
 
         DenseMatrix<Real> ans_r{size, size2};
         ans_r.fill(sum_r);
-        result.add_check(vanishes(((Ar + Br) - ans_r).as_vector().L2_norm()),
-                "add dense real");
+        result.add_check(approx((Ar + Br), ans_r), "add dense real");
 
         ans_r.fill(diff_r);
-        result.add_check(vanishes(((Ar - Br) - ans_r).as_vector().L2_norm()),
-                "subtract dense real");
+        result.add_check(approx((Ar - Br), ans_r), "subtract dense real");
 
         DenseMatrix<Complex> ans_z{size, size2};
         ans_z.fill(sum_z);
-        result.add_check(vanishes(((Az + Bz) - ans_z).as_vector().L2_norm()),
-                "add dense complex");
+        result.add_check(approx((Az + Bz), ans_z), "add dense complex");
 
         ans_z.fill(diff_z);
-        result.add_check(vanishes(((Az - Bz) - ans_z).as_vector().L2_norm()),
+        result.add_check(approx((Az - Bz), ans_z),
                 "subtract dense complex");
     }
 
@@ -541,11 +535,11 @@ inline TestResult test_matrix_multiply() {
         DenseMatrix<Real> AB{5, 2, AB_data};
         DenseMatrix<Complex> ABz{AB};
 
-        result.add_check(vanishes(((A*B) - AB).as_vector().L2_norm()),
+        result.add_check(approx(A*B, AB),
                 "dense real matrix-matrix case 1");
-        result.add_check(vanishes(((A*Bz) - ABz).as_vector().L2_norm()),
+        result.add_check(approx(A*Bz, ABz),
                 "dense real-complex matrix-matrix case 1");
-        result.add_check(vanishes(((Az*B) - ABz).as_vector().L2_norm()),
+        result.add_check(approx(Az*B, ABz),
                 "dense complex-real matrix-matrix case 1");
     }
     {
@@ -578,7 +572,7 @@ inline TestResult test_matrix_multiply() {
         DenseMatrix<Complex> B{6, 3, B_data};
         DenseMatrix<Complex> AB{4, 3, AB_data};
 
-        result.add_check(vanishes(((A*B) - AB).as_vector().L2_norm()),
+        result.add_check(approx(A*B, AB),
                 "dense complex matrix-matrix case 1");
     }
     {
@@ -603,11 +597,11 @@ inline TestResult test_matrix_multiply() {
         DenseMatrix<Complex> Az{A};
         Vector<Complex> bz{b}, Abz{Ab};
 
-        result.add_check(vanishes(((A*b) - Ab).L2_norm()),
+        result.add_check(approx(A*b, Ab),
                 "dense real matrix-vector case 1");
 //        result.add_check(vanishes(((A*bz) - Abz).L2_norm()),
 //                "dense real-complex matrix-vector case 1");
-        result.add_check(vanishes(((Az*b) - Abz).L2_norm()),
+        result.add_check(approx(Az*b, Abz),
                 "dense complex-real matrix-vector case 1");
     }
     {
@@ -633,7 +627,7 @@ inline TestResult test_matrix_multiply() {
 
         DenseMatrix<Complex> A{7, 4, A_data};
 
-        result.add_check(vanishes(((A*b) - Ab).L2_norm()),
+        result.add_check(approx(A*b, Ab),
                 "dense complex matrix-matrix case 1");
     }
     {
@@ -667,11 +661,11 @@ inline TestResult test_matrix_multiply() {
         BandedMatrix<Complex> Az{A};
         Vector<Complex> bz{b}, Abz{Ab};
 
-        result.add_check(vanishes(((A*b) - Ab).L2_norm()),
+        result.add_check(approx(A*b, Ab),
                 "banded real matrix-vector case 1");
 //        result.add_check(vanishes(((A*bz) - Abz).L2_norm()),
 //                "banded real-complex matrix-vector case 1");
-        result.add_check(vanishes(((Az*b) - Abz).L2_norm()),
+        result.add_check(approx(Az*b, Abz),
                 "banded complex-real matrix-vector case 1");
     }
     {
@@ -728,7 +722,7 @@ inline TestResult test_matrix_multiply() {
 
         BandedMatrix<Complex> A{10, 3, A_data};
 
-        result.add_check(vanishes(((A*b) - Ab).L2_norm()),
+        result.add_check(approx(A*b, Ab),
                 "banded complex matrix-vector case 1");
     }
 
@@ -763,10 +757,8 @@ inline TestResult test_matrix_arithmetic_compound() {
         auto lhs_z{kz1*(Az + Bz) + kz2*(Az - Cz)/kz3};
         auto rhs_z{(kz1 + kz2/kz3)*Az + kz1*Bz - kz2/kz3*Cz};
 
-        result.add_check(vanishes((lhs_r - rhs_r).as_vector().L2_norm()),
-                "banded real");
-        result.add_check(vanishes((lhs_z - rhs_z).as_vector().L2_norm()),
-                "banded complex");
+        result.add_check(approx(lhs_r, rhs_r), "banded real");
+        result.add_check(approx(lhs_z, rhs_z), "banded complex");
     }
     {
         std::size_t size2{size + 2};
@@ -779,10 +771,8 @@ inline TestResult test_matrix_arithmetic_compound() {
         auto lhs_z{(kz1 + kz2/kz3)*Az*Dz + kz1*Bz*Dz + kz2/kz3*Cz*Dz};
         auto rhs_z{(kz1 + kz2/kz3)*Az*Dz + kz1*Bz*Dz + kz2/kz3*Cz*Dz};
 
-        result.add_check(vanishes((lhs_r - rhs_r).as_vector().L2_norm()),
-                "dense real");
-        result.add_check(vanishes((lhs_z - rhs_z).as_vector().L2_norm()),
-                "dense complex");
+        result.add_check(approx(lhs_r, rhs_r), "dense real");
+        result.add_check(approx(lhs_z, rhs_z), "dense complex");
     }
 
     return result;
@@ -1031,13 +1021,12 @@ inline TestResult test_matrix_norms() {
         complex_col_inf_norm[col] = B.column_Linf_norm(col) - scale*(size + 2);
     }
 
-    result.add_check(vanishes(real_col_1_norm.L2_norm()), "real L1 norm");
-    result.add_check(vanishes(real_col_2_norm.L2_norm()), "real L2 norm");
-    result.add_check(vanishes(real_col_inf_norm.L2_norm()), "real Linf norm");
-    result.add_check(vanishes(complex_col_1_norm.L2_norm()), "complex L1 norm");
-    result.add_check(vanishes(complex_col_2_norm.L2_norm()), "complex L2 norm");
-    result.add_check(vanishes(complex_col_inf_norm.L2_norm()),
-            "complex Linf norm");
+    result.add_check(vanishes(real_col_1_norm), "real L1 norm");
+    result.add_check(vanishes(real_col_2_norm), "real L2 norm");
+    result.add_check(vanishes(real_col_inf_norm), "real Linf norm");
+    result.add_check(vanishes(complex_col_1_norm), "complex L1 norm");
+    result.add_check(vanishes(complex_col_2_norm), "complex L2 norm");
+    result.add_check(vanishes(complex_col_inf_norm), "complex Linf norm");
 
     return result;
 }
@@ -1095,8 +1084,9 @@ inline TestResult test_matrix_access_in_range() {
             }
         }
 
-        result.add_check(vanishes(real_sum - real_acc), "banded real");
-        result.add_check(vanishes(complex_sum - complex_acc), "banded complex");
+        result.add_check(approx(real_sum, real_acc), "banded real");
+        result.add_check(approx(complex_sum, complex_acc),
+                "banded complex");
     }
     {
         Real real_sum{0};
@@ -1125,8 +1115,8 @@ inline TestResult test_matrix_access_in_range() {
         auto complex_acc{std::accumulate(Az.as_vector().begin(),
                 Az.as_vector().end(), Complex{0})};
 
-        result.add_check(vanishes(real_sum - real_acc), "dense real");
-        result.add_check(vanishes(complex_sum - complex_acc), "dense complex");
+        result.add_check(approx(real_sum, real_acc), "dense real");
+        result.add_check(approx(complex_sum, complex_acc), "dense complex");
     }
 
     return result;
@@ -1260,5 +1250,4 @@ inline TestResult test_matrix_access_fail() {
 
     return result;
 }
-
 

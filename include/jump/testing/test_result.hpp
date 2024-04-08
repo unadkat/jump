@@ -46,36 +46,86 @@ inline TestResult TestResult::skip(std::string name) {
 }
 
 template <typename T>
-inline bool approx_rel(const T& lhs, const T& rhs) {
-    if constexpr (is_dual_v<T>) {
-        auto a{abs(lhs).value}, b{abs(rhs).value};
-        if (a > b) {
-            return abs(a - b)/b < epsilon_rel;
-        } else {
-            return abs(b - a)/a < epsilon_rel;
-        }
-    } else {
-        auto a{std::abs(lhs)}, b{std::abs(rhs)};
-        if (a > b) {
-            return std::abs(a - b)/b < epsilon_rel;
-        } else {
-            return std::abs(b - a)/a < epsilon_rel;
-        }
+inline bool approx(const T& lhs, const T& rhs) {
+    if (lhs == rhs) {
+        return true;
     }
+    auto diff{std::abs(lhs - rhs)};
+    auto norm{std::min(std::abs(lhs) + std::abs(rhs),
+            std::numeric_limits<T>::max())};
+    return diff < std::max(epsilon_absolute, epsilon_relative*norm);
 }
 
 template <typename T>
-inline bool approx_abs(const T& lhs, const T& rhs) {
-    if constexpr (is_dual_v<T>) {
-        return abs(lhs - rhs).value < epsilon_abs;
-    } else {
-        return std::abs(lhs - rhs) < epsilon_abs;
+inline bool approx(const std::complex<T>& lhs, const std::complex<T>& rhs) {
+    if (lhs == rhs) {
+        return true;
     }
+    auto diff_real{std::abs(lhs.real() - rhs.real())};
+    auto norm_real{std::min(std::abs(lhs.real()) + std::abs(rhs.real()),
+            std::numeric_limits<T>::max())};
+    auto diff_imag{std::abs(lhs.imag() - rhs.imag())};
+    auto norm_imag{std::min(std::abs(lhs.imag()) + std::abs(rhs.imag()),
+            std::numeric_limits<T>::max())};
+    return diff_real < std::max(epsilon_absolute, epsilon_relative*norm_real)
+        && diff_imag < std::max(epsilon_absolute, epsilon_relative*norm_imag);
+}
+
+template <std::size_t N, typename T>
+inline bool approx(const Dual<N, T>& lhs, const Dual<N, T>& rhs) {
+    return approx(lhs.value, rhs.value);
+}
+
+template <typename T>
+inline bool approx(const Vector<T>& lhs, const Vector<T>& rhs) {
+#ifndef NDEBUG
+    if (lhs.size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    for (std::size_t i{0}, N{lhs.size()}; i < N; ++i) {
+        if (!approx(lhs[i], rhs[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <typename T>
+inline bool approx(const BandedMatrix<T>& lhs, const BandedMatrix<T>& rhs) {
+    return approx(lhs.as_vector(), rhs.as_vector());
+}
+
+template <typename T>
+inline bool approx(const DenseMatrix<T>& lhs, const DenseMatrix<T>& rhs) {
+    return approx(lhs.as_vector(), rhs.as_vector());
 }
 
 template <typename T>
 inline bool vanishes(const T& x) {
-    return approx_abs(x, T{0});
+    return approx(x, T{0});
+}
+
+template <typename T>
+inline bool vanishes(const Vector<T>& v) {
+    for (const auto& x : v) {
+        if (!vanishes(x)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <typename T>
+inline bool vanishes(const BandedMatrix<T>& M) {
+    return vanishes(M.as_vector());
+}
+
+template <typename T>
+inline bool vanishes(const DenseMatrix<T>& M) {
+    return vanishes(M.as_vector());
 }
 }   // namespace jump
 

@@ -63,12 +63,10 @@ inline TestResult test_vector_arithmetic_basic() {
         Complex ans_z{az + bz};
         Vector<Complex> vans_z(5, ans_z), vcz{vaz + vbz};
 
-        result.add_check(vanishes((vans_r - vcr).L2_norm()), "add real");
-        result.add_check(vanishes((vans_rZ - vcrZ1).L2_norm()),
-                "add real-complex");
-        result.add_check(vanishes((vans_rZ - vcrZ2).L2_norm()),
-                "add complex-real");
-        result.add_check(vanishes((vans_z - vcz).L2_norm()), "add complex");
+        result.add_check(approx(vans_r, vcr), "add real");
+        result.add_check(approx(vans_rZ, vcrZ1), "add real-complex");
+        result.add_check(approx(vans_rZ, vcrZ2), "add complex-real");
+        result.add_check(approx(vans_z, vcz), "add complex");
     }
     {
         Real ans_r{ar - br};
@@ -78,13 +76,10 @@ inline TestResult test_vector_arithmetic_basic() {
         Complex ans_z{az - bz};
         Vector<Complex> vans_z(5, ans_z), vcz{vaz - vbz};
 
-        result.add_check(vanishes((vans_r - vcr).L2_norm()), "subtract real");
-        result.add_check(vanishes((vans_rZ - vcrZ1).L2_norm()),
-                "subtract real-complex");
-        result.add_check(vanishes((vans_rZ - vcrZ2).L2_norm()),
-                "subtract complex-real");
-        result.add_check(vanishes((vans_z - vcz).L2_norm()),
-                "subtract complex");
+        result.add_check(approx(vans_r, vcr), "subtract real");
+        result.add_check(approx(vans_rZ, vcrZ1), "subtract real-complex");
+        result.add_check(approx(vans_rZ, vcrZ2), "subtract complex-real");
+        result.add_check(approx(vans_z, vcz), "subtract complex");
     }
     {
         // TODO: Real vector multiplication by complex scalar
@@ -97,12 +92,12 @@ inline TestResult test_vector_arithmetic_basic() {
         Complex ans_z{az*bz};
         Vector<Complex> vans_z(5, ans_z), vcz{vaz*bz};
 
-        result.add_check(vanishes((vans_r - vcr).L2_norm()), "scale real");
+        result.add_check(approx(vans_r, vcr), "scale real");
 //        result.add_check(vanishes((vans_rZ - vcrZ1).L2_norm()),
 //                "scale real-complex");
 //        result.add_check(vanishes((vans_rZ - vcrZ2).L2_norm()),
 //                "scale complex-real");
-        result.add_check(vanishes((vans_z - vcz).L2_norm()), "scale complex");
+        result.add_check(approx(vans_z, vcz), "scale complex");
     }
 
     return result;
@@ -128,10 +123,10 @@ inline TestResult test_vector_arithmetic_compound() {
     }
 
     {
-        result.add_check(vanishes(dot(ar + kr1*br, cr/kr2)
-                    - (1./kr2)*(dot(ar, cr) + kr1*dot(cr, br))), "real");
-        result.add_check(vanishes(dot(az + kz1*bz, cz/kz2)
-                    - (1./kz2)*(dot(az, cz) + kz1*dot(cz, bz))), "complex");
+        result.add_check(approx(dot(ar + kr1*br, cr/kr2),
+                    (1./kr2)*(dot(ar, cr) + kr1*dot(cr, br))), "real");
+        result.add_check(approx(dot(az + kz1*bz, cz/kz2),
+                    (1./kz2)*(dot(az, cz) + kz1*dot(cz, bz))), "complex");
     }
 
     return result;
@@ -154,12 +149,12 @@ inline TestResult test_vector_inner_prod() {
     Real real_ans{(N*(N + 1)*(2*N + 1))/6.};
     auto res_complex{dot(az, az)};
 
-    result.add_check(approx_abs(dot(ar, ar), real_ans), "inner product real");
-    result.add_check(approx_abs(dot(ar, arZ), {real_ans, 0.}),
+    result.add_check(approx(dot(ar, ar), real_ans), "inner product real");
+    result.add_check(approx(dot(ar, arZ), {real_ans, 0.}),
             "inner product real-complex");
-    result.add_check(approx_abs(dot(arZ, ar), {real_ans, 0.}),
+    result.add_check(approx(dot(arZ, ar), {real_ans, 0.}),
             "inner product complex-real");
-    result.add_check(approx_abs(res_complex, {0.75*real_ans, real_ans}),
+    result.add_check(approx(res_complex, {0.75*real_ans, real_ans}),
             "inner product complex");
 
     return result;
@@ -244,17 +239,17 @@ inline TestResult test_vector_norms() {
 
     auto sum_k{0.5*N*(N + 1)};
     auto sum_k2{(N*(N + 1)*(2*N + 1))/6.};
-    result.add_check(approx_abs(ar.L1_norm(), sum_k), "L1 norm real");
-    result.add_check(approx_abs(ar.L2_norm(), std::sqrt(sum_k2)),
+    result.add_check(approx(ar.L1_norm(), sum_k), "L1 norm real");
+    result.add_check(approx(ar.L2_norm(), std::sqrt(sum_k2)),
             "L2 norm real");
-    result.add_check(approx_abs(ar.Linf_norm(), static_cast<Real>(N)),
+    result.add_check(approx(ar.Linf_norm(), static_cast<Real>(N)),
             "Linf norm real");
 
-    result.add_check(approx_abs(az.L1_norm(), 0.5*std::sqrt(5.)*sum_k),
+    result.add_check(approx(az.L1_norm(), 0.5*std::sqrt(5.)*sum_k),
             "L1 norm complex");
-    result.add_check(approx_abs(az.L2_norm(), 0.5*std::sqrt(5.*sum_k2)),
+    result.add_check(approx(az.L2_norm(), 0.5*std::sqrt(5.*sum_k2)),
             "L2 norm complex");
-    result.add_check(approx_abs(az.Linf_norm(), static_cast<Real>(
+    result.add_check(approx(az.Linf_norm(), static_cast<Real>(
                     0.5*std::sqrt(5)*N)), "Linf norm complex");
 
     return result;
@@ -273,7 +268,7 @@ inline TestResult test_vector_access_in_range() {
         acc += a[i];
     }
 
-    result.add_check(approx_abs(acc, 0.5*size*(size + 1)), "all indices");
+    result.add_check(approx(acc, 0.5*size*(size + 1)), "all indices");
 
     return result;
 }
