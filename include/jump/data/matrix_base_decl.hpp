@@ -7,8 +7,6 @@
 #include <string>
 #include <utility>
 
-#include "jump/utility/external.hpp"
-
 namespace jump {
 /// \brief General matrix interface.
 template <typename T>

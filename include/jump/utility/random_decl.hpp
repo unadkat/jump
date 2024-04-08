@@ -40,9 +40,6 @@ void randomise(Rng& rng, T& item);
 template <typename Rng, typename... Ts>
 void randomise(Rng& rng, Ts& ...items);
 
-template <typename Rng, template <typename> typename Container, typename T>
-void randomise(Rng& rng, Container<T>& container);
-
 using RandomReal = RandomNumbers<double, std::uniform_real_distribution>;
 using RandomInt = RandomNumbers<long, std::uniform_int_distribution>;
 }   // namespace jump
