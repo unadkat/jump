@@ -1,3 +1,6 @@
+#ifndef JUMP_TESTS_MATRIX_HPP
+#define JUMP_TESTS_MATRIX_HPP
+
 #include "jump/data/banded_matrix.hpp"
 #include "jump/data/banded_matrix_decl.hpp"
 #include "jump/data/dense_matrix.hpp"
@@ -528,11 +531,11 @@ inline TestResult test_matrix_multiply() {
             71.27924 ,   52.399922,   28.36413 ,  -28.329697,  121.24149
         };
 
-        DenseMatrix<Real> A{5, 7, A_data};
+        DenseMatrix<Real> A{5, 7, std::move(A_data)};
         DenseMatrix<Complex> Az{A};
-        DenseMatrix<Real> B{7, 2, B_data};
+        DenseMatrix<Real> B{7, 2, std::move(B_data)};
         DenseMatrix<Complex> Bz{B};
-        DenseMatrix<Real> AB{5, 2, AB_data};
+        DenseMatrix<Real> AB{5, 2, std::move(AB_data)};
         DenseMatrix<Complex> ABz{AB};
 
         result.add_check(approx(A*B, AB),
@@ -568,9 +571,9 @@ inline TestResult test_matrix_multiply() {
             {43.791261, 4.3252}, {80.200821, -46.930565}
         };
 
-        DenseMatrix<Complex> A{4, 6, A_data};
-        DenseMatrix<Complex> B{6, 3, B_data};
-        DenseMatrix<Complex> AB{4, 3, AB_data};
+        DenseMatrix<Complex> A{4, 6, std::move(A_data)};
+        DenseMatrix<Complex> B{6, 3, std::move(B_data)};
+        DenseMatrix<Complex> AB{4, 3, std::move(AB_data)};
 
         result.add_check(approx(A*B, AB),
                 "dense complex matrix-matrix case 1");
@@ -593,7 +596,7 @@ inline TestResult test_matrix_multiply() {
             8.876152, 78.389336, 103.923845, 58.577264, -8.659744
         };
 
-        DenseMatrix<Real> A{5, 6, A_data};
+        DenseMatrix<Real> A{5, 6, std::move(A_data)};
         DenseMatrix<Complex> Az{A};
         Vector<Complex> bz{b}, Abz{Ab};
 
@@ -625,7 +628,7 @@ inline TestResult test_matrix_multiply() {
             {-68.024192, 110.826656}
         };
 
-        DenseMatrix<Complex> A{7, 4, A_data};
+        DenseMatrix<Complex> A{7, 4, std::move(A_data)};
 
         result.add_check(approx(A*b, Ab),
                 "dense complex matrix-matrix case 1");
@@ -657,7 +660,7 @@ inline TestResult test_matrix_multiply() {
             178.110225, 10.478136, -93.40912,   4.858716
         };
 
-        BandedMatrix<Real> A{10, 3, A_data};
+        BandedMatrix<Real> A{10, 3, std::move(A_data)};
         BandedMatrix<Complex> Az{A};
         Vector<Complex> bz{b}, Abz{Ab};
 
@@ -720,7 +723,7 @@ inline TestResult test_matrix_multiply() {
             {170.766304, -7.784181}, {26.949408, 82.475785}
         };
 
-        BandedMatrix<Complex> A{10, 3, A_data};
+        BandedMatrix<Complex> A{10, 3, std::move(A_data)};
 
         result.add_check(approx(A*b, Ab),
                 "banded complex matrix-vector case 1");
@@ -1250,4 +1253,6 @@ inline TestResult test_matrix_access_fail() {
 
     return result;
 }
+
+#endif  // JUMP_TESTS_MATRIX_HPP
 

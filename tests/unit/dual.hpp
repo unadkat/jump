@@ -1,3 +1,6 @@
+#ifndef JUMP_TESTS_DUAL_HPP
+#define JUMP_TESTS_DUAL_HPP
+
 #include <cmath>
 
 #include "jump/autodiff/dual.hpp"
@@ -166,4 +169,6 @@ inline TestResult test_dual_arithmetic_basic() {
 
     return result;
 }
+
+#endif  // JUMP_TESTS_DUAL_HPP
 

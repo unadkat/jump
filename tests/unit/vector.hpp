@@ -1,3 +1,6 @@
+#ifndef JUMP_TESTS_VECTOR_HPP
+#define JUMP_TESTS_VECTOR_HPP
+
 #include <numeric>
 
 #include "jump/data/vector.hpp"
@@ -288,4 +291,6 @@ inline TestResult test_vector_access_fail() {
 
     return result;
 }
+
+#endif  // JUMP_TESTS_VECTOR_HPP
 
