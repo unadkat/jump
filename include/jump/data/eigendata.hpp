@@ -41,8 +41,8 @@ inline bool sort_eigendata_real(const Complex& lhs, const Complex& rhs) {
 /// This sets up a strict weak ordering in line with the requirements for
 /// `std::sort`.
 inline bool sort_eigendata_imag(const Complex& lhs, const Complex& rhs) {
-    return lhs.real() < rhs.real() ? true :
-        (lhs.real() == rhs.real() ? lhs.imag() < rhs.imag() : false);
+    return lhs.imag() < rhs.imag() ? true :
+        (lhs.imag() == rhs.imag() ? lhs.real() < rhs.real() : false);
 }
 }   // namespace jump
 
