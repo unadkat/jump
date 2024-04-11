@@ -119,7 +119,8 @@ inline TestResult test_dual_arithmetic_basic() {
     result.add_check(vector_compare(pow(zdual, d1z64{kz}), pow(z, kz),
                 kz*pow(z, kz - 1.)), "pow complex");
     result.add_check(vector_compare(sin(zdual), sin(z), cos(z)), "sin complex");
-    result.add_check(vector_compare(cos(zdual), cos(z), -sin(z)), "cos complex");
+    result.add_check(vector_compare(cos(zdual), cos(z), -sin(z)),
+            "cos complex");
     result.add_check(vector_compare(atan(zdual), atan(z),
                 pow(Vector<Complex>(N, 1.) + pow(z, {2., 0.}), {-1., 0.})),
             "atan complex");

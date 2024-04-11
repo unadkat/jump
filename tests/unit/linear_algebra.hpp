@@ -8,10 +8,12 @@
 #include "jump/data/dense_matrix.hpp"
 #include "jump/data/eigendata.hpp"
 #include "jump/data/vector.hpp"
+#include "jump/debug/exception.hpp"
 #include "jump/linear_algebra/banded_linear_system.hpp"
 #include "jump/linear_algebra/dense_linear_system.hpp"
 #include "jump/linear_algebra/generalised_eigenvalue_system.hpp"
 #include "jump/testing/testing.hpp"
+#include "jump/utility/random.hpp"
 
 using namespace jump;
 
@@ -157,6 +159,44 @@ inline TestResult test_linalg_banded_basic() {
 
 inline TestResult test_linalg_banded_fail() {
     TestResult result;
+    RandomReal rng_real(0., 10.);
+    std::size_t N{12}, bands{3};
+
+    {
+        bool real_caught{false}, complex_caught{false};
+
+        BandedMatrix<Real> Ar{N, bands};
+        Vector<Real> br(N);
+        BandedMatrix<Complex> Az{N, bands};
+        Vector<Complex> bz(N);
+        randomise(rng_real, Ar, br, Az, bz);
+
+        // Prepare iterators for deletion of data from col 6, creating a linear
+        // dependency and rank reduction
+        std::size_t clear_begin{6*(3*bands + 1)};
+        std::size_t clear_end{7*(3*bands + 1)};
+        std::transform(Ar.begin() + clear_begin, Ar.begin() + clear_end,
+                Ar.begin() + clear_begin, [] (const auto&) { return 0.; });
+        std::transform(Az.begin() + clear_begin, Az.begin() + clear_end,
+                Az.begin() + clear_begin, [] (const auto&) { return 0.; });
+
+        BandedLinearSystem system_real{Ar, br};
+        BandedLinearSystem system_complex{Az, bz};
+
+        try {
+            system_real.solve();
+        } catch (RuntimeError<BasicError>& e) {
+            real_caught = true;
+        }
+        try {
+            system_complex.solve();
+        } catch (RuntimeError<BasicError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "real");
+        result.add_check(complex_caught, "complex");
+    }
 
     return result;
 }
@@ -278,6 +318,45 @@ inline TestResult test_linalg_dense_basic() {
 
 inline TestResult test_linalg_dense_fail() {
     TestResult result;
+    RandomReal rng_real(0., 10.);
+    std::size_t N{12};
+
+    {
+        bool real_caught{false}, complex_caught{false};
+
+        DenseMatrix<Real> Ar{N};
+        Vector<Real> br(N);
+        DenseMatrix<Complex> Az{N};
+        Vector<Complex> bz(N);
+        randomise(rng_real, Ar, br, Az, bz);
+
+        // Prepare iterators for deletion of data from col 6, creating a linear
+        // dependency and rank reduction
+        auto col6_real{Ar.column_iterators(6)};
+        auto col6_complex{Az.column_iterators(6)};
+        std::transform(col6_real.first, col6_real.second, col6_real.first,
+                [] (const auto&) { return 0.; });
+        std::transform(col6_complex.first, col6_complex.second,
+                col6_complex.first, [] (const auto&) { return 0.; });
+
+
+        DenseLinearSystem system_real{Ar, br};
+        DenseLinearSystem system_complex{Az, bz};
+
+        try {
+            system_real.solve();
+        } catch (RuntimeError<BasicError>& e) {
+            real_caught = true;
+        }
+        try {
+            system_complex.solve();
+        } catch (RuntimeError<BasicError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "real");
+        result.add_check(complex_caught, "complex");
+    }
 
     return result;
 }
