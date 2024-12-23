@@ -202,6 +202,58 @@ inline TestResult test_linalg_banded_fail() {
 inline TestResult test_linalg_banded_mismatch() {
     TestResult result;
 
+    RandomInt rng_int(10, 15);
+    std::size_t bands{3};
+    auto size{static_cast<std::size_t>(rng_int.generate())};
+    auto underlying_size_banded{size*(3*bands + 1)};
+
+    Vector<Real> vbr(underlying_size_banded), br(size);
+    Vector<Complex> vbz(underlying_size_banded), bz(size);
+    BandedMatrix<Real> Ar{size, bands, vbr};
+    BandedMatrix<Complex> Az{size, bands, vbz};
+
+    {
+        bool real_caught{false};
+        bool complex_caught{false};
+
+        BandedLinearSystem real{Ar, br};
+        BandedLinearSystem complex{Az, bz};
+        br.resize(size + 1);
+        bz.resize(size + 1);
+
+        try {
+            real.solve_lapacke();
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            real_caught = true;
+        }
+        try {
+            complex.solve_lapacke();
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "real solution");
+        result.add_check(complex_caught, "complex solution");
+    }
+    {
+        bool real_caught{false};
+        bool complex_caught{false};
+
+        try {
+            [[maybe_unused]] BandedLinearSystem real{Ar, br};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            real_caught = true;
+        }
+        try {
+            [[maybe_unused]] BandedLinearSystem complex{Az, bz};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "real construction");
+        result.add_check(complex_caught, "complex construction");
+    }
+
     return result;
 }
 
