@@ -24,7 +24,6 @@ TestResult test_linalg_dense_basic();
 TestResult test_linalg_dense_fail();
 TestResult test_linalg_dense_mismatch();
 TestResult test_linalg_gev_basic();
-TestResult test_linalg_gev_fail();
 TestResult test_linalg_gev_mismatch();
 
 inline TestSuiteL1 linear_algebra_tests() {
@@ -49,7 +48,6 @@ inline TestSuiteL1 linear_algebra_tests() {
 
     tests.push_back({"generalised eigenvalue"});
     tests.back().register_item({"basic", {}, &test_linalg_gev_basic});
-    tests.back().register_item({"fail", {}, &test_linalg_gev_fail});
     // These tests should throw exceptions which are disabled by the NDEBUG flag
 #ifndef NDEBUG
     tests.back().register_item({"mismatch", {}, &test_linalg_gev_mismatch});
@@ -450,12 +448,6 @@ inline TestResult test_linalg_gev_basic() {
 
         result.add_check(solutions_match, "complex");
     }
-
-    return result;
-}
-
-inline TestResult test_linalg_gev_fail() {
-    TestResult result;
 
     return result;
 }
