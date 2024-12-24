@@ -413,6 +413,57 @@ inline TestResult test_linalg_dense_fail() {
 inline TestResult test_linalg_dense_mismatch() {
     TestResult result;
 
+    RandomInt rng_int(10, 15);
+    auto size1{static_cast<std::size_t>(rng_int.generate())};
+    auto size2{static_cast<std::size_t>(rng_int.generate())};
+
+    Vector<Real> br(size2);
+    Vector<Complex> bz(size2);
+    DenseMatrix<Real> Ar{size1, size2};
+    DenseMatrix<Complex> Az{size1, size2};
+
+    {
+        bool real_caught{false};
+        bool complex_caught{false};
+
+        DenseLinearSystem real{Ar, br};
+        DenseLinearSystem complex{Az, bz};
+        br.resize(size2 + 1);
+        bz.resize(size2 + 1);
+
+        try {
+            real.solve_lapacke();
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            real_caught = true;
+        }
+        try {
+            complex.solve_lapacke();
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "real solution");
+        result.add_check(complex_caught, "complex solution");
+    }
+    {
+        bool real_caught{false};
+        bool complex_caught{false};
+
+        try {
+            [[maybe_unused]] DenseLinearSystem real{Ar, br};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            real_caught = true;
+        }
+        try {
+            [[maybe_unused]] DenseLinearSystem complex{Az, bz};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            complex_caught = true;
+        }
+
+        result.add_check(real_caught, "real construction");
+        result.add_check(complex_caught, "complex construction");
+    }
+
     return result;
 }
 
