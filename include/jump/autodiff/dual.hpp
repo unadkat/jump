@@ -6,6 +6,11 @@
 
 #include "jump/autodiff/dual_decl.hpp"
 
+#include "jump/debug/exception.hpp"
+#include "jump/utility/utility.hpp"
+
+#include <cmath>
+
 namespace jump {
 /// \class Dual
 /// Denote a dual number (with a single dual component) as

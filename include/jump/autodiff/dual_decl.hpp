@@ -4,12 +4,9 @@
 #ifndef JUMP_DUAL_DECL_HPP
 #define JUMP_DUAL_DECL_HPP
 
-#include "jump/debug/exception.hpp"
 #include "jump/utility/types.hpp"
-#include "jump/utility/utility.hpp"
 
 #include <array>
-#include <cmath>
 
 namespace jump {
 /// \brief An augmented number type that can be used to automatically
