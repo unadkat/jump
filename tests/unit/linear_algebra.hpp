@@ -205,12 +205,11 @@ inline TestResult test_linalg_banded_mismatch() {
     RandomInt rng_int(10, 15);
     std::size_t bands{3};
     auto size{static_cast<std::size_t>(rng_int.generate())};
-    auto underlying_size_banded{size*(3*bands + 1)};
 
-    Vector<Real> vbr(underlying_size_banded), br(size);
-    Vector<Complex> vbz(underlying_size_banded), bz(size);
-    BandedMatrix<Real> Ar{size, bands, vbr};
-    BandedMatrix<Complex> Az{size, bands, vbz};
+    Vector<Real> br(size);
+    Vector<Complex> bz(size);
+    BandedMatrix<Real> Ar{size, bands};
+    BandedMatrix<Complex> Az{size, bands};
 
     {
         bool real_caught{false};
