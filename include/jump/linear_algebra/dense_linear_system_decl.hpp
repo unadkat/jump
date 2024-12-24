@@ -20,6 +20,11 @@ namespace jump {
 template <typename T>
 class DenseLinearSystem : public LinearSystemBase {
     private:
+#ifdef JUMP_HAS_LAPACKE
+        /// \brief Call the external solver for this linear system type.
+        void solve_lapacke();
+#endif  // JUMP_HAS_LAPACKE
+
         /// \brief Reference to the matrix \f$A\f$.
         DenseMatrix<T>& m_A;
         /// \brief Reference to the right-hand side `Vector` \f$b\f$. Upon
@@ -33,11 +38,6 @@ class DenseLinearSystem : public LinearSystemBase {
 
         /// \brief Solve the linear system.
         void solve();
-#ifdef JUMP_HAS_LAPACKE
-        /// \brief Call the external solver for this linear system type.
-        void solve_lapacke();
-#endif  // JUMP_HAS_LAPACKE
-
         /// \brief Return the number of equations in the linear system.
         std::size_t order() const;
 };

@@ -221,12 +221,12 @@ inline TestResult test_linalg_banded_mismatch() {
         bz.resize(size + 1);
 
         try {
-            real.solve_lapacke();
+            real.solve();
         } catch (RuntimeError<Mismatch2DError>& e) {
             real_caught = true;
         }
         try {
-            complex.solve_lapacke();
+            complex.solve();
         } catch (RuntimeError<Mismatch2DError>& e) {
             complex_caught = true;
         }
@@ -432,12 +432,12 @@ inline TestResult test_linalg_dense_mismatch() {
         bz.resize(size2 + 1);
 
         try {
-            real.solve_lapacke();
+            real.solve();
         } catch (RuntimeError<Mismatch2DError>& e) {
             real_caught = true;
         }
         try {
-            complex.solve_lapacke();
+            complex.solve();
         } catch (RuntimeError<Mismatch2DError>& e) {
             complex_caught = true;
         }

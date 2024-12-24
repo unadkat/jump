@@ -21,6 +21,11 @@ namespace jump {
 template <typename T>
 class GeneralisedEigenvalueSystem : public LinearSystemBase {
     private:
+#ifdef JUMP_HAS_LAPACKE
+        /// \brief Call the external solver for this eigenvalue system type.
+        void solve_lapacke();
+#endif  // JUMP_HAS_LAPACKE
+
         /// \brief Reference to the (square) matrix \f$A\f$.
         DenseMatrix<T>& m_A;
         /// \brief Reference to the (square) matrix \f$B\f$.
@@ -38,11 +43,6 @@ class GeneralisedEigenvalueSystem : public LinearSystemBase {
 
         /// \brief Solve the eigenvalue system.
         void solve();
-#ifdef JUMP_HAS_LAPACKE
-        /// \brief Call the external solver for this eigenvalue system type.
-        void solve_lapacke();
-#endif  // JUMP_HAS_LAPACKE
-
         /// \brief Return the number of equations in the eigenvalue system.
         std::size_t order() const;
 };
