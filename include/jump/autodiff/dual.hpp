@@ -182,14 +182,14 @@ inline Dual<N, T>::operator Dual<N, Complex>() const {
 }
 
 template <std::size_t N, typename T>
-inline Dual<N, T> Dual<N, T>::operator+() const {
+inline auto Dual<N, T>::operator+() const -> Dual {
     return *this;
 }
 
 /// Writing \f$\h{x}=x+\sum_{k=0}^{N-1}p'_k\epsilon_k\f$, we have
 /// \f$-\h{x}=-x-\sum_{k=0}^{N-1}p'_k\epsilon_k\f$.
 template <std::size_t N, typename T>
-inline Dual<N, T> Dual<N, T>::operator-() const {
+inline auto Dual<N, T>::operator-() const -> Dual {
     std::array<T, N> temp{dual};
     for (auto& x : temp) {
         x *= T{-1};
@@ -201,7 +201,7 @@ inline Dual<N, T> Dual<N, T>::operator-() const {
 /// \f$\h{y}=y+\sum_{k=0}^{N-1}q'_k\epsilon_k\f$, we have
 /// \f$\h{x}+\h{y}=(x+y)+\sum_{k=0}^{N-1}(p'_k+q'_k)\epsilon_k\f$.
 template <std::size_t N, typename T>
-inline Dual<N, T>& Dual<N, T>::operator+=(const Dual<N, T>& rhs) {
+inline auto Dual<N, T>::operator+=(const Dual<N, T>& rhs) -> Dual& {
     value += rhs.value;
     for (std::size_t i(0); i < N; ++i) {
         dual[i] += rhs.dual[i];
@@ -213,7 +213,7 @@ inline Dual<N, T>& Dual<N, T>::operator+=(const Dual<N, T>& rhs) {
 /// \f$\h{y}=y+\sum_{k=0}^{N-1}q'_k\epsilon_k\f$, we have
 /// \f$\h{x}-\h{y}=(x-y)+\sum_{k=0}^{N-1}(p'_k-q'_k)\epsilon_k\f$.
 template <std::size_t N, typename T>
-inline Dual<N, T>& Dual<N, T>::operator-=(const Dual<N, T>& rhs) {
+inline auto Dual<N, T>::operator-=(const Dual<N, T>& rhs) -> Dual& {
     value -= rhs.value;
     for (std::size_t i(0); i < N; ++i) {
         dual[i] -= rhs.dual[i];
@@ -229,7 +229,7 @@ inline Dual<N, T>& Dual<N, T>::operator-=(const Dual<N, T>& rhs) {
 ///  \\&=xy+\sum_{k=0}^{N-1}(yp'_k+xq'_k)\epsilon_k.
 /// \f}
 template <std::size_t N, typename T>
-inline Dual<N, T>& Dual<N, T>::operator*=(const Dual<N, T>& rhs) {
+inline auto Dual<N, T>::operator*=(const Dual<N, T>& rhs) -> Dual& {
     for (std::size_t i(0); i < N; ++i) {
         dual[i] = dual[i]*rhs.value + value*rhs.dual[i];
     }
@@ -249,7 +249,7 @@ inline Dual<N, T>& Dual<N, T>::operator*=(const Dual<N, T>& rhs) {
 ///   \left(p'_k-\frac{xq'_k}{y}\right)\epsilon_k.
 /// \f}
 template <std::size_t N, typename T>
-inline Dual<N, T>& Dual<N, T>::operator/=(const Dual<N, T>& rhs) {
+inline auto Dual<N, T>::operator/=(const Dual<N, T>& rhs) -> Dual& {
     for (std::size_t i(0); i < N; ++i) {
         dual[i] = (dual[i] - rhs.dual[i]*value/rhs.value)/rhs.value;
     }
@@ -259,7 +259,7 @@ inline Dual<N, T>& Dual<N, T>::operator/=(const Dual<N, T>& rhs) {
 
 /// \relates Jump::Dual
 template <std::size_t N, typename T, typename Os>
-inline Os& operator<<(Os& out, const Dual<N, T>& rhs) {
+inline auto operator<<(Os& out, const Dual<N, T>& rhs) -> Os& {
     out << "(" << rhs.value << ", {";
     if constexpr (N > 0) {
         out << rhs.dual[0];
@@ -278,7 +278,7 @@ inline Os& operator<<(Os& out, const Dual<N, T>& rhs) {
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> exp(Dual<N, T> x) {
+inline auto exp(Dual<N, T> x) -> Dual<N, T> {
     x.value = std::exp(x.value);
     for (auto& d : x.dual) {
         d *= x.value;
@@ -288,7 +288,7 @@ Dual<N, T> exp(Dual<N, T> x) {
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> log(Dual<N, T> x) {
+inline auto log(Dual<N, T> x) -> Dual<N, T> {
     for (auto& d : x.dual) {
         d /= x.value;
     }
@@ -298,7 +298,7 @@ Dual<N, T> log(Dual<N, T> x) {
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> pow(Dual<N, T> x, Dual<N, T> p) {
+inline auto pow(Dual<N, T> x, Dual<N, T> p) -> Dual<N, T> {
     return exp(log(x)*p);
 }
 
@@ -308,7 +308,7 @@ Dual<N, T> pow(Dual<N, T> x, Dual<N, T> p) {
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> sin(Dual<N, T> x) {
+inline auto sin(Dual<N, T> x) -> Dual<N, T> {
     auto derivative{std::cos(x.value)};
     for (auto& d : x.dual) {
         d *= derivative;
@@ -319,7 +319,7 @@ Dual<N, T> sin(Dual<N, T> x) {
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> cos(Dual<N, T> x) {
+inline auto cos(Dual<N, T> x) -> Dual<N, T> {
     auto derivative{-std::sin(x.value)};
     for (auto& d : x.dual) {
         d *= derivative;
@@ -330,7 +330,7 @@ Dual<N, T> cos(Dual<N, T> x) {
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> tan(Dual<N, T> x) {
+inline auto tan(Dual<N, T> x) -> Dual<N, T> {
     auto derivative{1./(std::pow(std::cos(x.value), 2.))};
     for (auto& d : x.dual) {
         d *= derivative;
@@ -341,7 +341,7 @@ Dual<N, T> tan(Dual<N, T> x) {
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> asin(Dual<N, T> x) {
+inline auto asin(Dual<N, T> x) -> Dual<N, T> {
     auto derivative{1./std::sqrt(1. - std::pow(x.value, 2.))};
     for (auto& d : x.dual) {
         d *= derivative;
@@ -352,7 +352,7 @@ Dual<N, T> asin(Dual<N, T> x) {
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> acos(Dual<N, T> x) {
+inline auto acos(Dual<N, T> x) -> Dual<N, T> {
     auto derivative{-1./std::sqrt(1. - std::pow(x.value, 2.))};
     for (auto& d : x.dual) {
         d *= derivative;
@@ -363,7 +363,7 @@ Dual<N, T> acos(Dual<N, T> x) {
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> atan(Dual<N, T> x) {
+inline auto atan(Dual<N, T> x) -> Dual<N, T> {
     auto derivative{1./(1. + std::pow(x.value, 2.))};
     for (auto& d : x.dual) {
         d *= derivative;
@@ -378,7 +378,7 @@ Dual<N, T> atan(Dual<N, T> x) {
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> sinh(Dual<N, T> x) {
+inline auto sinh(Dual<N, T> x) -> Dual<N, T> {
     auto derivative{std::cosh(x.value)};
     for (auto& d : x.dual) {
         d *= derivative;
@@ -389,7 +389,7 @@ Dual<N, T> sinh(Dual<N, T> x) {
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> cosh(Dual<N, T> x) {
+inline auto cosh(Dual<N, T> x) -> Dual<N, T> {
     auto derivative{std::sinh(x.value)};
     for (auto& d : x.dual) {
         d *= derivative;
@@ -400,7 +400,7 @@ Dual<N, T> cosh(Dual<N, T> x) {
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> tanh(Dual<N, T> x) {
+inline auto tanh(Dual<N, T> x) -> Dual<N, T> {
     auto derivative{1./(std::pow(std::cosh(x.value), 2.))};
     for (auto& d : x.dual) {
         d *= derivative;
@@ -411,7 +411,7 @@ Dual<N, T> tanh(Dual<N, T> x) {
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> asinh(Dual<N, T> x) {
+inline auto asinh(Dual<N, T> x) -> Dual<N, T> {
     auto derivative{1./std::sqrt(1. + std::pow(x.value, 2.))};
     for (auto& d : x.dual) {
         d *= derivative;
@@ -422,7 +422,7 @@ Dual<N, T> asinh(Dual<N, T> x) {
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> acosh(Dual<N, T> x) {
+inline auto acosh(Dual<N, T> x) -> Dual<N, T> {
     auto derivative{1./std::sqrt(std::pow(x.value, 2.) - 1.)};
     for (auto& d : x.dual) {
         d *= derivative;
@@ -433,7 +433,7 @@ Dual<N, T> acosh(Dual<N, T> x) {
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> atanh(Dual<N, T> x) {
+inline auto atanh(Dual<N, T> x) -> Dual<N, T> {
     auto derivative{1./(1. - std::pow(x.value, 2.))};
     for (auto& d : x.dual) {
         d *= derivative;
@@ -448,7 +448,7 @@ Dual<N, T> atanh(Dual<N, T> x) {
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> abs(Dual<N, T> x) {
+inline auto abs(Dual<N, T> x) -> Dual<N, T> {
     auto derivative{sgn(x.value)};
     for (auto& d : x.dual) {
         d *= derivative;
@@ -459,7 +459,7 @@ Dual<N, T> abs(Dual<N, T> x) {
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> sgn(Dual<N, T> x) {
+inline auto sgn(Dual<N, T> x) -> Dual<N, T> {
     x.dual.fill(0.);
     x.value = sgn(x.value);
 }

@@ -4,12 +4,12 @@
 #ifndef JUMP_DUAL_DECL_HPP
 #define JUMP_DUAL_DECL_HPP
 
-#include <array>
-#include <cmath>
-
 #include "jump/debug/exception.hpp"
 #include "jump/utility/types.hpp"
 #include "jump/utility/utility.hpp"
+
+#include <array>
+#include <cmath>
 
 namespace jump {
 /// \brief An augmented number type that can be used to automatically
@@ -42,24 +42,24 @@ struct Dual {
     operator Dual<N, Complex>() const;
 
     /// \brief No operation on `Dual`.
-    Dual operator+() const;
+    auto operator+() const -> Dual;
     /// \brief Negate `Dual`.
-    Dual operator-() const;
+    auto operator-() const -> Dual;
     /// \brief Add one `Dual` to another in place.
-    Dual& operator+=(const Dual& rhs);
+    auto operator+=(const Dual& rhs) -> Dual&;
     /// \brief Subtract one `Dual` from another in place.
-    Dual& operator-=(const Dual& rhs);
+    auto operator-=(const Dual& rhs) -> Dual&;
     /// \brief Multiply one `Dual` by another in place.
-    Dual& operator*=(const Dual& rhs);
+    auto operator*=(const Dual& rhs) -> Dual&;
     /// \brief Divide one `Dual` by another in place.
-    Dual& operator/=(const Dual& rhs);
+    auto operator/=(const Dual& rhs) -> Dual&;
 
     #include "jump/autodiff/dual_friends.hpp"
 };
 
 /// \relates Jump::Dual
 template <std::size_t N, typename T, typename Os>
-inline Os& operator<<(Os& out, const Dual<N, T>& rhs);
+inline auto operator<<(Os& out, const Dual<N, T>& rhs) -> Os&;
 
 // ========================================================================
 // Exponentiation
@@ -67,15 +67,15 @@ inline Os& operator<<(Os& out, const Dual<N, T>& rhs);
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> exp(Dual<N, T> x);
+auto exp(Dual<N, T> x) -> Dual<N, T>;
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> log(Dual<N, T> x);
+auto log(Dual<N, T> x) -> Dual<N, T>;
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> pow(Dual<N, T> x, Dual<N, T> p);
+auto pow(Dual<N, T> x, Dual<N, T> p) -> Dual<N, T>;
 
 // ========================================================================
 // Trigonometry
@@ -83,27 +83,27 @@ Dual<N, T> pow(Dual<N, T> x, Dual<N, T> p);
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> sin(Dual<N, T> x);
+auto sin(Dual<N, T> x) -> Dual<N, T>;
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> cos(Dual<N, T> x);
+auto cos(Dual<N, T> x) -> Dual<N, T>;
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> tan(Dual<N, T> x);
+auto tan(Dual<N, T> x) -> Dual<N, T>;
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> asin(Dual<N, T> x);
+auto asin(Dual<N, T> x) -> Dual<N, T>;
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> acos(Dual<N, T> x);
+auto acos(Dual<N, T> x) -> Dual<N, T>;
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> atan(Dual<N, T> x);
+auto atan(Dual<N, T> x) -> Dual<N, T>;
 
 // ========================================================================
 // Hyperbolics
@@ -111,27 +111,27 @@ Dual<N, T> atan(Dual<N, T> x);
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> sinh(Dual<N, T> x);
+auto sinh(Dual<N, T> x) -> Dual<N, T>;
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> cosh(Dual<N, T> x);
+auto cosh(Dual<N, T> x) -> Dual<N, T>;
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> tanh(Dual<N, T> x);
+auto tanh(Dual<N, T> x) -> Dual<N, T>;
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> asinh(Dual<N, T> x);
+auto asinh(Dual<N, T> x) -> Dual<N, T>;
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> acosh(Dual<N, T> x);
+auto acosh(Dual<N, T> x) -> Dual<N, T>;
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> atanh(Dual<N, T> x);
+auto atanh(Dual<N, T> x) -> Dual<N, T>;
 
 // ========================================================================
 // Miscellaneous
@@ -139,11 +139,11 @@ Dual<N, T> atanh(Dual<N, T> x);
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> abs(Dual<N, T> x);
+auto abs(Dual<N, T> x) -> Dual<N, T>;
 
 /// \relates Dual
 template <std::size_t N, typename T>
-Dual<N, T> sgn(Dual<N, T> x);
+auto sgn(Dual<N, T> x) -> Dual<N, T>;
 
 // ========================================================================
 // Type traits and aliases

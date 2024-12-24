@@ -5,44 +5,44 @@
 #define JUMP_DUAL_FRIENDS_HPP
 
 /// \relates Dual
-friend Dual operator+(Dual lhs, const Dual& rhs) {
+friend auto operator+(Dual lhs, const Dual& rhs) -> Dual {
     lhs += rhs;
     return lhs;
 }
 
 /// \relates Dual
-friend Dual operator+(const Dual& lhs, Dual&& rhs) {
+friend auto operator+(const Dual& lhs, Dual&& rhs) -> Dual {
     rhs += lhs;
     return rhs;
 }
 
 /// \relates Dual
-friend Dual operator-(Dual lhs, const Dual& rhs) {
+friend auto operator-(Dual lhs, const Dual& rhs) -> Dual {
     lhs -= rhs;
     return lhs;
 }
 
 /// \relates Dual
-friend Dual operator-(const Dual& lhs, Dual&& rhs) {
+friend auto operator-(const Dual& lhs, Dual&& rhs) -> Dual {
     rhs *= T{-1};
     rhs += lhs;
     return rhs;
 }
 
 /// \relates Dual
-friend Dual operator*(Dual lhs, const Dual& rhs) {
+friend auto operator*(Dual lhs, const Dual& rhs) -> Dual {
     lhs *= rhs;
     return lhs;
 }
 
 /// \relates Dual
-friend Dual operator*(const Dual& lhs, Dual&& rhs) {
+friend auto operator*(const Dual& lhs, Dual&& rhs) -> Dual {
     rhs *= lhs;
     return rhs;
 }
 
 /// \relates Dual
-friend Dual operator/(Dual lhs, const Dual& rhs) {
+friend auto operator/(Dual lhs, const Dual& rhs) -> Dual {
     lhs /= rhs;
     return lhs;
 }
