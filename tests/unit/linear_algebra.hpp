@@ -557,6 +557,85 @@ inline TestResult test_linalg_gev_basic() {
 inline TestResult test_linalg_gev_mismatch() {
     TestResult result;
 
+    RandomInt rng_int(10, 15);
+    auto size1{static_cast<std::size_t>(rng_int.generate())};
+    auto size2{static_cast<std::size_t>(rng_int.generate() + 6)};
+
+    {
+        DenseMatrix<Complex> Az{size1}, Bz{size1};
+        std::vector<Eigendatum<Complex>> complex_eigendata;
+
+        bool complex_caught_A_non_square{false};
+        bool complex_caught_B_non_square{false};
+        bool complex_caught_AB_mismatch{false};
+
+        GeneralisedEigenvalueSystem complex{Az, Bz, complex_eigendata};
+
+        Bz.assign(size2);
+        try {
+            complex.solve();
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            complex_caught_AB_mismatch = true;
+        }
+        Bz.assign(size1, size2);
+        try {
+            complex.solve();
+        } catch (RuntimeError<InvalidArgumentError>& e) {
+            complex_caught_B_non_square = true;
+        }
+        Az.assign(size1, size2);
+        Bz.assign(size1);
+        try {
+            complex.solve();
+        } catch (RuntimeError<InvalidArgumentError>& e) {
+            complex_caught_A_non_square = true;
+        }
+
+        result.add_check(complex_caught_A_non_square,
+                "complex solution A non-square");
+        result.add_check(complex_caught_B_non_square,
+                "complex solution B non-square");
+        result.add_check(complex_caught_AB_mismatch,
+                "complex solution A-B mismatch");
+    }
+    {
+        DenseMatrix<Complex> Az{size1}, Bz{size2};
+        std::vector<Eigendatum<Complex>> complex_eigendata;
+
+        bool complex_caught_A_non_square{false};
+        bool complex_caught_B_non_square{false};
+        bool complex_caught_AB_mismatch{false};
+
+        try {
+            [[maybe_unused]] GeneralisedEigenvalueSystem complex{
+                Az, Bz, complex_eigendata};
+        } catch (RuntimeError<Mismatch2DError>& e) {
+            complex_caught_AB_mismatch = true;
+        }
+        Bz.assign(size1, size2);
+        try {
+            [[maybe_unused]] GeneralisedEigenvalueSystem complex{
+                Az, Bz, complex_eigendata};
+        } catch (RuntimeError<InvalidArgumentError>& e) {
+            complex_caught_B_non_square = true;
+        }
+        Az.assign(size1, size2);
+        Bz.assign(size1);
+        try {
+            [[maybe_unused]] GeneralisedEigenvalueSystem complex{
+                Az, Bz, complex_eigendata};
+        } catch (RuntimeError<InvalidArgumentError>& e) {
+            complex_caught_A_non_square = true;
+        }
+
+        result.add_check(complex_caught_A_non_square,
+                "complex construction A non-square");
+        result.add_check(complex_caught_B_non_square,
+                "complex construction B non-square");
+        result.add_check(complex_caught_AB_mismatch,
+                "complex construction A-B mismatch");
+    }
+
     return result;
 }
 
