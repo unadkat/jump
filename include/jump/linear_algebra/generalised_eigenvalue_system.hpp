@@ -46,6 +46,11 @@ inline void GeneralisedEigenvalueSystem<T>::solve() {
 #endif  // JUMP_HAS_LAPACKE
 }
 
+template <typename T>
+inline std::size_t GeneralisedEigenvalueSystem<T>::order() const {
+    return m_A.num_rows();
+}
+
 #ifdef JUMP_HAS_LAPACKE
 /// \brief Call the external solver for a complex-valued problem.
 template <>
@@ -125,11 +130,6 @@ inline void GeneralisedEigenvalueSystem<Complex>::solve_lapacke() {
     }
 }
 #endif  // JUMP_HAS_LAPACKE
-
-template <typename T>
-inline std::size_t GeneralisedEigenvalueSystem<T>::order() const {
-    return m_A.num_rows();
-}
 }   // namespace jump
 
 #endif  // JUMP_GENERALISED_EIGENVALUE_SYSTEM_HPP

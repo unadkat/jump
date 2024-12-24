@@ -16,13 +16,6 @@ namespace jump {
 /// \brief Deals with the storage of input and output file streams, and ensures
 /// that files are closed appropriately when finished with.
 class FileSystem {
-    private:
-        /// \brief Stores file streams as shared pointers indexed by a
-        /// user-supplied handle.
-        std::map<std::string, std::unique_ptr<std::fstream>> m_files;
-        /// \brief The root directory to use for all input and output files.
-        std::filesystem::path m_root;
-
     public:
         using FileMode = std::ios_base::openmode;
 
@@ -78,6 +71,13 @@ class FileSystem {
         /// \brief File mode for input and output (append).
         static constexpr FileMode mode_random_app{std::ios_base::in
             | std::ios_base::out | std::ios_base::app};
+
+    private:
+        /// \brief Stores file streams as shared pointers indexed by a
+        /// user-supplied handle.
+        std::map<std::string, std::unique_ptr<std::fstream>> m_files;
+        /// \brief The root directory to use for all input and output files.
+        std::filesystem::path m_root;
 };
 }   // namespace jump
 

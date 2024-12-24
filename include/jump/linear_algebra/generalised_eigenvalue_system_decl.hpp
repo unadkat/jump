@@ -20,20 +20,6 @@ namespace jump {
 /// \f$\vec{x}\f$.
 template <typename T>
 class GeneralisedEigenvalueSystem : public LinearSystemBase {
-    private:
-#ifdef JUMP_HAS_LAPACKE
-        /// \brief Call the external solver for this eigenvalue system type.
-        void solve_lapacke();
-#endif  // JUMP_HAS_LAPACKE
-
-        /// \brief Reference to the (square) matrix \f$A\f$.
-        DenseMatrix<T>& m_A;
-        /// \brief Reference to the (square) matrix \f$B\f$.
-        DenseMatrix<T>& m_B;
-        /// \brief Reference to the solution data structure, which will store
-        /// eigenvalue/eigenvector pairs.
-        std::vector<Eigendatum<T>>& m_data;
-
     public:
         /// \brief Initialise the eigenvalue system with references to the
         /// DenseMatrices in \f$A\vec{x}=\lambda*B*\vec{x}\f$ and the solution
@@ -45,6 +31,21 @@ class GeneralisedEigenvalueSystem : public LinearSystemBase {
         void solve();
         /// \brief Return the number of equations in the eigenvalue system.
         std::size_t order() const;
+
+    private:
+#ifdef JUMP_HAS_LAPACKE
+        /// \brief Call the external solver for this eigenvalue system type.
+        void solve_lapacke();
+#endif  // JUMP_HAS_LAPACKE
+
+    private:
+        /// \brief Reference to the (square) matrix \f$A\f$.
+        DenseMatrix<T>& m_A;
+        /// \brief Reference to the (square) matrix \f$B\f$.
+        DenseMatrix<T>& m_B;
+        /// \brief Reference to the solution data structure, which will store
+        /// eigenvalue/eigenvector pairs.
+        std::vector<Eigendatum<T>>& m_data;
 };
 }   // namespace jump
 

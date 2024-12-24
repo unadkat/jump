@@ -11,17 +11,6 @@ namespace jump {
 /// \brief General matrix interface.
 template <typename T>
 class MatrixBase {
-    protected:
-        /// \brief Number of matrix rows.
-        std::size_t m_num_rows{0};
-        /// \brief Number of matrix columns.
-        std::size_t m_num_columns{0};
-
-        /// \brief Set the number of rows and columns to be equal.
-        void initialise(std::size_t size = 0);
-        /// \brief Set the number of rows and columns separately.
-        void initialise(std::size_t num_rows, std::size_t num_columns);
-
     public:
         /// \brief Construct a square matrix with the given size.
         MatrixBase(std::size_t size = 0);
@@ -47,6 +36,18 @@ class MatrixBase {
         virtual void operator<<(std::string data) = 0;
         /// \brief Interface for matrix serialisation to a `std::string`.
         virtual std::string as_string() const = 0;
+
+    protected:
+        /// \brief Set the number of rows and columns to be equal.
+        void initialise(std::size_t size = 0);
+        /// \brief Set the number of rows and columns separately.
+        void initialise(std::size_t num_rows, std::size_t num_columns);
+
+    protected:
+        /// \brief Number of matrix rows.
+        std::size_t m_num_rows{0};
+        /// \brief Number of matrix columns.
+        std::size_t m_num_columns{0};
 };
 
 /// \relates MatrixBase

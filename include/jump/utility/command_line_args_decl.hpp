@@ -18,6 +18,20 @@ namespace jump {
 /// \brief Parses and stores information supplied at runtime via command-line
 /// arguments, and enables their extraction.
 class CommandLineArgs {
+    public:
+        /// \brief Reads command-line arguments at construction.
+        CommandLineArgs(int argc, char** const argv);
+
+        /// \brief Attempt extraction of flag and indicate success.
+        bool get(const char& flag, bool& storage);
+        /// \brief Attempt extraction of option and indicate success.
+        template <typename T>
+        bool get(const std::string& option, T& storage);
+
+        /// \brief Print list of extracted flags and options to a stream.
+        template <typename Os> friend
+        Os& operator<<(Os& out, const CommandLineArgs& rhs);
+
     private:
         /// \brief Stores a flag (single character only) and whether this flag
         /// has been extracted by the user.
@@ -38,20 +52,6 @@ class CommandLineArgs {
         std::vector<Flag> m_flags;
         /// \brief Collection of options read from the command line.
         std::vector<Option> m_options;
-
-    public:
-        /// \brief Reads command-line arguments at construction.
-        CommandLineArgs(int argc, char** const argv);
-
-        /// \brief Attempt extraction of flag and indicate success.
-        bool get(const char& flag, bool& storage);
-        /// \brief Attempt extraction of option and indicate success.
-        template <typename T>
-        bool get(const std::string& option, T& storage);
-
-        /// \brief Print list of extracted flags and options to a stream.
-        template <typename Os> friend
-        Os& operator<<(Os& out, const CommandLineArgs& rhs);
 };
 }   // namespace jump
 

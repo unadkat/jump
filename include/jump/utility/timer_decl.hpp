@@ -14,28 +14,10 @@ namespace jump {
 /// \brief Enables timing of function calls and the calculation of average and
 /// total time taken.
 class Timer {
-    private:
+    public:
         // \brief Type alias to reduce verbosity.
         using Clock = std::chrono::steady_clock;
 
-        /// \brief Flag to show if the `Timer` is currently stopped.
-        bool m_stopped{true};
-        /// \brief Counter of the number of start/stop laps, for the calculation
-        /// of the average time.
-        long m_counter{0};
-        /// \brief Start time for the current timing session.
-        Clock::time_point m_start;
-        /// \brief Storage of the total duration the `Timer` has been running
-        /// since its creation.
-        Clock::duration m_delta_t {Clock::duration::zero()};
-        /// \brief String storing a description of the task being timed.
-        std::string m_task;
-
-        /// \brief Returns the time in a formatted string appropriate for the
-        /// time duration supplied.
-        std::string formatted_time(Clock::duration time) const;
-
-    public:
         /// \brief Construct the `Timer` in a stopped state, with a given task
         /// description, and an elapsed time of zero.
         Timer(std::string task = "");
@@ -66,6 +48,25 @@ class Timer {
         /// \brief Return the average time of completed timing sessions in the
         /// format provided by formatted_time.
         std::string formatted_average_time() const;
+
+    private:
+        /// \brief Returns the time in a formatted string appropriate for the
+        /// time duration supplied.
+        std::string formatted_time(Clock::duration time) const;
+
+    private:
+        /// \brief Flag to show if the `Timer` is currently stopped.
+        bool m_stopped{true};
+        /// \brief Counter of the number of start/stop laps, for the calculation
+        /// of the average time.
+        long m_counter{0};
+        /// \brief Start time for the current timing session.
+        Clock::time_point m_start;
+        /// \brief Storage of the total duration the `Timer` has been running
+        /// since its creation.
+        Clock::duration m_delta_t {Clock::duration::zero()};
+        /// \brief String storing a description of the task being timed.
+        std::string m_task;
 };
 
 /// \relates Timer

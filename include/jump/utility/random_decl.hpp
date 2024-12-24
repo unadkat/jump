@@ -16,12 +16,6 @@ namespace jump {
 /// type for the random numbers and underlying distribution.
 template <typename T, template <typename> typename Distribution>
 class RandomNumbers {
-    private:
-        /// \brief The engine that generates the random seed data which is in
-        /// turn used to provide numbers from a chosen distribution.
-        std::default_random_engine m_engine;
-        Distribution<T> m_distribution;
-
     public:
         /// \brief Seeds the default random engine that is later used to
         /// generate random numbers from the templated distribution, forwarding
@@ -32,6 +26,12 @@ class RandomNumbers {
         /// \brief Generate a random number of the templated type and
         /// distribution.
         T generate();
+
+    private:
+        /// \brief The engine that generates the random seed data which is in
+        /// turn used to provide numbers from a chosen distribution.
+        std::default_random_engine m_engine;
+        Distribution<T> m_distribution;
 };
 
 template <typename Rng, typename T>

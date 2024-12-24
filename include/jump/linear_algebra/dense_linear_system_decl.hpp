@@ -19,18 +19,6 @@ namespace jump {
 /// solution \f$x\f$.
 template <typename T>
 class DenseLinearSystem : public LinearSystemBase {
-    private:
-#ifdef JUMP_HAS_LAPACKE
-        /// \brief Call the external solver for this linear system type.
-        void solve_lapacke();
-#endif  // JUMP_HAS_LAPACKE
-
-        /// \brief Reference to the matrix \f$A\f$.
-        DenseMatrix<T>& m_A;
-        /// \brief Reference to the right-hand side `Vector` \f$b\f$. Upon
-        /// calling `solve`, this will contain the solution.
-        Vector<T>& m_b;
-
     public:
         /// \brief Initialise the linear system with references to the
         /// `DenseMatrix` and `Vector` in \f$A\vec{x}=\vec{b}\f$.
@@ -40,6 +28,19 @@ class DenseLinearSystem : public LinearSystemBase {
         void solve();
         /// \brief Return the number of equations in the linear system.
         std::size_t order() const;
+
+    private:
+#ifdef JUMP_HAS_LAPACKE
+        /// \brief Call the external solver for this linear system type.
+        void solve_lapacke();
+#endif  // JUMP_HAS_LAPACKE
+
+    private:
+        /// \brief Reference to the matrix \f$A\f$.
+        DenseMatrix<T>& m_A;
+        /// \brief Reference to the right-hand side `Vector` \f$b\f$. Upon
+        /// calling `solve`, this will contain the solution.
+        Vector<T>& m_b;
 };
 }   // namespace jump
 

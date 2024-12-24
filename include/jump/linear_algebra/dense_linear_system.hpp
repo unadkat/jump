@@ -32,6 +32,11 @@ inline void DenseLinearSystem<T>::solve() {
 #endif  // JUMP_HAS_LAPACKE
 }
 
+template <typename T>
+inline std::size_t DenseLinearSystem<T>::order() const {
+    return m_A.num_rows();
+}
+
 #ifdef JUMP_HAS_LAPACKE
 /// Call the external solver for a real-valued problem.
 template <>
@@ -87,11 +92,6 @@ inline void DenseLinearSystem<Complex>::solve_lapacke() {
     }
 }
 #endif  // JUMP_HAS_LAPACKE
-
-template <typename T>
-inline std::size_t DenseLinearSystem<T>::order() const {
-    return m_A.num_rows();
-}
 }   // namespace jump
 
 #endif  // JUMP_DENSE_LINEAR_SYSTEM_HPP

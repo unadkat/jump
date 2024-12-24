@@ -7,27 +7,6 @@
 #include "jump/testing/reporter_decl.hpp"
 
 namespace jump {
-inline TestResult TestReporter::flatten(TestResult root) const {
-    for (const auto& sub : root.sub_results) {
-        auto flat_sub = flatten(sub);
-
-        root.passed += flat_sub.passed;
-        root.failed += flat_sub.failed;
-        root.skipped += flat_sub.skipped;
-        for (const auto& fail : flat_sub.failed_tests) {
-            root.failed_tests.push_back(std::format("{}{}{}", flat_sub.name,
-                        delimiter, fail));
-        }
-        for (const auto& skip : flat_sub.skipped_tests) {
-            root.skipped_tests.push_back(std::format("{}{}{}", flat_sub.name,
-                        delimiter, skip));
-        }
-    }
-    root.sub_results.clear();
-
-    return root;
-}
-
 inline void TestReporter::trace(const TestResult& results,
         std::string current) const {
     if (current == "") {
@@ -89,6 +68,27 @@ inline void TestReporter::summarise(const TestResult& results) const {
                     skip);
         }
     }
+}
+
+inline TestResult TestReporter::flatten(TestResult root) const {
+    for (const auto& sub : root.sub_results) {
+        auto flat_sub = flatten(sub);
+
+        root.passed += flat_sub.passed;
+        root.failed += flat_sub.failed;
+        root.skipped += flat_sub.skipped;
+        for (const auto& fail : flat_sub.failed_tests) {
+            root.failed_tests.push_back(std::format("{}{}{}", flat_sub.name,
+                        delimiter, fail));
+        }
+        for (const auto& skip : flat_sub.skipped_tests) {
+            root.skipped_tests.push_back(std::format("{}{}{}", flat_sub.name,
+                        delimiter, skip));
+        }
+    }
+    root.sub_results.clear();
+
+    return root;
 }
 }   // namespace jump
 

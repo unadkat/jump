@@ -15,18 +15,6 @@ namespace jump {
 /// type of error being thrown.
 template <typename ErrorData>
 class RuntimeError : public std::exception {
-    private:
-        /// \brief Package of data for the exception being raised.
-        ErrorData m_data;
-        /// \brief Full error message (with banner).
-        std::string m_message;
-        /// \brief Details about the source location where the error occurred.
-        std::source_location m_source;
-        // TODO: add std::stacktrace when available
-
-        /// \brief Construct full error message from constituent parts.
-        void construct_message();
-
     public:
         /// \brief Construct error of specified type with details of the problem
         /// and the source information at that location.
@@ -42,6 +30,19 @@ class RuntimeError : public std::exception {
         /// \brief Return source information at location of the raised
         /// exception.
         const std::source_location& where() const noexcept;
+
+    private:
+        /// \brief Construct full error message from constituent parts.
+        void construct_message();
+
+    private:
+        /// \brief Package of data for the exception being raised.
+        ErrorData m_data;
+        /// \brief Full error message (with banner).
+        std::string m_message;
+        /// \brief Details about the source location where the error occurred.
+        std::source_location m_source;
+        // TODO: add std::stacktrace when available
 };
 
 /// \brief Data for basic RuntimeError.

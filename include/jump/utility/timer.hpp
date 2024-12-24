@@ -7,34 +7,6 @@
 #include "jump/utility/timer_decl.hpp"
 
 namespace jump {
-/// The time is returned formatted based on the largest time unit
-/// (hours/minutes/seconds) that have been measured. If the number of hours is
-/// non-zero, the time is given in the format hh:mm:ss.sss. Otherwise if the
-/// number of minutes is non-zero, the time is given in the format mm:ss.sss.
-/// Failing both of these, the time is returned in the format ss.sss with a
-/// trailing 's' to denote seconds.
-inline std::string Timer::formatted_time(Clock::duration time) const {
-    auto ms{std::chrono::duration_cast<std::chrono::milliseconds>(
-            time).count()};
-
-    decltype(ms) minutes{0}, hours{0};
-    Real seconds{0.};
-
-    hours = ms/(1000*60*60);
-    ms %= 1000*60*60;
-    minutes = ms/(1000*60);
-    ms %= 1000*60;
-    seconds = 0.001*ms;
-
-    if (hours > 0) {
-        return std::format("{:d}:{:02d}:{:06.3f}", hours, minutes, seconds);
-    } else if (minutes > 0) {
-        return std::format("{:d}{:06.3f}", minutes, seconds);
-    } else {
-        return std::format("{:.3f}s", seconds);
-    }
-}
-
 inline Timer::Timer(std::string task) :
     m_task{std::move(task)} {
 }
@@ -94,6 +66,34 @@ inline Timer::Clock::duration Timer::average_time() const {
 
 inline std::string Timer::formatted_average_time() const {
     return formatted_time(average_time());
+}
+
+/// The time is returned formatted based on the largest time unit
+/// (hours/minutes/seconds) that have been measured. If the number of hours is
+/// non-zero, the time is given in the format hh:mm:ss.sss. Otherwise if the
+/// number of minutes is non-zero, the time is given in the format mm:ss.sss.
+/// Failing both of these, the time is returned in the format ss.sss with a
+/// trailing 's' to denote seconds.
+inline std::string Timer::formatted_time(Clock::duration time) const {
+    auto ms{std::chrono::duration_cast<std::chrono::milliseconds>(
+            time).count()};
+
+    decltype(ms) minutes{0}, hours{0};
+    Real seconds{0.};
+
+    hours = ms/(1000*60*60);
+    ms %= 1000*60*60;
+    minutes = ms/(1000*60);
+    ms %= 1000*60;
+    seconds = 0.001*ms;
+
+    if (hours > 0) {
+        return std::format("{:d}:{:02d}:{:06.3f}", hours, minutes, seconds);
+    } else if (minutes > 0) {
+        return std::format("{:d}{:06.3f}", minutes, seconds);
+    } else {
+        return std::format("{:.3f}s", seconds);
+    }
 }
 
 /// \relates Timer

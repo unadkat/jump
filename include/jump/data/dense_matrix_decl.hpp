@@ -20,10 +20,6 @@ namespace jump {
 /// common arithmetic operations enabled.
 template <typename T>
 class DenseMatrix : public MatrixBase<T> {
-    private:
-        /// \brief Internal contiguous storage.
-        Vector<T> m_storage;
-
     public:
         /// \brief Iterator for algorithms.
         using Iterator = typename Vector<T>::Iterator;
@@ -127,6 +123,10 @@ class DenseMatrix : public MatrixBase<T> {
         static DenseMatrix identity(std::size_t size);
 
         #include "jump/data/dense_matrix_friends.hpp"
+
+    private:
+        /// \brief Internal contiguous storage.
+        Vector<T> m_storage;
 };
 }   // namespace jump
 

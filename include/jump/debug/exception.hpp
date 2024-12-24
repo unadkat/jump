@@ -8,17 +8,6 @@
 
 namespace jump {
 template <typename ErrorData>
-inline void RuntimeError<ErrorData>::construct_message() {
-    m_message =
-        "\n--------------------------------------------------\n"
-        + std::format("{} in {}\nAt location {}:{}:{}\n", m_data.type,
-                m_source.function_name(), m_source.file_name(), m_source.line(),
-                m_source.column())
-        + "--------------------------------------------------\n"
-        + m_data.info() + '\n';
-}
-
-template <typename ErrorData>
 inline RuntimeError<ErrorData>::RuntimeError(ErrorData data,
         std::source_location source) :
     m_data{std::move(data)},
@@ -41,6 +30,17 @@ template <typename ErrorData>
 inline const std::source_location& RuntimeError<ErrorData>::where()
     const noexcept {
     return m_source;
+}
+
+template <typename ErrorData>
+inline void RuntimeError<ErrorData>::construct_message() {
+    m_message =
+        "\n--------------------------------------------------\n"
+        + std::format("{} in {}\nAt location {}:{}:{}\n", m_data.type,
+                m_source.function_name(), m_source.file_name(), m_source.line(),
+                m_source.column())
+        + "--------------------------------------------------\n"
+        + m_data.info() + '\n';
 }
 
 inline std::string BasicError::info() const {

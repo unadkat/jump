@@ -16,13 +16,6 @@ namespace jump {
 /// \brief Banded square matrix for use with LAPACKE.
 template <typename T>
 class BandedMatrix : public MatrixBase<T> {
-    private:
-        /// \brief Maximum number of diagonals on either side of the leading
-        /// diagonal that are permitted to contain non-zero elements.
-        std::size_t m_num_bands = 0;
-        /// \brief Internal contiguous storage.
-        Vector<T> m_storage;
-
     public:
         /// \brief Iterator for algorithms.
         using Iterator = typename Vector<T>::Iterator;
@@ -112,6 +105,13 @@ class BandedMatrix : public MatrixBase<T> {
         std::string as_string() const override;
 
         #include "jump/data/banded_matrix_friends.hpp"
+
+    private:
+        /// \brief Maximum number of diagonals on either side of the leading
+        /// diagonal that are permitted to contain non-zero elements.
+        std::size_t m_num_bands = 0;
+        /// \brief Internal contiguous storage.
+        Vector<T> m_storage;
 };
 }   // namespace jump
 

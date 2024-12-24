@@ -32,6 +32,11 @@ inline void BandedLinearSystem<T>::solve() {
 #endif  // JUMP_HAS_LAPACKE
 }
 
+template <typename T>
+inline std::size_t BandedLinearSystem<T>::order() const {
+    return m_A.num_rows();
+}
+
 #ifdef JUMP_HAS_LAPACKE
 /// Call the external solver for a real-valued problem.
 template <>
@@ -95,11 +100,6 @@ inline void BandedLinearSystem<Complex>::solve_lapacke() {
     }
 }
 #endif  // JUMP_HAS_LAPACKE
-
-template <typename T>
-inline std::size_t BandedLinearSystem<T>::order() const {
-    return m_A.num_rows();
-}
 }   // namespace jump
 
 #endif  // JUMP_BANDED_LINEAR_SYSTEM_HPP

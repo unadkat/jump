@@ -8,18 +8,6 @@
 
 namespace jump {
 template <typename T>
-inline void MatrixBase<T>::initialise(std::size_t size) {
-    m_num_rows = m_num_columns = size;
-}
-
-template <typename T>
-inline void MatrixBase<T>::initialise(std::size_t num_rows,
-        std::size_t num_columns) {
-    m_num_rows = num_rows;
-    m_num_columns = num_columns;
-}
-
-template <typename T>
 inline MatrixBase<T>::MatrixBase(std::size_t size) :
     m_num_rows{size},
     m_num_columns{size} {
@@ -45,6 +33,18 @@ inline std::size_t MatrixBase<T>::num_columns() const {
 template <typename T>
 inline std::pair<std::size_t, std::size_t> MatrixBase<T>::size() const {
     return {m_num_rows, m_num_columns};
+}
+
+template <typename T>
+inline void MatrixBase<T>::initialise(std::size_t size) {
+    m_num_rows = m_num_columns = size;
+}
+
+template <typename T>
+inline void MatrixBase<T>::initialise(std::size_t num_rows,
+        std::size_t num_columns) {
+    m_num_rows = num_rows;
+    m_num_columns = num_columns;
 }
 
 /// \relates MatrixBase

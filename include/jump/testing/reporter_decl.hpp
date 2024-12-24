@@ -11,11 +11,6 @@
 
 namespace jump {
 class TestReporter {
-    private:
-        /// \brief Traverse result structure and collect all results in a
-        /// top-level result object.
-        TestResult flatten(TestResult root) const;
-
     public:
         /// \brief Delimiter for output of test structure.
         std::string delimiter{"->"};
@@ -26,6 +21,11 @@ class TestReporter {
         /// \brief Print summary of the total reported results in the tree, and
         /// give details of all failed and skipped tests.
         void summarise(const TestResult& results) const;
+
+    private:
+        /// \brief Traverse result structure and collect all results in a
+        /// top-level result object.
+        TestResult flatten(TestResult root) const;
 };
 }   // namespace jump
 

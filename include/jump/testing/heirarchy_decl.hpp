@@ -17,15 +17,6 @@
 
 namespace jump {
 class AtomicTest {
-    private:
-        /// \brief Name of the atomic test.
-        std::string m_name;
-        /// \brief List of tags for which this test can be skipped.
-        std::vector<std::string> m_tags;
-        /// \brief Handle to test function (accepting no arguments and returning
-        /// a TestResult).
-        std::function<TestResult()> m_func;
-
     public:
         /// \brief Constructor for an atomic test requires name and tags to be
         /// supplied at the same time as the function, to keep all information
@@ -40,18 +31,18 @@ class AtomicTest {
         const std::string& name() const;
         /// \brief Accessor for the list of tags of this atomic test.
         const std::vector<std::string>& tags() const;
+
+    private:
+        /// \brief Name of the atomic test.
+        std::string m_name;
+        /// \brief List of tags for which this test can be skipped.
+        std::vector<std::string> m_tags;
+        /// \brief Handle to test function (accepting no arguments and returning
+        /// a TestResult).
+        std::function<TestResult()> m_func;
 };
 
 class Test {
-    private:
-        /// \brief Name of the test.
-        std::string m_name;
-        /// \brief List of tags for which this test (and hence all subtests)
-        /// can be skipped.
-        std::vector<std::string> m_tags;
-        /// \brief List of atomic tests that will be run by this test unit.
-        std::vector<AtomicTest> m_atomic_tests;
-
     public:
         /// \brief Constructor for a test unit requires name and tags to be
         /// supplied at the outset, to keep all information local.
@@ -72,19 +63,19 @@ class Test {
         const std::vector<std::string>& tags() const;
         /// \brief Accessor for the collection of registered atomic tests.
         const std::vector<AtomicTest>& tests() const;
+
+    private:
+        /// \brief Name of the test.
+        std::string m_name;
+        /// \brief List of tags for which this test (and hence all subtests)
+        /// can be skipped.
+        std::vector<std::string> m_tags;
+        /// \brief List of atomic tests that will be run by this test unit.
+        std::vector<AtomicTest> m_atomic_tests;
 };
 
 template <typename T = Test>
 class TestSuite {
-    private:
-        /// \brief Name of the test suite.
-        std::string m_name;
-        /// \brief List of tags for which this test suite (and hence all
-        /// subtests) can be skipped.
-        std::vector<std::string> m_tags;
-        /// \brief Collection of tests making up this test suite.
-        std::vector<T> m_tests;
-
     public:
         /// \brief Constructor for a test suite requires name to be supplied at
         /// the outset, to keep all information local.
@@ -106,6 +97,15 @@ class TestSuite {
         const std::vector<std::string>& tags() const;
         /// \brief Accessor for the collection of registered tests.
         const std::vector<T>& tests() const;
+
+    private:
+        /// \brief Name of the test suite.
+        std::string m_name;
+        /// \brief List of tags for which this test suite (and hence all
+        /// subtests) can be skipped.
+        std::vector<std::string> m_tags;
+        /// \brief Collection of tests making up this test suite.
+        std::vector<T> m_tests;
 };
 
 using TestSuiteL1 = TestSuite<Test>;
