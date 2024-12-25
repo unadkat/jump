@@ -16,7 +16,8 @@
 ///
 /// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
 /// return. Also handles the case that lhs is given an rvalue (NRVO).
-friend BandedMatrix operator+(BandedMatrix lhs, const BandedMatrix& rhs) {
+friend auto operator+(BandedMatrix lhs, const BandedMatrix& rhs)
+        -> BandedMatrix {
     lhs += rhs;
     return lhs;
 }
@@ -26,7 +27,8 @@ friend BandedMatrix operator+(BandedMatrix lhs, const BandedMatrix& rhs) {
 ///
 /// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
 /// reference parameter (NRVO).
-friend BandedMatrix operator+(const BandedMatrix& lhs, BandedMatrix&& rhs) {
+friend auto operator+(const BandedMatrix& lhs, BandedMatrix&& rhs)
+        -> BandedMatrix {
     rhs += lhs;
     return rhs;
 }
@@ -36,7 +38,8 @@ friend BandedMatrix operator+(const BandedMatrix& lhs, BandedMatrix&& rhs) {
 ///
 /// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
 /// return. Also handles the case that lhs is given an rvalue (NRVO).
-friend BandedMatrix operator-(BandedMatrix lhs, const BandedMatrix& rhs) {
+friend auto operator-(BandedMatrix lhs, const BandedMatrix& rhs)
+        -> BandedMatrix {
     lhs -= rhs;
     return lhs;
 }
@@ -46,7 +49,8 @@ friend BandedMatrix operator-(BandedMatrix lhs, const BandedMatrix& rhs) {
 ///
 /// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
 /// reference parameter (NRVO).
-friend BandedMatrix operator-(const BandedMatrix& lhs, BandedMatrix&& rhs) {
+friend auto operator-(const BandedMatrix& lhs, BandedMatrix&& rhs)
+        -> BandedMatrix {
     rhs *= T{-1};
     rhs += lhs;
     return rhs;
@@ -54,7 +58,8 @@ friend BandedMatrix operator-(const BandedMatrix& lhs, BandedMatrix&& rhs) {
 
 /// \relates BandedMatrix
 /// \brief Right-hand-side multiplication by vector.
-friend Vector<T> operator*(const BandedMatrix& lhs, const Vector<T>& rhs) {
+friend auto operator*(const BandedMatrix& lhs, const Vector<T>& rhs)
+        -> Vector<T> {
 #ifndef NDEBUG
     if (lhs.num_columns() != rhs.size()) {
         throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
@@ -75,21 +80,21 @@ friend Vector<T> operator*(const BandedMatrix& lhs, const Vector<T>& rhs) {
 
 /// \relates BandedMatrix
 /// \brief Left-hand multiplication by scalar.
-friend BandedMatrix operator*(const T& lhs, BandedMatrix rhs) {
+friend auto operator*(const T& lhs, BandedMatrix rhs) -> BandedMatrix {
     rhs *= lhs;
     return rhs;
 }
 
 /// \relates BandedMatrix
 /// \brief Right-hand multiplication by scalar.
-friend BandedMatrix operator*(BandedMatrix lhs, const T& rhs) {
+friend auto operator*(BandedMatrix lhs, const T& rhs) -> BandedMatrix {
     lhs *= rhs;
     return lhs;
 }
 
 /// \relates BandedMatrix
 /// \brief Division by a scalar.
-friend BandedMatrix operator/(BandedMatrix lhs, const T& rhs) {
+friend auto operator/(BandedMatrix lhs, const T& rhs) -> BandedMatrix {
     lhs /= rhs;
     return lhs;
 }

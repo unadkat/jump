@@ -21,17 +21,17 @@ inline MatrixBase<T>::MatrixBase(std::size_t num_rows,
 }
 
 template <typename T>
-inline std::size_t MatrixBase<T>::num_rows() const {
+inline auto MatrixBase<T>::num_rows() const -> std::size_t {
     return m_num_rows;
 }
 
 template <typename T>
-inline std::size_t MatrixBase<T>::num_columns() const {
+inline auto MatrixBase<T>::num_columns() const -> std::size_t {
     return m_num_columns;
 }
 
 template <typename T>
-inline std::pair<std::size_t, std::size_t> MatrixBase<T>::size() const {
+inline auto MatrixBase<T>::size() const -> std::pair<std::size_t, std::size_t> {
     return {m_num_rows, m_num_columns};
 }
 
@@ -49,7 +49,7 @@ inline void MatrixBase<T>::initialise(std::size_t num_rows,
 
 /// \relates MatrixBase
 template <typename T, typename Os>
-inline Os& operator<<(Os& out, const MatrixBase<T>& rhs) {
+inline auto operator<<(Os& out, const MatrixBase<T>& rhs) -> Os& {
     return out << rhs.as_string();
 }
 }   // namespace jump

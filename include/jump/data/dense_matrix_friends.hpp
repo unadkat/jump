@@ -16,7 +16,7 @@
 ///
 /// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
 /// return. Also handles the case that lhs is given an rvalue (NRVO).
-friend DenseMatrix operator+(DenseMatrix lhs, const DenseMatrix& rhs) {
+friend auto operator+(DenseMatrix lhs, const DenseMatrix& rhs) -> DenseMatrix {
     lhs += rhs;
     return lhs;
 }
@@ -26,7 +26,8 @@ friend DenseMatrix operator+(DenseMatrix lhs, const DenseMatrix& rhs) {
 ///
 /// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
 /// reference parameter (NRVO).
-friend DenseMatrix operator+(const DenseMatrix& lhs, DenseMatrix&& rhs) {
+friend auto operator+(const DenseMatrix& lhs, DenseMatrix&& rhs)
+        -> DenseMatrix {
     rhs += lhs;
     return rhs;
 }
@@ -36,7 +37,7 @@ friend DenseMatrix operator+(const DenseMatrix& lhs, DenseMatrix&& rhs) {
 ///
 /// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
 /// return. Also handles the case that lhs is given an rvalue (NRVO).
-friend DenseMatrix operator-(DenseMatrix lhs, const DenseMatrix& rhs) {
+friend auto operator-(DenseMatrix lhs, const DenseMatrix& rhs) -> DenseMatrix {
     lhs -= rhs;
     return lhs;
 }
@@ -46,7 +47,8 @@ friend DenseMatrix operator-(DenseMatrix lhs, const DenseMatrix& rhs) {
 ///
 /// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
 /// reference parameter (NRVO).
-friend DenseMatrix operator-(const DenseMatrix& lhs, DenseMatrix&& rhs) {
+friend auto operator-(const DenseMatrix& lhs, DenseMatrix&& rhs)
+        -> DenseMatrix {
     rhs *= T{-1};
     rhs += lhs;
     return rhs;
@@ -54,7 +56,8 @@ friend DenseMatrix operator-(const DenseMatrix& lhs, DenseMatrix&& rhs) {
 
 /// \relates DenseMatrix
 /// \brief Right-hand-side multiplication by vector.
-friend Vector<T> operator*(const DenseMatrix& lhs, const Vector<T>& rhs) {
+friend auto operator*(const DenseMatrix& lhs, const Vector<T>& rhs)
+        -> Vector<T> {
 #ifndef NDEBUG
     if (lhs.num_columns() != rhs.size()) {
         throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
@@ -75,28 +78,28 @@ friend Vector<T> operator*(const DenseMatrix& lhs, const Vector<T>& rhs) {
 
 /// \relates DenseMatrix
 /// \brief Left-hand multiplication by scalar.
-friend DenseMatrix operator*(const T& lhs, DenseMatrix rhs) {
+friend auto operator*(const T& lhs, DenseMatrix rhs) -> DenseMatrix {
     rhs *= lhs;
     return rhs;
 }
 
 /// \relates DenseMatrix
 /// \brief Right-hand multiplication by scalar.
-friend DenseMatrix operator*(DenseMatrix lhs, const T& rhs) {
+friend auto operator*(DenseMatrix lhs, const T& rhs) -> DenseMatrix {
     lhs *= rhs;
     return lhs;
 }
 
 /// \relates DenseMatrix
 /// \brief Multiplication of two DenseMatrices.
-friend DenseMatrix operator*(DenseMatrix lhs, const DenseMatrix& rhs) {
+friend auto operator*(DenseMatrix lhs, const DenseMatrix& rhs) -> DenseMatrix {
     lhs *= rhs;
     return lhs;
 }
 
 /// \relates DenseMatrix
 /// \brief Division by a scalar.
-friend DenseMatrix operator/(DenseMatrix lhs, const T& rhs) {
+friend auto operator/(DenseMatrix lhs, const T& rhs) -> DenseMatrix {
     lhs /= rhs;
     return lhs;
 }
@@ -109,8 +112,8 @@ friend DenseMatrix operator/(DenseMatrix lhs, const T& rhs) {
 /// \relates DenseMatrix
 /// \brief Specialisation of multiplication of a real `DenseMatrix` by a real
 /// Vector, using CBLAS.
-friend Vector<Real> operator*(const DenseMatrix<Real>& lhs,
-        const Vector<Real>& rhs) {
+friend auto operator*(const DenseMatrix<Real>& lhs, const Vector<Real>& rhs)
+        -> Vector<Real> {
 #ifndef NDEBUG
     if (lhs.num_columns() != rhs.size()) {
         throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
@@ -129,8 +132,8 @@ friend Vector<Real> operator*(const DenseMatrix<Real>& lhs,
 /// \relates DenseMatrix
 /// \brief Specialisation of multiplication of a complex `DenseMatrix` by a
 /// complex Vector, using CBLAS.
-friend Vector<Complex> operator*(const DenseMatrix<Complex>& lhs,
-        const Vector<Complex>& rhs) {
+friend auto operator*(const DenseMatrix<Complex>& lhs,
+        const Vector<Complex>& rhs) -> Vector<Complex> {
 #ifndef NDEBUG
     if (lhs.num_columns() != rhs.size()) {
         throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),

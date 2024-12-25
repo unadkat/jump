@@ -4,16 +4,14 @@
 #ifndef JUMP_DENSE_MATRIX_DECL_HPP
 #define JUMP_DENSE_MATRIX_DECL_HPP
 
-#include <algorithm>
-#include <numeric>
-#include <sstream>
-#include <string>
-
-#include "jump/autodiff/dual.hpp"
 #include "jump/data/matrix_base.hpp"
 #include "jump/data/vector.hpp"
 #include "jump/debug/exception.hpp"
+#include "jump/utility/external.hpp"
 #include "jump/utility/types.hpp"
+
+#include <string>
+#include <utility>
 
 namespace jump {
 /// \brief Stores all elements of a general \f$m\f$ by \f$n\f$ matrix, with
@@ -54,73 +52,74 @@ class DenseMatrix : public MatrixBase<T> {
         template <class InputIt>
         void assign(InputIt first, InputIt last);
         /// \brief Return size of internal storage.
-        std::size_t num_elements() const override;
+        auto num_elements() const -> std::size_t override;
 
         /// \brief Defaulted spaceship operator.
         auto operator<=>(const DenseMatrix&) const = default;
 
         /// \brief Const element access.
-        const T& operator[](std::size_t row, std::size_t column) const;
+        auto operator[](std::size_t row, std::size_t column) const -> const T&;
         /// \brief Mutable element access.
-        T& operator[](std::size_t row, std::size_t column);
+        auto operator[](std::size_t row, std::size_t column) -> T&;
 
         /// \brief Const iterator for algorithms.
-        ConstIterator begin() const;
+        auto begin() const -> ConstIterator;
         /// \brief Const iterator for algorithms.
-        ConstIterator end() const;
+        auto end() const -> ConstIterator;
         /// \brief Iterator for algorithms.
-        Iterator begin();
+        auto begin() -> Iterator;
         /// \brief Iterator for algorithms.
-        Iterator end();
+        auto end() -> Iterator;
         /// \brief Return iterators to extract/manipulate a column.
-        std::pair<Iterator, Iterator> column_iterators(std::size_t column);
+        auto column_iterators(std::size_t column)
+                -> std::pair<Iterator, Iterator>;
         /// \brief Return iterators to extract/manipulate a column.
-        std::pair<ConstIterator, ConstIterator> column_iterators(
-                std::size_t column) const;
+        auto column_iterators(std::size_t column) const
+                -> std::pair<ConstIterator, ConstIterator>;
 
         /// \brief Fill matrix with given value.
         void fill(const T& value);
         /// \brief Zero the matrix.
-        void zero() override;
+        virtual void zero() override;
 
         /// \brief No operation on matrix.
-        const DenseMatrix& operator+() const;
+        auto operator+() const -> const DenseMatrix&;
         /// \brief Negate matrix.
-        DenseMatrix operator-() const;
+        auto operator-() const -> DenseMatrix;
         /// \brief Add two matrices together in place.
-        DenseMatrix& operator+=(const DenseMatrix& rhs);
+        auto operator+=(const DenseMatrix& rhs) -> DenseMatrix&;
         /// \brief Subtract a matrix from another in place.
-        DenseMatrix& operator-=(const DenseMatrix& rhs);
+        auto operator-=(const DenseMatrix& rhs) -> DenseMatrix&;
         /// \brief Multiply matrix by scalar in place.
-        DenseMatrix& operator*=(const T& k);
+        auto operator*=(const T& k) -> DenseMatrix&;
         /// \brief Multiply matrix by another in place
-        DenseMatrix& operator*=(const DenseMatrix& rhs);
+        auto operator*=(const DenseMatrix& rhs) -> DenseMatrix&;
         /// \brief Divide matrix by scalar in place.
-        DenseMatrix& operator/=(const T& k);
+        auto operator/=(const T& k) -> DenseMatrix&;
 
         /// \brief Return sum of element magnitudes in a column.
-        Real column_L1_norm(std::size_t column) const;
+        auto column_L1_norm(std::size_t column) const -> Real;
         /// \brief Return Euclidean norm of a column.
-        Real column_L2_norm(std::size_t column) const;
+        auto column_L2_norm(std::size_t column) const -> Real;
         /// \brief Return maximum magnitude over all elements in a column.
-        Real column_Linf_norm(std::size_t column) const;
+        auto column_Linf_norm(std::size_t column) const -> Real;
 
         /// \brief Pointer to underlying data, for use with external libraries.
-        T* data();
+        auto data() -> T*;
         /// \brief Pointer to underlying data, for use with external libraries.
-        const T* data() const;
+        auto data() const -> const T*;
         /// \brief Const reference to underlying Vector (column-major).
-        const Vector<T>& as_vector() const;
+        auto as_vector() const -> const Vector<T>&;
 
         /// \brief Populate with data from a `std::string`. Noting that data
         /// storage is assumed to be column-major, matrices stored as strings
         /// will be assumed to be a transpose matrix.
-        void operator<<(std::string data) override;
+        virtual void operator<<(std::string data) override;
         /// \brief Matrix serialisation to a string.
-        std::string as_string() const override;
+        virtual auto as_string() const -> std::string override;
 
         /// \brief Return identity matrix of specified size.
-        static DenseMatrix identity(std::size_t size);
+        static auto identity(std::size_t size) -> DenseMatrix;
 
         #include "jump/data/dense_matrix_friends.hpp"
 

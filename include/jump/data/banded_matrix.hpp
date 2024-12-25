@@ -6,6 +6,10 @@
 
 #include "jump/data/banded_matrix_decl.hpp"
 
+#include <format>
+#include <sstream>
+#include <utility>
+
 namespace jump {
 /// \var BandedMatrix::m_storage
 /// In short, the interal storage takes the form of a dense matrix with
@@ -101,12 +105,12 @@ inline void BandedMatrix<T>::assign(InputIt first, InputIt last) {
 }
 
 template <typename T>
-inline std::size_t BandedMatrix<T>::num_bands() const {
+inline auto BandedMatrix<T>::num_bands() const -> std::size_t {
     return m_num_bands;
 }
 
 template <typename T>
-inline std::size_t BandedMatrix<T>::num_elements() const {
+inline auto BandedMatrix<T>::num_elements() const -> std::size_t {
     return m_storage.size();
 }
 
@@ -121,8 +125,8 @@ inline std::size_t BandedMatrix<T>::num_elements() const {
 /// `(i, j)` must be mapped to the element `(1 + 2*#num_bands() + i - j, j)` in
 /// the internal storage.
 template <typename T>
-inline T BandedMatrix<T>::operator[](std::size_t row,
-        std::size_t column) const {
+inline auto BandedMatrix<T>::operator[](std::size_t row,
+        std::size_t column) const -> T {
 #ifndef NDEBUG
     if (row >= this->num_rows() || column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {row, column},
@@ -145,7 +149,8 @@ inline T BandedMatrix<T>::operator[](std::size_t row,
 /// `(i, j)` must be mapped to the element `(1 + 2*#num_bands() + i - j, j)` in
 /// the internal storage.
 template <typename T>
-inline T& BandedMatrix<T>::get_unsafe(std::size_t row, std::size_t column) {
+inline auto BandedMatrix<T>::get_unsafe(std::size_t row, std::size_t column)
+        -> T& {
 #ifndef NDEBUG
     if (row >= this->num_rows() || column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {row, column},
@@ -174,8 +179,8 @@ inline T& BandedMatrix<T>::get_unsafe(std::size_t row, std::size_t column) {
 /// `(i, j)` must be mapped to the element `(1 + 2*#num_bands() + i - j, j)` in
 /// the internal storage.
 template <typename T>
-inline bool BandedMatrix<T>::set(std::size_t row, std::size_t column,
-        const T& value) {
+inline auto BandedMatrix<T>::set(std::size_t row, std::size_t column,
+        const T& value) -> bool {
 #ifndef NDEBUG
     if (row >= this->num_rows() || column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {row, column},
@@ -192,22 +197,22 @@ inline bool BandedMatrix<T>::set(std::size_t row, std::size_t column,
 }
 
 template <typename T>
-inline typename BandedMatrix<T>::ConstIterator BandedMatrix<T>::begin() const {
+inline auto BandedMatrix<T>::begin() const -> ConstIterator {
     return m_storage.begin();
 }
 
 template <typename T>
-inline typename BandedMatrix<T>::ConstIterator BandedMatrix<T>::end() const {
+inline auto BandedMatrix<T>::end() const -> ConstIterator {
     return m_storage.end();
 }
 
 template <typename T>
-inline typename BandedMatrix<T>::Iterator BandedMatrix<T>::begin() {
+inline auto BandedMatrix<T>::begin() -> Iterator {
     return m_storage.begin();
 }
 
 template <typename T>
-inline typename BandedMatrix<T>::Iterator BandedMatrix<T>::end() {
+inline auto BandedMatrix<T>::end() -> Iterator {
     return m_storage.end();
 }
 
@@ -222,20 +227,20 @@ inline void BandedMatrix<T>::zero() {
 }
 
 template <typename T>
-inline const BandedMatrix<T>& BandedMatrix<T>::operator+() const {
+inline auto BandedMatrix<T>::operator+() const -> const BandedMatrix& {
     return *this;
 }
 
 template <typename T>
-inline BandedMatrix<T> BandedMatrix<T>::operator-() const {
+inline auto BandedMatrix<T>::operator-() const -> BandedMatrix {
     BandedMatrix<T> result(*this);
     result *= T{-1};
     return result;
 }
 
 template <typename T>
-inline BandedMatrix<T>& BandedMatrix<T>::operator+=(
-        const BandedMatrix<T>& rhs) {
+inline auto BandedMatrix<T>::operator+=(const BandedMatrix<T>& rhs)
+        -> BandedMatrix& {
 #ifndef NDEBUG
     if (this->size() != rhs.size()) {
         throw RuntimeError{Mismatch2DError{.size1 = this->size(),
@@ -253,8 +258,8 @@ inline BandedMatrix<T>& BandedMatrix<T>::operator+=(
 }
 
 template <typename T>
-inline BandedMatrix<T>& BandedMatrix<T>::operator-=(
-        const BandedMatrix<T>& rhs) {
+inline auto BandedMatrix<T>::operator-=(const BandedMatrix<T>& rhs)
+        -> BandedMatrix& {
 #ifndef NDEBUG
     if (this->size() != rhs.size()) {
         throw RuntimeError{Mismatch2DError{.size1 = this->size(),
@@ -272,29 +277,29 @@ inline BandedMatrix<T>& BandedMatrix<T>::operator-=(
 }
 
 template <typename T>
-inline BandedMatrix<T>& BandedMatrix<T>::operator*=(const T& k) {
+inline auto BandedMatrix<T>::operator*=(const T& k) -> BandedMatrix& {
     m_storage *= k;
     return *this;
 }
 
 template <typename T>
-inline BandedMatrix<T>& BandedMatrix<T>::operator/=(const T& k) {
+inline auto BandedMatrix<T>::operator/=(const T& k) -> BandedMatrix& {
     m_storage /= k;
     return *this;
 }
 
 template <typename T>
-inline T* BandedMatrix<T>::data() {
+inline auto BandedMatrix<T>::data() -> T* {
     return m_storage.data();
 }
 
 template <typename T>
-inline const T* BandedMatrix<T>::data() const {
+inline auto BandedMatrix<T>::data() const -> const T* {
     return m_storage.data();
 }
 
 template <typename T>
-inline const Vector<T>& BandedMatrix<T>::as_vector() const {
+inline auto BandedMatrix<T>::as_vector() const -> const Vector<T>& {
     return m_storage;
 }
 
@@ -306,7 +311,7 @@ inline const Vector<T>& BandedMatrix<T>::as_vector() const {
 /// single line, or even lines of unequal length.
 /// TODO: add metadata to load arbitrary matrices
 template <typename T>
-void BandedMatrix<T>::operator<<(std::string data) {
+inline void BandedMatrix<T>::operator<<(std::string data) {
     Vector<T> new_data;
     new_data << std::move(data);
     if (new_data.size() != m_storage.size()) {
@@ -333,7 +338,7 @@ void BandedMatrix<T>::operator<<(std::string data) {
 /// `(i, j)` must be mapped to the element `(1 + 2*#num_bands() + i - j, j)` in
 /// the internal storage. The matrix is output as the transpose.
 template <typename T>
-inline std::string BandedMatrix<T>::as_string() const {
+inline auto BandedMatrix<T>::as_string() const -> std::string {
     // TODO: ranges?
     std::ostringstream oss;
     for (std::size_t j{0}, size{this->num_columns()}; j < size; ++j) {

@@ -5,7 +5,12 @@
 #define JUMP_DENSE_MATRIX_HPP
 
 #include "jump/data/dense_matrix_decl.hpp"
+
 #include <algorithm>
+#include <cmath>
+#include <format>
+#include <numeric>
+#include <sstream>
 
 namespace jump {
 /// \class DenseMatrix
@@ -122,15 +127,15 @@ inline void DenseMatrix<T>::assign(InputIt first, InputIt last) {
 }
 
 template <typename T>
-inline std::size_t DenseMatrix<T>::num_elements() const {
+inline auto DenseMatrix<T>::num_elements() const -> std::size_t {
     return m_storage.size();
 }
 
 /// The element at row `i` and column `j` appears at location
 /// `m_storage[j*num_rows() + i]` (see `DenseMatrix::m_storage`).
 template <typename T>
-inline const T& DenseMatrix<T>::operator[](std::size_t row,
-        std::size_t column) const {
+inline auto DenseMatrix<T>::operator[](std::size_t row,
+        std::size_t column) const -> const T& {
 #ifndef NDEBUG
     if (row >= this->num_rows() || column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {row, column},
@@ -144,7 +149,8 @@ inline const T& DenseMatrix<T>::operator[](std::size_t row,
 /// The element at row `i` and column `j` appears at location
 /// `m_storage[j*num_rows() + i]` (see `DenseMatrix::m_storage`).
 template <typename T>
-inline T& DenseMatrix<T>::operator[](std::size_t row, std::size_t column) {
+inline auto DenseMatrix<T>::operator[](std::size_t row, std::size_t column)
+        -> T& {
 #ifndef NDEBUG
     if (row >= this->num_rows() || column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {row, column},
@@ -156,22 +162,22 @@ inline T& DenseMatrix<T>::operator[](std::size_t row, std::size_t column) {
 }
 
 template <typename T>
-inline typename DenseMatrix<T>::ConstIterator DenseMatrix<T>::begin() const {
+inline auto DenseMatrix<T>::begin() const -> ConstIterator {
     return m_storage.begin();
 }
 
 template <typename T>
-inline typename DenseMatrix<T>::ConstIterator DenseMatrix<T>::end() const {
+inline auto DenseMatrix<T>::end() const -> ConstIterator {
     return m_storage.end();
 }
 
 template <typename T>
-inline typename DenseMatrix<T>::Iterator DenseMatrix<T>::begin() {
+inline auto DenseMatrix<T>::begin() -> Iterator {
     return m_storage.begin();
 }
 
 template <typename T>
-inline typename DenseMatrix<T>::Iterator DenseMatrix<T>::end() {
+inline auto DenseMatrix<T>::end() -> Iterator {
     return m_storage.end();
 }
 
@@ -179,9 +185,8 @@ inline typename DenseMatrix<T>::Iterator DenseMatrix<T>::end() {
 /// the beginning of column `j` is at index `num_rows()*j` while the end of the
 /// column is at index `num_rows()*(j + 1)`.
 template <typename T>
-inline std::pair<typename DenseMatrix<T>::Iterator,
-       typename DenseMatrix<T>::Iterator>
-       DenseMatrix<T>::column_iterators(std::size_t column) {
+inline auto DenseMatrix<T>::column_iterators(std::size_t column)
+        -> std::pair<Iterator, Iterator> {
 #ifndef NDEBUG
     if (column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {0, column},
@@ -197,9 +202,8 @@ inline std::pair<typename DenseMatrix<T>::Iterator,
 /// the beginning of column `j` is at index `num_rows()*j` while the end of the
 /// column is at index `num_rows()*(j + 1)`.
 template <typename T>
-inline std::pair<typename DenseMatrix<T>::ConstIterator,
-       typename DenseMatrix<T>::ConstIterator>
-       DenseMatrix<T>::column_iterators(std::size_t column) const {
+inline auto DenseMatrix<T>::column_iterators(std::size_t column) const
+        -> std::pair<ConstIterator, ConstIterator> {
 #ifndef NDEBUG
     if (column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {0, column},
@@ -222,19 +226,19 @@ inline void DenseMatrix<T>::zero() {
 }
 
 template <typename T>
-inline const DenseMatrix<T>& DenseMatrix<T>::operator+() const {
+inline auto DenseMatrix<T>::operator+() const -> const DenseMatrix& {
     return *this;
 }
 
 template <typename T>
-inline DenseMatrix<T> DenseMatrix<T>::operator-() const {
+inline auto DenseMatrix<T>::operator-() const -> DenseMatrix {
     DenseMatrix<T> result{*this};
     result *= T{-1};
     return result;
 }
 
 template <typename T>
-inline DenseMatrix<T>& DenseMatrix<T>::operator+=(const DenseMatrix& rhs) {
+inline auto DenseMatrix<T>::operator+=(const DenseMatrix& rhs) -> DenseMatrix& {
 #ifndef NDEBUG
     if (this->size() != rhs.size()) {
         throw RuntimeError{Mismatch2DError{.size1 = this->size(),
@@ -247,7 +251,7 @@ inline DenseMatrix<T>& DenseMatrix<T>::operator+=(const DenseMatrix& rhs) {
 }
 
 template <typename T>
-inline DenseMatrix<T>& DenseMatrix<T>::operator-=(const DenseMatrix& rhs) {
+inline auto DenseMatrix<T>::operator-=(const DenseMatrix& rhs) -> DenseMatrix& {
 #ifndef NDEBUG
     if (this->size() != rhs.size()) {
         throw RuntimeError{Mismatch2DError{.size1 = this->size(),
@@ -260,13 +264,14 @@ inline DenseMatrix<T>& DenseMatrix<T>::operator-=(const DenseMatrix& rhs) {
 }
 
 template <typename T>
-inline DenseMatrix<T>& DenseMatrix<T>::operator*=(const T& k) {
+inline auto DenseMatrix<T>::operator*=(const T& k) -> DenseMatrix& {
     m_storage *= k;
     return *this;
 }
 
 template <typename T>
-inline DenseMatrix<T>& DenseMatrix<T>::operator*=(const DenseMatrix<T>& rhs) {
+inline auto DenseMatrix<T>::operator*=(const DenseMatrix<T>& rhs)
+        -> DenseMatrix& {
 #ifndef NDEBUG
     if (this->num_columns() != rhs.num_rows()) {
         throw RuntimeError{Mismatch2DError{.size1 = this->size(),
@@ -290,13 +295,13 @@ inline DenseMatrix<T>& DenseMatrix<T>::operator*=(const DenseMatrix<T>& rhs) {
 }
 
 template <typename T>
-inline DenseMatrix<T>& DenseMatrix<T>::operator/=(const T& k) {
+inline auto DenseMatrix<T>::operator/=(const T& k) -> DenseMatrix& {
     m_storage /= k;
     return *this;
 }
 
 template <typename T>
-inline Real DenseMatrix<T>::column_L1_norm(std::size_t column) const {
+inline auto DenseMatrix<T>::column_L1_norm(std::size_t column) const -> Real {
 #ifndef NDEBUG
     if (column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {0, column},
@@ -315,7 +320,7 @@ inline Real DenseMatrix<T>::column_L1_norm(std::size_t column) const {
 }
 
 template <typename T>
-inline Real DenseMatrix<T>::column_L2_norm(std::size_t column) const {
+inline auto DenseMatrix<T>::column_L2_norm(std::size_t column) const -> Real {
 #ifndef NDEBUG
     if (column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {0, column},
@@ -336,7 +341,7 @@ inline Real DenseMatrix<T>::column_L2_norm(std::size_t column) const {
 }
 
 template <typename T>
-inline Real DenseMatrix<T>::column_Linf_norm(std::size_t column) const {
+inline auto DenseMatrix<T>::column_Linf_norm(std::size_t column) const -> Real {
 #ifndef NDEBUG
     if (column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {0, column},
@@ -355,17 +360,17 @@ inline Real DenseMatrix<T>::column_Linf_norm(std::size_t column) const {
 }
 
 template <typename T>
-inline T* DenseMatrix<T>::data() {
+inline auto DenseMatrix<T>::data() -> T* {
     return m_storage.data();
 }
 
 template <typename T>
-inline const T* DenseMatrix<T>::data() const {
+inline auto DenseMatrix<T>::data() const -> const T* {
     return m_storage.data();
 }
 
 template <typename T>
-inline const Vector<T>& DenseMatrix<T>::as_vector() const {
+inline auto DenseMatrix<T>::as_vector() const -> const Vector<T>& {
     return m_storage;
 }
 
@@ -396,7 +401,7 @@ inline void DenseMatrix<T>::operator<<(std::string data) {
 /// Iterates through columns of matrix and dumps them to a string, formatted as
 /// the transpose.
 template <typename T>
-inline std::string DenseMatrix<T>::as_string() const {
+inline auto DenseMatrix<T>::as_string() const -> std::string {
     std::ostringstream oss;
     auto inserter{[&oss](const auto& x) { oss << x << ' '; }};
     for (std::size_t i{0}, num_cols{this->num_columns()}; i < num_cols; ++i) {
@@ -409,7 +414,7 @@ inline std::string DenseMatrix<T>::as_string() const {
 }
 
 template <typename T>
-inline DenseMatrix<T> DenseMatrix<T>::identity(std::size_t size) {
+inline auto DenseMatrix<T>::identity(std::size_t size) -> DenseMatrix {
     DenseMatrix<T> I{size};
     for (std::size_t i{0}; i < size; ++i) {
         I[i, i] = T{1};
@@ -425,8 +430,8 @@ inline DenseMatrix<T> DenseMatrix<T>::identity(std::size_t size) {
 /// \brief Specialisation of multiplication of two real DenseMatrices, using
 /// CBLAS.
 template <>
-inline DenseMatrix<Real>& DenseMatrix<Real>::operator*=(
-        const DenseMatrix<Real>& rhs) {
+inline auto DenseMatrix<Real>::operator*=(const DenseMatrix<Real>& rhs)
+        -> DenseMatrix& {
 #ifndef NDEBUG
     if (this->num_columns() != rhs.num_rows()) {
         throw RuntimeError{Mismatch2DError{.size1 = this->size(),
@@ -447,8 +452,8 @@ inline DenseMatrix<Real>& DenseMatrix<Real>::operator*=(
 /// \brief Specialisation of multiplication of two complex DenseMatrices, using
 /// CBLAS.
 template <>
-inline DenseMatrix<Complex>& DenseMatrix<Complex>::operator*=(
-        const DenseMatrix<Complex>& rhs) {
+inline auto DenseMatrix<Complex>::operator*=(const DenseMatrix<Complex>& rhs)
+        -> DenseMatrix<Complex>& {
 #ifndef NDEBUG
     if (this->num_columns() != rhs.num_rows()) {
         throw RuntimeError{Mismatch2DError{.size1 = this->size(),
@@ -470,7 +475,8 @@ inline DenseMatrix<Complex>& DenseMatrix<Complex>::operator*=(
 /// \brief Specialisation of the column L1-norm calculation for a real
 /// `DenseMatrix`, using CBLAS.
 template <>
-inline Real DenseMatrix<Real>::column_L1_norm(std::size_t column) const {
+inline auto DenseMatrix<Real>::column_L1_norm(std::size_t column) const
+        -> Real {
 #ifndef NDEBUG
     if (column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {0, column},
@@ -487,7 +493,8 @@ inline Real DenseMatrix<Real>::column_L1_norm(std::size_t column) const {
 /// \brief Specialisation of the column L1-norm calculation for a complex
 /// `DenseMatrix`, using CBLAS.
 template <>
-inline Real DenseMatrix<Complex>::column_L1_norm(std::size_t column) const {
+inline auto DenseMatrix<Complex>::column_L1_norm(std::size_t column) const
+        -> Real {
 #ifndef NDEBUG
     if (column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {0, column},
@@ -505,7 +512,8 @@ inline Real DenseMatrix<Complex>::column_L1_norm(std::size_t column) const {
 /// \brief Specialisation of the column L2-norm calculation for a real
 /// `DenseMatrix`, using CBLAS.
 template <>
-inline Real DenseMatrix<Real>::column_L2_norm(std::size_t column) const {
+inline auto DenseMatrix<Real>::column_L2_norm(std::size_t column) const
+        -> Real {
 #ifndef NDEBUG
     if (column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {0, column},
@@ -522,7 +530,8 @@ inline Real DenseMatrix<Real>::column_L2_norm(std::size_t column) const {
 /// \brief Specialisation of the column L2-norm calculation for a complex
 /// `DenseMatrix`, using CBLAS.
 template <>
-inline Real DenseMatrix<Complex>::column_L2_norm(std::size_t column) const {
+inline auto DenseMatrix<Complex>::column_L2_norm(std::size_t column) const
+        -> Real {
 #ifndef NDEBUG
     if (column >= this->num_columns()) {
         throw RuntimeError{Range2DError{.indices = {0, column},
