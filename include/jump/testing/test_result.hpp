@@ -6,8 +6,18 @@
 
 #include "jump/testing/test_result_decl.hpp"
 
+#include "jump/autodiff/dual.hpp"
+#include "jump/data/banded_matrix.hpp"
+#include "jump/data/dense_matrix.hpp"
+#include "jump/data/vector.hpp"
+#include "jump/debug/exception.hpp"
+
+#include <cmath>
+#include <complex>
+#include <limits>
+
 namespace jump {
-inline bool TestResult::has_info() const {
+inline auto TestResult::has_info() const -> bool {
     return passed + failed + skipped > 0;
 }
 
@@ -30,23 +40,23 @@ inline void TestResult::add_check(bool expr, std::string fail_name) {
     }
 }
 
-inline TestResult TestResult::pass() {
+inline auto TestResult::pass() -> TestResult {
     return {.name = {}, .sub_results = {}, .passed = 1, .failed = 0,
         .skipped = 0, .failed_tests = {}, .skipped_tests = {}};
 }
 
-inline TestResult TestResult::fail(std::string name) {
+inline auto TestResult::fail(std::string name) -> TestResult {
     return {.name = {}, .sub_results = {}, .passed = 0, .failed = 1,
         .skipped = 0, .failed_tests = {name}, .skipped_tests = {}};
 }
 
-inline TestResult TestResult::skip(std::string name) {
+inline auto TestResult::skip(std::string name) -> TestResult {
     return {.name = {}, .sub_results = {}, .passed = 0, .failed = 0,
         .skipped = 1, .failed_tests = {}, .skipped_tests = {name}};
 }
 
 template <typename T>
-inline bool approx(const T& lhs, const T& rhs) {
+inline auto approx(const T& lhs, const T& rhs) -> bool {
     if (lhs == rhs) {
         return true;
     }
@@ -57,7 +67,8 @@ inline bool approx(const T& lhs, const T& rhs) {
 }
 
 template <typename T>
-inline bool approx(const std::complex<T>& lhs, const std::complex<T>& rhs) {
+inline auto approx(const std::complex<T>& lhs, const std::complex<T>& rhs)
+        -> bool {
     if (lhs == rhs) {
         return true;
     }
@@ -72,12 +83,12 @@ inline bool approx(const std::complex<T>& lhs, const std::complex<T>& rhs) {
 }
 
 template <std::size_t N, typename T>
-inline bool approx(const Dual<N, T>& lhs, const Dual<N, T>& rhs) {
+inline auto approx(const Dual<N, T>& lhs, const Dual<N, T>& rhs) -> bool {
     return approx(lhs.value, rhs.value);
 }
 
 template <typename T>
-inline bool approx(const Vector<T>& lhs, const Vector<T>& rhs) {
+inline auto approx(const Vector<T>& lhs, const Vector<T>& rhs) -> bool {
 #ifndef NDEBUG
     if (lhs.size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
@@ -94,22 +105,24 @@ inline bool approx(const Vector<T>& lhs, const Vector<T>& rhs) {
 }
 
 template <typename T>
-inline bool approx(const BandedMatrix<T>& lhs, const BandedMatrix<T>& rhs) {
+inline auto approx(const BandedMatrix<T>& lhs, const BandedMatrix<T>& rhs)
+        -> bool {
     return approx(lhs.as_vector(), rhs.as_vector());
 }
 
 template <typename T>
-inline bool approx(const DenseMatrix<T>& lhs, const DenseMatrix<T>& rhs) {
+inline auto approx(const DenseMatrix<T>& lhs, const DenseMatrix<T>& rhs)
+        -> bool {
     return approx(lhs.as_vector(), rhs.as_vector());
 }
 
 template <typename T>
-inline bool vanishes(const T& x) {
+inline auto vanishes(const T& x) -> bool {
     return approx(x, T{0});
 }
 
 template <typename T>
-inline bool vanishes(const Vector<T>& v) {
+inline auto vanishes(const Vector<T>& v) -> bool {
     for (const auto& x : v) {
         if (!vanishes(x)) {
             return false;
@@ -119,12 +132,12 @@ inline bool vanishes(const Vector<T>& v) {
 }
 
 template <typename T>
-inline bool vanishes(const BandedMatrix<T>& M) {
+inline auto vanishes(const BandedMatrix<T>& M) -> bool {
     return vanishes(M.as_vector());
 }
 
 template <typename T>
-inline bool vanishes(const DenseMatrix<T>& M) {
+inline auto vanishes(const DenseMatrix<T>& M) -> bool {
     return vanishes(M.as_vector());
 }
 }   // namespace jump

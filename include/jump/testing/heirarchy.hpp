@@ -6,6 +6,11 @@
 
 #include "jump/testing/heirarchy_decl.hpp"
 
+#include "jump/utility/utility.hpp"
+
+#include <algorithm>
+#include <utility>
+
 namespace jump {
 inline AtomicTest::AtomicTest(std::string_view name,
         std::vector<std::string> tags,
@@ -16,17 +21,17 @@ inline AtomicTest::AtomicTest(std::string_view name,
     std::ranges::sort(m_tags);
 }
 
-inline TestResult AtomicTest::run() const {
+inline auto AtomicTest::run() const -> TestResult {
     TestResult result{m_func()};
     result.name = name();
     return result;
 }
 
-inline const std::string& AtomicTest::name() const {
+inline auto AtomicTest::name() const -> const std::string& {
     return m_name;
 }
 
-inline const std::vector<std::string>& AtomicTest::tags() const {
+inline auto AtomicTest::tags() const -> const std::vector<std::string>& {
     return m_tags;
 }
 
@@ -46,7 +51,8 @@ inline void Test::register_items(std::vector<AtomicTest> tests) {
     }
 }
 
-inline TestResult Test::run(const std::vector<std::string>& skip_tags) const {
+inline auto Test::run(const std::vector<std::string>& skip_tags) const
+        -> TestResult {
     TestResult result;
     result.name = name();
     for (const auto& test: m_atomic_tests) {
@@ -65,15 +71,15 @@ inline TestResult Test::run(const std::vector<std::string>& skip_tags) const {
     return result;
 }
 
-inline const std::string& Test::name() const {
+inline auto Test::name() const -> const std::string& {
     return m_name;
 }
 
-inline const std::vector<std::string>& Test::tags() const {
+inline auto Test::tags() const -> const std::vector<std::string>& {
     return m_tags;
 }
 
-inline const std::vector<AtomicTest>& Test::tests() const {
+inline auto Test::tests() const -> const std::vector<AtomicTest>& {
     return m_atomic_tests;
 }
 
@@ -98,8 +104,8 @@ inline void TestSuite<T>::register_items(std::vector<T> tests) {
 }
 
 template <typename T>
-inline TestResult TestSuite<T>::run(
-        const std::vector<std::string>& skip_tags) const {
+inline auto TestSuite<T>::run(const std::vector<std::string>& skip_tags) const
+        -> TestResult {
     TestResult all_results;
     all_results.name = name();
     for (const auto& test : m_tests) {
@@ -115,17 +121,17 @@ inline TestResult TestSuite<T>::run(
 }
 
 template <typename T>
-inline const std::string& TestSuite<T>::name() const {
+inline auto TestSuite<T>::name() const -> const std::string& {
     return m_name;
 }
 
 template <typename T>
-inline const std::vector<std::string>& TestSuite<T>::tags() const {
+inline auto TestSuite<T>::tags() const -> const std::vector<std::string>& {
     return m_tags;
 }
 
 template <typename T>
-inline const std::vector<T>& TestSuite<T>::tests() const {
+inline auto TestSuite<T>::tests() const -> const std::vector<T>& {
     return m_tests;
 }
 }   // namespace jump

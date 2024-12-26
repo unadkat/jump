@@ -4,10 +4,9 @@
 #ifndef JUMP_TEST_REPORTER_DECL_HPP
 #define JUMP_TEST_REPORTER_DECL_HPP
 
-#include <iostream>
-
 #include "jump/testing/test_result.hpp"
-#include "jump/utility/logging.hpp"
+
+#include <string>
 
 namespace jump {
 class TestReporter {
@@ -25,7 +24,7 @@ class TestReporter {
     private:
         /// \brief Traverse result structure and collect all results in a
         /// top-level result object.
-        TestResult flatten(TestResult root) const;
+        auto flatten(TestResult root) const -> TestResult;
 };
 }   // namespace jump
 

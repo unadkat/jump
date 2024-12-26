@@ -4,16 +4,12 @@
 #ifndef JUMP_TEST_HEIRARCHY_DECL_HPP
 #define JUMP_TEST_HEIRARCHY_DECL_HPP
 
-#include <algorithm>
+#include "jump/testing/test_result.hpp"
+
 #include <functional>
 #include <string>
 #include <string_view>
-#include <utility>
 #include <vector>
-
-#include "jump/debug/exception.hpp"
-#include "jump/testing/test_result.hpp"
-#include "jump/utility/utility.hpp"
 
 namespace jump {
 class AtomicTest {
@@ -25,12 +21,12 @@ class AtomicTest {
                 const std::function<TestResult()>& func);
 
         /// \brief Run the test case and return the result directly.
-        TestResult run() const;
+        auto run() const -> TestResult;
 
         /// \brief Accessor for the atomic test name.
-        const std::string& name() const;
+        auto name() const -> const std::string&;
         /// \brief Accessor for the list of tags of this atomic test.
-        const std::vector<std::string>& tags() const;
+        auto tags() const -> const std::vector<std::string>&;
 
     private:
         /// \brief Name of the atomic test.
@@ -55,14 +51,15 @@ class Test {
         void register_items(std::vector<AtomicTest> tests);
         /// \brief Run registered tests, skipping any whose name or tags
         /// intersects with the supplied skip_tags list.
-        TestResult run(const std::vector<std::string>& skip_tags = {}) const;
+        auto run(const std::vector<std::string>& skip_tags = {}) const
+                -> TestResult;
 
         /// \brief Accessor for the test unit name.
-        const std::string& name() const;
+        auto name() const -> const std::string&;
         /// \brief Accessor for the list of tags for this test unit.
-        const std::vector<std::string>& tags() const;
+        auto tags() const -> const std::vector<std::string>&;
         /// \brief Accessor for the collection of registered atomic tests.
-        const std::vector<AtomicTest>& tests() const;
+        auto tests() const -> const std::vector<AtomicTest>&;
 
     private:
         /// \brief Name of the test.
@@ -89,14 +86,15 @@ class TestSuite {
         /// \brief Run registered tests, skipping any whose name or tags
         /// intersects with the supplied skip_tags list. Forward this list on
         /// when running a valid test so that subtests can be further filtered.
-        TestResult run(const std::vector<std::string>& skip_tags = {}) const;
+        auto run(const std::vector<std::string>& skip_tags = {}) const
+                -> TestResult;
 
         /// \brief Accessor for the test suite name.
-        const std::string& name() const;
+        auto name() const -> const std::string&;
         /// \brief Accessor for the list of tags for this test suite.
-        const std::vector<std::string>& tags() const;
+        auto tags() const -> const std::vector<std::string>&;
         /// \brief Accessor for the collection of registered tests.
-        const std::vector<T>& tests() const;
+        auto tests() const -> const std::vector<T>&;
 
     private:
         /// \brief Name of the test suite.

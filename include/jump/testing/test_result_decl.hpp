@@ -4,16 +4,10 @@
 #ifndef JUMP_TEST_RESULT_DECL_HPP
 #define JUMP_TEST_RESULT_DECL_HPP
 
-#include <format>
-#include <limits>
+#include "jump/utility/types.hpp"
+
 #include <string>
 #include <vector>
-
-#include "jump/autodiff/dual.hpp"
-#include "jump/data/banded_matrix.hpp"
-#include "jump/data/dense_matrix.hpp"
-#include "jump/data/vector.hpp"
-#include "jump/debug/exception.hpp"
 
 namespace jump {
 struct TestResult {
@@ -36,7 +30,7 @@ struct TestResult {
 
     /// \brief Indicates if this instance has some data to report (in addition
     /// to any children).
-    bool has_info() const;
+    auto has_info() const -> bool;
     /// \brief Add new set of results to the existing set (intended for a leaf).
     /// Results for subtests should be pushed onto the sub_results collection.
     void operator+=(const TestResult& result);
@@ -45,21 +39,21 @@ struct TestResult {
     void add_check(bool expr, std::string fail_name);
 
     /// \brief Generate a basic passed test.
-    static TestResult pass();
+    static auto pass() -> TestResult;
     /// \brief Generate a failed test and pass the failing test name on.
-    static TestResult fail(std::string name = "");
+    static auto fail(std::string name = "") -> TestResult;
     /// \brief Generate a skipped test and pass the skipped test name on.
-    static TestResult skip(std::string name = "");
+    static auto skip(std::string name = "") -> TestResult;
 };
 
 static Real epsilon_relative{1e-6};
 static Real epsilon_absolute{1e-12};
 
 template <typename T>
-bool approx(const T& lhs, const T& rhs);
+auto approx(const T& lhs, const T& rhs) -> bool;
 
 template <typename T>
-bool vanishes(const T& x);
+auto vanishes(const T& x) -> bool;
 }   // namespace jump
 
 #endif  // JUMP_TEST_RESULT_DECL_HPP

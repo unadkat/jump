@@ -6,6 +6,10 @@
 
 #include "jump/testing/reporter_decl.hpp"
 
+#include "jump/utility/logging.hpp"
+
+#include <iostream>
+
 namespace jump {
 inline void TestReporter::trace(const TestResult& results,
         std::string current) const {
@@ -70,7 +74,7 @@ inline void TestReporter::summarise(const TestResult& results) const {
     }
 }
 
-inline TestResult TestReporter::flatten(TestResult root) const {
+inline auto TestReporter::flatten(TestResult root) const -> TestResult {
     for (const auto& sub : root.sub_results) {
         auto flat_sub = flatten(sub);
 
