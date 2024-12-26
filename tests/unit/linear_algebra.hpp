@@ -26,35 +26,33 @@ auto test_linalg_dense_mismatch() -> TestResult;
 auto test_linalg_gev_basic() -> TestResult;
 auto test_linalg_gev_mismatch() -> TestResult;
 
-inline auto linear_algebra_tests() -> TestSuiteL1 {
-    TestSuiteL1 linear_algebra_suite("linear algebra");
+inline auto linear_algebra_tests() {
     std::vector<Test> tests;
 
     tests.push_back({"banded"});
-    tests.back().register_item({"basic", {}, &test_linalg_banded_basic});
-    tests.back().register_item({"fail", {}, &test_linalg_banded_fail});
+    tests.back().register_item({"basic", &test_linalg_banded_basic});
+    tests.back().register_item({"fail", &test_linalg_banded_fail});
     // These tests should throw exceptions which are disabled by the NDEBUG flag
 #ifndef NDEBUG
-    tests.back().register_item({"mismatch", {}, &test_linalg_banded_mismatch});
+    tests.back().register_item({"mismatch", &test_linalg_banded_mismatch});
 #endif  // NDEBUG
 
     tests.push_back({"dense"});
-    tests.back().register_item({"basic", {}, &test_linalg_dense_basic});
-    tests.back().register_item({"fail", {}, &test_linalg_dense_fail});
+    tests.back().register_item({"basic", &test_linalg_dense_basic});
+    tests.back().register_item({"fail", &test_linalg_dense_fail});
     // These tests should throw exceptions which are disabled by the NDEBUG flag
 #ifndef NDEBUG
-    tests.back().register_item({"mismatch", {}, &test_linalg_dense_mismatch});
+    tests.back().register_item({"mismatch", &test_linalg_dense_mismatch});
 #endif  // NDEBUG
 
     tests.push_back({"generalised eigenvalue"});
-    tests.back().register_item({"basic", {}, &test_linalg_gev_basic});
+    tests.back().register_item({"basic", &test_linalg_gev_basic});
     // These tests should throw exceptions which are disabled by the NDEBUG flag
 #ifndef NDEBUG
-    tests.back().register_item({"mismatch", {}, &test_linalg_gev_mismatch});
+    tests.back().register_item({"mismatch", &test_linalg_gev_mismatch});
 #endif  // NDEBUG
 
-    linear_algebra_suite.register_items(tests);
-    return linear_algebra_suite;
+    return TestSuite{"linear algebra", tests};
 }
 
 inline auto test_linalg_banded_basic() -> TestResult {

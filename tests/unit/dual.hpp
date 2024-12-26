@@ -57,15 +57,13 @@ inline auto populate_complex(Complex begin, Complex end, std::size_t N)
 
 auto test_dual_arithmetic_basic() -> TestResult;
 
-inline auto dual_tests() -> TestSuiteL1 {
-    TestSuiteL1 dual_suite("dual");
+inline auto dual_tests() {
     std::vector<Test> tests;
 
     tests.push_back({"arithmetic"});
-    tests.back().register_item({"basic", {}, &test_dual_arithmetic_basic});
+    tests.back().register_item({"basic", &test_dual_arithmetic_basic});
 
-    dual_suite.register_items(tests);
-    return dual_suite;
+    return TestSuite{"dual", tests};
 }
 
 inline auto test_dual_arithmetic_basic() -> TestResult {

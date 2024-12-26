@@ -18,32 +18,29 @@ auto test_vector_norms() -> TestResult;
 auto test_vector_access_in_range() -> TestResult;
 auto test_vector_access_fail() -> TestResult;
 
-inline auto vector_tests() -> TestSuiteL1 {
-    TestSuiteL1 vector_suite("vector");
+inline auto vector_tests() {
     std::vector<Test> tests;
 
     tests.push_back({"arithmetic"});
-    tests.back().register_item({"basic", {}, &test_vector_arithmetic_basic});
-    tests.back().register_item({"compound", {},
-            &test_vector_arithmetic_compound});
-    tests.back().register_item({"inner product", {}, &test_vector_inner_prod});
+    tests.back().register_item({"basic", &test_vector_arithmetic_basic});
+    tests.back().register_item({"compound", &test_vector_arithmetic_compound});
+    tests.back().register_item({"inner product", &test_vector_inner_prod});
     // These tests should throw exceptions which are disabled by the NDEBUG flag
 #ifndef NDEBUG
-    tests.back().register_item({"fail", {}, &test_vector_arithmetic_fail});
+    tests.back().register_item({"fail", &test_vector_arithmetic_fail});
 #endif  // NDEBUG
 
     tests.push_back({"summary"});
-    tests.back().register_item({"norms", {}, &test_vector_norms});
+    tests.back().register_item({"norms", &test_vector_norms});
 
     tests.push_back({"access"});
-    tests.back().register_item({"in range", {}, &test_vector_access_in_range});
+    tests.back().register_item({"in range", &test_vector_access_in_range});
     // These tests should throw exceptions which are disabled by the NDEBUG flag
 #ifndef NDEBUG
-    tests.back().register_item({"fail", {}, &test_vector_access_fail});
+    tests.back().register_item({"fail", &test_vector_access_fail});
 #endif  // NDEBUG
 
-    vector_suite.register_items(tests);
-    return vector_suite;
+    return TestSuite{"vector", tests};
 }
 
 inline auto test_vector_arithmetic_basic() -> TestResult {

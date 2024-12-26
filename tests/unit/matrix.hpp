@@ -23,42 +23,38 @@ auto test_matrix_access_in_range() -> TestResult;
 auto test_matrix_dense_columns() -> TestResult;
 auto test_matrix_access_fail() -> TestResult;
 
-inline auto matrix_tests() -> TestSuiteL1 {
-    TestSuiteL1 matrix_suite("matrix");
+inline auto matrix_tests() {
     std::vector<Test> tests;
 
     tests.push_back({"initialise"});
-    tests.back().register_item({"basic", {}, &test_matrix_initialise_basic});
-    tests.back().register_item({"chained", {},
-            &test_matrix_initialise_chained});
+    tests.back().register_item({"basic", &test_matrix_initialise_basic});
+    tests.back().register_item({"chained", &test_matrix_initialise_chained});
     // These tests should throw exceptions which are disabled by the NDEBUG flag
 #ifndef NDEBUG
-    tests.back().register_item({"fail", {}, &test_matrix_initialise_fail});
+    tests.back().register_item({"fail", &test_matrix_initialise_fail});
 #endif  // NDEBUG
 
     tests.push_back({"arithmetic"});
-    tests.back().register_item({"basic", {}, &test_matrix_arithmetic_basic});
-    tests.back().register_item({"multiply", {}, &test_matrix_multiply});
-    tests.back().register_item({"compound", {},
-            &test_matrix_arithmetic_compound});
+    tests.back().register_item({"basic", &test_matrix_arithmetic_basic});
+    tests.back().register_item({"multiply", &test_matrix_multiply});
+    tests.back().register_item({"compound", &test_matrix_arithmetic_compound});
     // These tests should throw exceptions which are disabled by the NDEBUG flag
 #ifndef NDEBUG
-    tests.back().register_item({"fail", {}, &test_matrix_arithmetic_fail});
+    tests.back().register_item({"fail", &test_matrix_arithmetic_fail});
 #endif  // NDEBUG
 
     tests.push_back({"summary"});
-    tests.back().register_item({"norms", {}, &test_matrix_norms});
+    tests.back().register_item({"norms", &test_matrix_norms});
 
     tests.push_back({"access"});
-    tests.back().register_item({"in range", {}, &test_matrix_access_in_range});
-    tests.back().register_item({"columns", {}, &test_matrix_dense_columns});
+    tests.back().register_item({"in range", &test_matrix_access_in_range});
+    tests.back().register_item({"columns", &test_matrix_dense_columns});
     // These tests should throw exceptions which are disabled by the NDEBUG flag
 #ifndef NDEBUG
-    tests.back().register_item({"fail", {}, &test_matrix_access_fail});
+    tests.back().register_item({"fail", &test_matrix_access_fail});
 #endif  // NDEBUG
 
-    matrix_suite.register_items(tests);
-    return matrix_suite;
+    return TestSuite{"matrix", tests};
 }
 
 inline auto test_matrix_initialise_basic() -> TestResult {

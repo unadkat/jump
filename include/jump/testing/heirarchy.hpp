@@ -13,8 +13,8 @@
 
 namespace jump {
 inline AtomicTest::AtomicTest(std::string_view name,
-        std::vector<std::string> tags,
-        const std::function<TestResult()>& func) :
+        const std::function<TestResult()>& func,
+        std::vector<std::string> tags) :
     m_name{name},
     m_tags{std::move(tags)},
     m_func{func} {
@@ -89,6 +89,24 @@ inline TestSuite<T>::TestSuite(std::string_view name,
     m_name{name},
     m_tags{std::move(tags)} {
     std::ranges::sort(m_tags);
+}
+
+template <typename T>
+inline TestSuite<T>::TestSuite(std::string_view name, T test,
+        std::vector<std::string> tags) :
+    m_name{name},
+    m_tags{std::move(tags)} {
+    std::ranges::sort(m_tags);
+    register_item(test);
+}
+
+template <typename T>
+inline TestSuite<T>::TestSuite(std::string_view name, std::vector<T> tests,
+        std::vector<std::string> tags) :
+    m_name{name},
+    m_tags{std::move(tags)} {
+    std::ranges::sort(m_tags);
+    register_items(tests);
 }
 
 template <typename T>

@@ -14,20 +14,12 @@ int main(int argc, char** argv) {
     args.get("trace", do_trace);
     args.get('t', do_trace);
 
-    TestSuiteL3 jump_tests{"jump"};
+    TestSuite data_tests{"data", std::vector{vector_tests(), matrix_tests()}};
+    TestSuite autodiff_tests{"autodiff", dual_tests()};
+    TestSuite linalg_tests{"linear algebra", linear_algebra_tests()};
 
-    TestSuiteL2 data_tests{"data"};
-    data_tests.register_item(vector_tests());
-    data_tests.register_item(matrix_tests());
-    jump_tests.register_item(data_tests);
-
-    TestSuiteL2 autodiff_tests{"autodiff"};
-    autodiff_tests.register_item(dual_tests());
-    jump_tests.register_item(autodiff_tests);
-
-    TestSuiteL2 linalg_tests{"linear algebra"};
-    linalg_tests.register_item(linear_algebra_tests());
-    jump_tests.register_item(linalg_tests);
+    TestSuite jump_tests{"jump",
+        std::vector{data_tests, autodiff_tests, linalg_tests}};
 
     auto all_results{jump_tests.run()};
     TestReporter report;

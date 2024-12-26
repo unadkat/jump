@@ -17,8 +17,9 @@ class AtomicTest {
         /// \brief Constructor for an atomic test requires name and tags to be
         /// supplied at the same time as the function, to keep all information
         /// local to the implementation.
-        AtomicTest(std::string_view name, std::vector<std::string> tags,
-                const std::function<TestResult()>& func);
+        AtomicTest(std::string_view name,
+                const std::function<TestResult()>& func,
+                std::vector<std::string> tags = {});
 
         /// \brief Run the test case and return the result directly.
         auto run() const -> TestResult;
@@ -71,12 +72,22 @@ class Test {
         std::vector<AtomicTest> m_atomic_tests;
 };
 
-template <typename T = Test>
+template <typename T>
 class TestSuite {
     public:
         /// \brief Constructor for a test suite requires name to be supplied at
         /// the outset, to keep all information local.
         TestSuite(std::string_view name, std::vector<std::string> tags = {});
+        /// \brief Constructor for a test suite requires name to be supplied at
+        /// the outset, to keep all information local. Deduce test suite level
+        /// by passed argument.
+        TestSuite(std::string_view name, T test,
+                std::vector<std::string> tags = {});
+        /// \brief Constructor for a test suite requires name to be supplied at
+        /// the outset, to keep all information local. Deduce test suite level
+        /// by passed argument.
+        TestSuite(std::string_view name, std::vector<T> tests,
+                std::vector<std::string> tags = {});
 
         /// \brief Register a test unit to be run with this test suite.
         void register_item(T test);
@@ -105,10 +116,6 @@ class TestSuite {
         /// \brief Collection of tests making up this test suite.
         std::vector<T> m_tests;
 };
-
-using TestSuiteL1 = TestSuite<Test>;
-using TestSuiteL2 = TestSuite<TestSuite<Test>>;
-using TestSuiteL3 = TestSuite<TestSuite<TestSuite<Test>>>;
 }   // namespace jump
 
 #endif  // JUMP_TEST_HEIRARCHY_DECL_HPP
