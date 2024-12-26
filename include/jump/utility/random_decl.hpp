@@ -6,11 +6,6 @@
 
 #include <random>
 
-#include "jump/data/banded_matrix.hpp"
-#include "jump/data/dense_matrix.hpp"
-#include "jump/data/vector.hpp"
-#include "jump/utility/types.hpp"
-
 namespace jump {
 /// \brief Supplies easy random number generation capabilities, with a templated
 /// type for the random numbers and underlying distribution.
@@ -25,7 +20,7 @@ class RandomNumbers {
 
         /// \brief Generate a random number of the templated type and
         /// distribution.
-        T generate();
+        auto generate() -> T;
 
     private:
         /// \brief The engine that generates the random seed data which is in

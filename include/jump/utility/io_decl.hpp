@@ -4,17 +4,14 @@
 #ifndef JUMP_IO_DECL_HPP
 #define JUMP_IO_DECL_HPP
 
-#include <fstream>
 #include <string>
-
-#include "jump/debug/exception.hpp"
 
 namespace jump {
 /// \brief Read all the content of the given fstream into a std::string. Note:
 /// parameter is a universal reference to be able to bind to both lvalue- and
 /// rvalue-references.
 template <typename Fs>
-std::string read_file_contents(Fs&& in);
+auto read_file_contents(Fs&& in) -> std::string;
 }   // namespace jump
 
 #endif  // JUMP_IO_DECL_HPP

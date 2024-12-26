@@ -6,9 +6,13 @@
 
 #include "jump/utility/io_decl.hpp"
 
+#include "jump/debug/exception.hpp"
+
+#include <ios>
+
 namespace jump {
 template <typename Fs>
-std::string read_file_contents(Fs&& in) {
+auto read_file_contents(Fs&& in) -> std::string {
     // Reset in::gcount in case the file has been read from before. If this
     // fails for any reason we should have not goodbit
     in.peek();

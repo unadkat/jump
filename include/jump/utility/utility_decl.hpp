@@ -4,19 +4,17 @@
 #ifndef JUMP_UTILITY_DECL_HPP
 #define JUMP_UTILITY_DECL_HPP
 
-#include <concepts>
-#include <limits>
 #include <vector>
 
 namespace jump {
 /// \brief Tests two vectors (assumed sorted) to see if they have an
 /// intersection.
 template <typename T>
-bool has_intersection(const std::vector<T>& A, const std::vector<T>& B);
+auto has_intersection(const std::vector<T>& A, const std::vector<T>& B) -> bool;
 
 /// \brief Signum function.
 template <typename T>
-int sgn(T val);
+auto sgn(T val) -> int;
 }   // namespace jump
 
 #endif  // JUMP_UTILITY_DECL_HPP

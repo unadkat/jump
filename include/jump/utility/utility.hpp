@@ -6,9 +6,13 @@
 
 #include "jump/utility/utility_decl.hpp"
 
+#include <concepts>
+#include <limits>
+
 namespace jump {
 template <typename T>
-bool has_intersection(const std::vector<T>& A, const std::vector<T>& B) {
+inline auto has_intersection(const std::vector<T>& A, const std::vector<T>& B)
+        -> bool {
     std::size_t nA{A.size()}, b{0}, nB{B.size()};
     if (nA == 0 || nB == 0) {
         return false;
@@ -32,7 +36,7 @@ bool has_intersection(const std::vector<T>& A, const std::vector<T>& B) {
 }
 
 template <typename T>
-inline int sgn(T val) {
+inline auto sgn(T val) -> int {
     if constexpr (std::totally_ordered<T>) {
         return (T{0} < val) - (val < T{0});
     } else {

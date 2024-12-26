@@ -6,11 +6,10 @@
 
 #include <filesystem>
 #include <fstream>
+#include <ios>
 #include <map>
 #include <memory>
 #include <string>
-
-#include "jump/debug/exception.hpp"
 
 namespace jump {
 /// \brief Deals with the storage of input and output file streams, and ensures
@@ -47,15 +46,15 @@ class FileSystem {
         /// \brief Open file with a specified filename (relative to the root
         /// directory) for quick data output (in truncation mode), without
         /// explicitly storing the file handle for later access.
-        std::fstream quick_write(const std::string& filename) const;
+        auto quick_write(const std::string& filename) const -> std::fstream;
         /// \brief Open file with a specified filename (relative to the root
         /// directory) for quick data reading, without explicitly storing the
         /// file handle for later access.
-        std::fstream quick_read(const std::string& filename) const;
+        auto quick_read(const std::string& filename) const -> std::fstream;
 
         /// \brief Return file stream corresponding to the supplied handle, if
         /// it exists, otherwise throw an exception.
-        std::fstream& operator()(const std::string& key);
+        auto operator()(const std::string& key) -> std::fstream&;
 
         /// \brief File mode for input.
         static constexpr FileMode mode_in{std::ios_base::in};

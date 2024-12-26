@@ -6,6 +6,8 @@
 
 #include "jump/utility/file_system_decl.hpp"
 
+#include "jump/debug/exception.hpp"
+
 namespace jump {
 inline FileSystem::FileSystem(const std::string& path) :
     m_root{"./" + path} {
@@ -59,7 +61,8 @@ inline void FileSystem::close_all() {
     m_files.clear();
 }
 
-inline std::fstream FileSystem::quick_write(const std::string& filename) const {
+inline auto FileSystem::quick_write(const std::string& filename) const
+        -> std::fstream {
     std::fstream file{m_root/filename, mode_out_trunc};
     if (!(file.is_open() && file.good())) {
         throw RuntimeError{FileIOError{
@@ -68,7 +71,8 @@ inline std::fstream FileSystem::quick_write(const std::string& filename) const {
     return file;
 }
 
-inline std::fstream FileSystem::quick_read(const std::string& filename) const {
+inline auto FileSystem::quick_read(const std::string& filename) const
+        -> std::fstream {
     std::fstream file{m_root/filename, mode_in};
     if (!(file.is_open() && file.good())) {
         throw RuntimeError{FileIOError{
@@ -77,7 +81,7 @@ inline std::fstream FileSystem::quick_read(const std::string& filename) const {
     return file;
 }
 
-inline std::fstream& FileSystem::operator()(const std::string& key) {
+inline auto FileSystem::operator()(const std::string& key) -> std::fstream& {
     if (auto it{m_files.find(key)}; it != m_files.end()) {
         return *(it->second);
     } else {

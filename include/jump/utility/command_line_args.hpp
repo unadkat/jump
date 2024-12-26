@@ -6,6 +6,13 @@
 
 #include "jump/utility/command_line_args_decl.hpp"
 
+#include "jump/utility/logging.hpp"
+
+#include <algorithm>
+#include <cctype>
+#include <format>
+#include <sstream>
+
 namespace jump {
 /// Reads options (string prefixed by "--") and flags (single alpha chars),
 /// which may appear singly or grouped. If an option is followed by another
@@ -56,7 +63,7 @@ inline CommandLineArgs::CommandLineArgs(int argc, char** const argv) :
                     m_options.push_back({.option = arguments[i].substr(2)});
                 }
             } else if (is_flag_group(arguments[i])) {
-                for (std::size_t j(1); j < length; ++j) {
+                for (std::size_t j{1}; j < length; ++j) {
                     m_flags.push_back({.flag = arguments[i][j]});
                 }
             }
@@ -66,7 +73,7 @@ inline CommandLineArgs::CommandLineArgs(int argc, char** const argv) :
 
 /// Query if a specified flag appears in the command-line arguments. If the flag
 /// exists, mark it as having been recognised.
-inline bool CommandLineArgs::get(const char& flag, bool& storage) {
+inline auto CommandLineArgs::get(const char& flag, bool& storage) -> bool {
     if (auto it{std::ranges::find(m_flags, flag, &Flag::flag)};
             it != m_flags.end()) {
         return (storage = it->read = true);
@@ -79,7 +86,8 @@ inline bool CommandLineArgs::get(const char& flag, bool& storage) {
 /// stored data (in a `std::string`) so it may be stored in the user-supplied
 /// variable. If an argument is extracted, mark it as having been recognised.
 template <typename T>
-inline bool CommandLineArgs::get(const std::string& option, T& storage) {
+inline auto CommandLineArgs::get(const std::string& option, T& storage)
+        -> bool {
     if (auto it{std::ranges::find(m_options, option, &Option::option)};
             it != m_options.end()) {
         // Don't overwrite passed variable yet
@@ -102,7 +110,8 @@ inline bool CommandLineArgs::get(const std::string& option, T& storage) {
 /// supplied with an accompanying value or not). If the argument exists, mark it
 /// as having been recognised.
 template <>
-inline bool CommandLineArgs::get(const std::string& option, bool& storage) {
+inline auto CommandLineArgs::get(const std::string& option, bool& storage)
+        -> bool {
     if (auto it{std::ranges::find(m_options, option, &Option::option)};
             it != m_options.end()) {
         return (storage = it->read = true);
@@ -112,7 +121,7 @@ inline bool CommandLineArgs::get(const std::string& option, bool& storage) {
 }
 
 template <typename Os>
-inline Os& operator<<(Os& out, const CommandLineArgs& rhs) {
+inline auto operator<<(Os& out, const CommandLineArgs& rhs) -> Os& {
     std::string flags_text{""}, options_text{""};
 
     for (const auto& x : rhs.m_flags) {

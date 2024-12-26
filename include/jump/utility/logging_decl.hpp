@@ -12,23 +12,23 @@ namespace jump {
 struct Log {
     static bool colours;
 
-    static std::string black(const std::string& message);
-    static std::string red(const std::string& message);
-    static std::string green(const std::string& message);
-    static std::string yellow(const std::string& message);
-    static std::string blue(const std::string& message);
-    static std::string magenta(const std::string& message);
-    static std::string cyan(const std::string& message);
-    static std::string white(const std::string& message);
+    static auto black(const std::string& message) -> std::string;
+    static auto red(const std::string& message) -> std::string;
+    static auto green(const std::string& message) -> std::string;
+    static auto yellow(const std::string& message) -> std::string;
+    static auto blue(const std::string& message) -> std::string;
+    static auto magenta(const std::string& message) -> std::string;
+    static auto cyan(const std::string& message) -> std::string;
+    static auto white(const std::string& message) -> std::string;
 
-    static std::string bright_black(const std::string& message);
-    static std::string bright_red(const std::string& message);
-    static std::string bright_green(const std::string& message);
-    static std::string bright_yellow(const std::string& message);
-    static std::string bright_blue(const std::string& message);
-    static std::string bright_magenta(const std::string& message);
-    static std::string bright_cyan(const std::string& message);
-    static std::string bright_white(const std::string& message);
+    static auto bright_black(const std::string& message) -> std::string;
+    static auto bright_red(const std::string& message) -> std::string;
+    static auto bright_green(const std::string& message) -> std::string;
+    static auto bright_yellow(const std::string& message) -> std::string;
+    static auto bright_blue(const std::string& message) -> std::string;
+    static auto bright_magenta(const std::string& message) -> std::string;
+    static auto bright_cyan(const std::string& message) -> std::string;
+    static auto bright_white(const std::string& message) -> std::string;
 };
 }   // namespace jump
 

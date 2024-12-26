@@ -6,6 +6,13 @@
 
 #include "jump/utility/random_decl.hpp"
 
+#include "jump/data/banded_matrix.hpp"
+#include "jump/data/dense_matrix.hpp"
+#include "jump/data/vector.hpp"
+
+#include <complex>
+#include <utility>
+
 namespace jump {
 /// Note that T must be appropriate for the chosen distribution, i.e. an
 /// integral type for `std::uniform_int_distribution`, etc.
@@ -17,7 +24,7 @@ inline RandomNumbers<T, Distribution>::RandomNumbers(Args&&... args) :
 }
 
 template <typename T, template <typename> typename Distribution>
-inline T RandomNumbers<T, Distribution>::generate() {
+inline auto RandomNumbers<T, Distribution>::generate() -> T {
     return m_distribution(m_engine);
 }
 

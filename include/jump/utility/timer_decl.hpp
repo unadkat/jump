@@ -5,10 +5,7 @@
 #define JUMP_TIMER_DECL_HPP
 
 #include <chrono>
-#include <format>
 #include <string>
-
-#include "jump/utility/types.hpp"
 
 namespace jump {
 /// \brief Enables timing of function calls and the calculation of average and
@@ -33,26 +30,26 @@ class Timer {
         void reset();
 
         /// \brief Return task string.
-        const std::string& task() const;
+        auto task() const -> const std::string&;
         /// \brief Return current running state.
-        bool stopped() const;
+        auto stopped() const -> bool;
         /// \brief Return the number of completed start/stop cycles.
-        const long& lap_count() const;
+        auto lap_count() const -> const long&;
         /// \brief Return the total elapsed time of the timing sessions.
-        Clock::duration running_time() const;
+        auto running_time() const -> Clock::duration;
         /// \brief Return the total elapsed time of the timing sessions in the
         /// format provided by formatted_time.
-        std::string formatted_running_time() const;
+        auto formatted_running_time() const -> std::string;
         /// \brief Return the average time of completed timing sessions.
-        Clock::duration average_time() const;
+        auto average_time() const -> Clock::duration;
         /// \brief Return the average time of completed timing sessions in the
         /// format provided by formatted_time.
-        std::string formatted_average_time() const;
+        auto formatted_average_time() const -> std::string;
 
     private:
         /// \brief Returns the time in a formatted string appropriate for the
         /// time duration supplied.
-        std::string formatted_time(Clock::duration time) const;
+        auto formatted_time(Clock::duration time) const -> std::string;
 
     private:
         /// \brief Flag to show if the `Timer` is currently stopped.
@@ -72,7 +69,7 @@ class Timer {
 /// \relates Timer
 /// \brief Print summary of timing results to a stream.
 template <typename Os>
-inline Os& operator<<(Os& out, const Timer& rhs);
+inline auto operator<<(Os& out, const Timer& rhs) -> Os&;
 }   // namespace jump
 
 #endif  // JUMP_TIMER_DECL_HPP

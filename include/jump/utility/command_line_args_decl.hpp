@@ -4,15 +4,8 @@
 #ifndef JUMP_COMMAND_LINE_ARGS_DECL_HPP
 #define JUMP_COMMAND_LINE_ARGS_DECL_HPP
 
-#include <algorithm>
-#include <cctype>
-#include <format>
-#include <ranges>
 #include <string>
-#include <sstream>
 #include <vector>
-
-#include "jump/utility/logging.hpp"
 
 namespace jump {
 /// \brief Parses and stores information supplied at runtime via command-line
@@ -23,14 +16,14 @@ class CommandLineArgs {
         CommandLineArgs(int argc, char** const argv);
 
         /// \brief Attempt extraction of flag and indicate success.
-        bool get(const char& flag, bool& storage);
+        auto get(const char& flag, bool& storage) -> bool;
         /// \brief Attempt extraction of option and indicate success.
         template <typename T>
-        bool get(const std::string& option, T& storage);
+        auto get(const std::string& option, T& storage) -> bool;
 
         /// \brief Print list of extracted flags and options to a stream.
         template <typename Os> friend
-        Os& operator<<(Os& out, const CommandLineArgs& rhs);
+        auto operator<<(Os& out, const CommandLineArgs& rhs) -> Os&;
 
     private:
         /// \brief Stores a flag (single character only) and whether this flag

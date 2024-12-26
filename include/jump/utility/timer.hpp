@@ -6,6 +6,10 @@
 
 #include "jump/utility/timer_decl.hpp"
 
+#include "jump/utility/types.hpp"
+
+#include <format>
+
 namespace jump {
 inline Timer::Timer(std::string task) :
     m_task{std::move(task)} {
@@ -32,19 +36,19 @@ inline void Timer::reset() {
     m_delta_t = Clock::duration::zero();
 }
 
-inline const std::string& Timer::task() const {
+inline auto Timer::task() const -> const std::string& {
     return m_task;
 }
 
-inline bool Timer::stopped() const {
+inline auto Timer::stopped() const -> bool {
     return m_stopped;
 }
 
-inline const long& Timer::lap_count() const {
+inline auto Timer::lap_count() const -> const long& {
     return m_counter;
 }
 
-inline Timer::Clock::duration Timer::running_time() const {
+inline auto Timer::running_time() const -> Timer::Clock::duration {
     auto time{m_delta_t};
     if (!m_stopped) {
         time += Clock::now() - m_start;
@@ -52,11 +56,11 @@ inline Timer::Clock::duration Timer::running_time() const {
     return time;
 }
 
-inline std::string Timer::formatted_running_time() const {
+inline auto Timer::formatted_running_time() const -> std::string {
     return formatted_time(running_time());
 }
 
-inline Timer::Clock::duration Timer::average_time() const {
+inline auto Timer::average_time() const -> Timer::Clock::duration {
     if (m_counter == 0) {
         return Clock::duration::zero();
     } else {
@@ -64,7 +68,7 @@ inline Timer::Clock::duration Timer::average_time() const {
     }
 }
 
-inline std::string Timer::formatted_average_time() const {
+inline auto Timer::formatted_average_time() const -> std::string {
     return formatted_time(average_time());
 }
 
@@ -74,7 +78,7 @@ inline std::string Timer::formatted_average_time() const {
 /// number of minutes is non-zero, the time is given in the format mm:ss.sss.
 /// Failing both of these, the time is returned in the format ss.sss with a
 /// trailing 's' to denote seconds.
-inline std::string Timer::formatted_time(Clock::duration time) const {
+inline auto Timer::formatted_time(Clock::duration time) const -> std::string {
     auto ms{std::chrono::duration_cast<std::chrono::milliseconds>(
             time).count()};
 
@@ -98,7 +102,7 @@ inline std::string Timer::formatted_time(Clock::duration time) const {
 
 /// \relates Timer
 template <typename Os>
-inline Os& operator<<(Os& out, const Timer& rhs) {
+inline auto operator<<(Os& out, const Timer& rhs) -> Os& {
     if (rhs.task() != "") {
         out << rhs.task() << '\n';
     }
