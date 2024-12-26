@@ -6,6 +6,12 @@
 
 #include "jump/linear_algebra/generalised_eigenvalue_system_decl.hpp"
 
+#include "jump/debug/exception.hpp"
+#include "jump/utility/external.hpp"
+#include "jump/utility/types.hpp"
+
+#include <format>
+
 namespace jump {
 template <typename T>
 inline GeneralisedEigenvalueSystem<T>::GeneralisedEigenvalueSystem(
@@ -47,7 +53,7 @@ inline void GeneralisedEigenvalueSystem<T>::solve() {
 }
 
 template <typename T>
-inline std::size_t GeneralisedEigenvalueSystem<T>::order() const {
+inline auto GeneralisedEigenvalueSystem<T>::order() const -> std::size_t {
     return m_A.num_rows();
 }
 

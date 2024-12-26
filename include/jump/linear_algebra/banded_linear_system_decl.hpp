@@ -4,14 +4,9 @@
 #ifndef JUMP_BANDED_LINEAR_SYSTEM_DECL_HPP
 #define JUMP_BANDED_LINEAR_SYSTEM_DECL_HPP
 
-#include <format>
-#include <vector>
-
 #include "jump/data/banded_matrix.hpp"
 #include "jump/data/vector.hpp"
-#include "jump/debug/exception.hpp"
 #include "jump/linear_algebra/linear_system_base.hpp"
-#include "jump/utility/external.hpp"
 
 namespace jump {
 /// \brief A linear system \f$A\vec{x}=\vec{b}\f$, where \f$A\f$ is a matrix and
@@ -25,9 +20,9 @@ class BandedLinearSystem : public LinearSystemBase {
         BandedLinearSystem(BandedMatrix<T>& A, Vector<T>& b);
 
         /// \brief Solve the linear system.
-        void solve();
+        virtual void solve() override;
         /// \brief Return the number of equations in the linear system.
-        std::size_t order() const;
+        virtual auto order() const -> std::size_t override;
 
     private:
 #ifdef JUMP_HAS_LAPACKE

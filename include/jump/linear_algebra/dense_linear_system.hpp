@@ -6,6 +6,13 @@
 
 #include "jump/linear_algebra/dense_linear_system_decl.hpp"
 
+#include "jump/debug/exception.hpp"
+#include "jump/utility/external.hpp"
+#include "jump/utility/types.hpp"
+
+#include <format>
+#include <vector>
+
 namespace jump {
 template <typename T>
 inline DenseLinearSystem<T>::DenseLinearSystem(DenseMatrix<T>& A,
@@ -33,7 +40,7 @@ inline void DenseLinearSystem<T>::solve() {
 }
 
 template <typename T>
-inline std::size_t DenseLinearSystem<T>::order() const {
+inline auto DenseLinearSystem<T>::order() const -> std::size_t {
     return m_A.num_rows();
 }
 

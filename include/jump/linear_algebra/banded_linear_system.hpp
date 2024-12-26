@@ -6,6 +6,13 @@
 
 #include "jump/linear_algebra/banded_linear_system_decl.hpp"
 
+#include "jump/debug/exception.hpp"
+#include "jump/utility/external.hpp"
+#include "jump/utility/types.hpp"
+
+#include <format>
+#include <vector>
+
 namespace jump {
 template <typename T>
 inline BandedLinearSystem<T>::BandedLinearSystem(BandedMatrix<T>& A,
@@ -33,7 +40,7 @@ inline void BandedLinearSystem<T>::solve() {
 }
 
 template <typename T>
-inline std::size_t BandedLinearSystem<T>::order() const {
+inline auto BandedLinearSystem<T>::order() const -> std::size_t {
     return m_A.num_rows();
 }
 

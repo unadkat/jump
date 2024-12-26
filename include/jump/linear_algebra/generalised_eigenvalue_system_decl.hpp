@@ -4,14 +4,11 @@
 #ifndef JUMP_GENERALISED_EIGENVALUE_SYSTEM_DECL_HPP
 #define JUMP_GENERALISED_EIGENVALUE_SYSTEM_DECL_HPP
 
-#include <format>
-#include <vector>
-
 #include "jump/data/dense_matrix.hpp"
 #include "jump/data/eigendata.hpp"
-#include "jump/debug/exception.hpp"
 #include "jump/linear_algebra/linear_system_base.hpp"
-#include "jump/utility/external.hpp"
+
+#include <vector>
 
 namespace jump {
 /// \brief A linear eigenvalue system \f$A\vec{x}=\lambda B\vec{x}\f$, where
@@ -28,9 +25,9 @@ class GeneralisedEigenvalueSystem : public LinearSystemBase {
                 std::vector<Eigendatum<T>>& data);
 
         /// \brief Solve the eigenvalue system.
-        void solve();
+        virtual void solve() override;
         /// \brief Return the number of equations in the eigenvalue system.
-        std::size_t order() const;
+        virtual auto order() const -> std::size_t override;
 
     private:
 #ifdef JUMP_HAS_LAPACKE

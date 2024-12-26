@@ -6,8 +6,6 @@
 
 #include <cstddef>
 
-#include "../debug/exception.hpp"
-
 namespace jump {
 /// \brief Interface for linear system solvers.
 class LinearSystemBase
@@ -16,7 +14,7 @@ class LinearSystemBase
         /// \brief Solve the linear system.
         virtual void solve() = 0;
         /// \brief Return the number of equations in the linear system.
-        virtual std::size_t order() const = 0;
+        virtual auto order() const -> std::size_t = 0;
 };
 }   // namespace jump
 
