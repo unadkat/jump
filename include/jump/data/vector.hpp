@@ -6,6 +6,14 @@
 
 #include "jump/data/vector_decl.hpp"
 
+#include "jump/autodiff/dual.hpp"
+#include "jump/utility/utility.hpp"
+
+#include <algorithm>
+#include <cmath>
+#include <sstream>
+#include <utility>
+
 namespace jump {
 /// \class Vector
 /// Most operations are simply passed through to the underlying `std::vector`
@@ -69,12 +77,12 @@ inline void Vector<T>::resize(std::size_t size) {
 }
 
 template <typename T>
-inline std::size_t Vector<T>::size() const {
+inline auto Vector<T>::size() const -> std::size_t {
     return storage.size();
 }
 
 template <typename T>
-inline const T& Vector<T>::operator[](std::size_t index) const {
+inline auto Vector<T>::operator[](std::size_t index) const -> const T& {
 #ifndef NDEBUG
     if (index >= size()) {
         throw RuntimeError{Range1DError{.index = index, .size = size()}};
@@ -85,7 +93,7 @@ inline const T& Vector<T>::operator[](std::size_t index) const {
 }
 
 template <typename T>
-inline T& Vector<T>::operator[](std::size_t index) {
+inline auto Vector<T>::operator[](std::size_t index) -> T& {
 #ifndef NDEBUG
     if (index >= size()) {
         throw RuntimeError{Range1DError{.index = index, .size = size()}};
@@ -96,22 +104,22 @@ inline T& Vector<T>::operator[](std::size_t index) {
 }
 
 template <typename T>
-inline typename Vector<T>::ConstIterator Vector<T>::begin() const {
+inline auto Vector<T>::begin() const -> ConstIterator {
     return storage.cbegin();
 }
 
 template <typename T>
-inline typename Vector<T>::ConstIterator Vector<T>::end() const {
+inline auto Vector<T>::end() const -> ConstIterator {
     return storage.cend();
 }
 
 template <typename T>
-inline typename Vector<T>::Iterator Vector<T>::begin() {
+inline auto Vector<T>::begin() -> Iterator {
     return storage.begin();
 }
 
 template <typename T>
-inline typename Vector<T>::Iterator Vector<T>::end() {
+inline auto Vector<T>::end() -> Iterator {
     return storage.end();
 }
 
@@ -126,18 +134,18 @@ inline void Vector<T>::zero() {
 }
 
 template <typename T>
-inline const Vector<T>& Vector<T>::operator+() const {
+inline auto Vector<T>::operator+() const -> const Vector<T>& {
     return *this;
 }
 
 template <typename T>
-inline Vector<T> Vector<T>::operator-() const {
+inline auto Vector<T>::operator-() const -> Vector<T> {
     Vector<T> temp{*this};
     return temp *= -1;
 }
 
 template <typename T>
-inline Vector<T>& Vector<T>::operator+=(const Vector<T>& rhs) {
+inline auto Vector<T>::operator+=(const Vector<T>& rhs) -> Vector<T>& {
 #ifndef NDEBUG
     if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
@@ -152,7 +160,7 @@ inline Vector<T>& Vector<T>::operator+=(const Vector<T>& rhs) {
 }
 
 template <typename T>
-inline Vector<T>& Vector<T>::operator-=(const Vector<T>& rhs) {
+inline auto Vector<T>::operator-=(const Vector<T>& rhs) -> Vector<T>& {
 #ifndef NDEBUG
     if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
@@ -167,7 +175,7 @@ inline Vector<T>& Vector<T>::operator-=(const Vector<T>& rhs) {
 }
 
 template <typename T>
-inline Vector<T>& Vector<T>::operator*=(const T& rhs) {
+inline auto Vector<T>::operator*=(const T& rhs) -> Vector<T>& {
     for (auto& x : storage) {
         x *= rhs;
     }
@@ -175,7 +183,7 @@ inline Vector<T>& Vector<T>::operator*=(const T& rhs) {
 }
 
 template <typename T>
-inline Vector<T>& Vector<T>::operator*=(const Vector<T>& rhs) {
+inline auto Vector<T>::operator*=(const Vector<T>& rhs) -> Vector<T>& {
 #ifndef NDEBUG
     if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
@@ -190,12 +198,12 @@ inline Vector<T>& Vector<T>::operator*=(const Vector<T>& rhs) {
 }
 
 template <typename T>
-inline Vector<T>& Vector<T>::operator/=(const T& rhs) {
+inline auto Vector<T>::operator/=(const T& rhs) -> Vector<T>& {
     return *this *= (T{1}/rhs);
 }
 
 template <typename T>
-inline Vector<T>& Vector<T>::operator/=(const Vector<T>& rhs) {
+inline auto Vector<T>::operator/=(const Vector<T>& rhs) -> Vector<T>& {
 #ifndef NDEBUG
     if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
@@ -210,7 +218,7 @@ inline Vector<T>& Vector<T>::operator/=(const Vector<T>& rhs) {
 }
 
 template <typename T>
-inline Real Vector<T>::L1_norm() const {
+inline auto Vector<T>::L1_norm() const -> Real {
     if constexpr (is_dual_v<T>) {
         auto F{[](Real acc, const T& x) { return acc + abs(x).value; }};
         return std::accumulate(storage.begin(), storage.end(), Real{0}, F);
@@ -221,7 +229,7 @@ inline Real Vector<T>::L1_norm() const {
 }
 
 template <typename T>
-inline Real Vector<T>::L2_norm() const {
+inline auto Vector<T>::L2_norm() const -> Real {
     if constexpr (is_dual_v<T>) {
         auto F{[](Real acc, const T& x) {
             return acc + pow(abs(x), 2.).value; }};
@@ -236,7 +244,7 @@ inline Real Vector<T>::L2_norm() const {
 }
 
 template <typename T>
-inline Real Vector<T>::Linf_norm() const {
+inline auto Vector<T>::Linf_norm() const -> Real {
     if constexpr (is_dual_v<T>) {
         auto F{[](const T& x) { return abs(x).value; }};
         return F(std::ranges::max(storage, {}, F));
@@ -247,12 +255,12 @@ inline Real Vector<T>::Linf_norm() const {
 }
 
 template <typename T>
-inline T* Vector<T>::data() {
+inline auto Vector<T>::data() -> T* {
     return storage.data();
 }
 
 template <typename T>
-inline const T* Vector<T>::data() const {
+inline auto Vector<T>::data() const -> const T* {
     return storage.data();
 }
 
@@ -276,7 +284,7 @@ inline void Vector<T>::operator<<(std::string data) {
 
 /// \relates Vector
 template <typename T, typename Os>
-inline Os& operator<<(Os& out, const Vector<T>& rhs) {
+inline auto operator<<(Os& out, const Vector<T>& rhs) -> Os& {
     for (const auto& x : rhs) {
         out << x << ' ';
     }
@@ -289,7 +297,7 @@ inline Os& operator<<(Os& out, const Vector<T>& rhs) {
 
 /// \relates Vector
 template <typename T>
-Vector<T> exp(Vector<T> v) {
+auto exp(Vector<T> v) -> Vector<T> {
     using std::exp;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return exp(x); });
@@ -298,7 +306,7 @@ Vector<T> exp(Vector<T> v) {
 
 /// \relates Vector
 template <typename T>
-Vector<T> log(Vector<T> v) {
+auto log(Vector<T> v) -> Vector<T> {
     using std::log;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return log(x); });
@@ -307,7 +315,7 @@ Vector<T> log(Vector<T> v) {
 
 /// \relates Vector
 template <typename T>
-Vector<T> pow(Vector<T> v, T p) {
+auto pow(Vector<T> v, T p) -> Vector<T> {
     using std::pow;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return pow(x, p); });
@@ -320,7 +328,7 @@ Vector<T> pow(Vector<T> v, T p) {
 
 /// \relates Vector
 template <typename T>
-Vector<T> sin(Vector<T> v) {
+auto sin(Vector<T> v) -> Vector<T> {
     using std::sin;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return sin(x); });
@@ -329,7 +337,7 @@ Vector<T> sin(Vector<T> v) {
 
 /// \relates Vector
 template <typename T>
-Vector<T> cos(Vector<T> v) {
+auto cos(Vector<T> v) -> Vector<T> {
     using std::cos;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return cos(x); });
@@ -338,7 +346,7 @@ Vector<T> cos(Vector<T> v) {
 
 /// \relates Vector
 template <typename T>
-Vector<T> tan(Vector<T> v) {
+auto tan(Vector<T> v) -> Vector<T> {
     using std::tan;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return tan(x); });
@@ -347,7 +355,7 @@ Vector<T> tan(Vector<T> v) {
 
 /// \relates Vector
 template <typename T>
-Vector<T> asin(Vector<T> v) {
+auto asin(Vector<T> v) -> Vector<T> {
     using std::asin;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return asin(x); });
@@ -356,7 +364,7 @@ Vector<T> asin(Vector<T> v) {
 
 /// \relates Vector
 template <typename T>
-Vector<T> acos(Vector<T> v) {
+auto acos(Vector<T> v) -> Vector<T> {
     using std::acos;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return acos(x); });
@@ -365,7 +373,7 @@ Vector<T> acos(Vector<T> v) {
 
 /// \relates Vector
 template <typename T>
-Vector<T> atan(Vector<T> v) {
+auto atan(Vector<T> v) -> Vector<T> {
     using std::atan;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return atan(x); });
@@ -378,7 +386,7 @@ Vector<T> atan(Vector<T> v) {
 
 /// \relates Vector
 template <typename T>
-Vector<T> sinh(Vector<T> v) {
+auto sinh(Vector<T> v) -> Vector<T> {
     using std::sinh;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return sinh(x); });
@@ -387,7 +395,7 @@ Vector<T> sinh(Vector<T> v) {
 
 /// \relates Vector
 template <typename T>
-Vector<T> cosh(Vector<T> v) {
+auto cosh(Vector<T> v) -> Vector<T> {
     using std::cosh;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return cosh(x); });
@@ -396,7 +404,7 @@ Vector<T> cosh(Vector<T> v) {
 
 /// \relates Vector
 template <typename T>
-Vector<T> tanh(Vector<T> v) {
+auto tanh(Vector<T> v) -> Vector<T> {
     using std::tanh;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return tanh(x); });
@@ -405,7 +413,7 @@ Vector<T> tanh(Vector<T> v) {
 
 /// \relates Vector
 template <typename T>
-Vector<T> asinh(Vector<T> v) {
+auto asinh(Vector<T> v) -> Vector<T> {
     using std::asinh;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return asinh(x); });
@@ -414,7 +422,7 @@ Vector<T> asinh(Vector<T> v) {
 
 /// \relates Vector
 template <typename T>
-Vector<T> acosh(Vector<T> v) {
+auto acosh(Vector<T> v) -> Vector<T> {
     using std::acosh;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return acosh(x); });
@@ -423,7 +431,7 @@ Vector<T> acosh(Vector<T> v) {
 
 /// \relates Vector
 template <typename T>
-Vector<T> atanh(Vector<T> v) {
+auto atanh(Vector<T> v) -> Vector<T> {
     using std::atanh;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return atanh(x); });
@@ -436,7 +444,7 @@ Vector<T> atanh(Vector<T> v) {
 
 /// \relates Vector
 template <typename T>
-Vector<T> abs(Vector<T> v) {
+auto abs(Vector<T> v) -> Vector<T> {
     using std::abs;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return abs(x); });
@@ -445,7 +453,7 @@ Vector<T> abs(Vector<T> v) {
 
 /// \relates Vector
 template <typename T>
-Vector<T> sgn(Vector<T> v) {
+auto sgn(Vector<T> v) -> Vector<T> {
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return sgn(x); });
     return v;
@@ -458,7 +466,7 @@ Vector<T> sgn(Vector<T> v) {
 #ifdef JUMP_HAS_CBLAS
 /// \brief Specialisation of in-place addition of two real Vectors, using CBLAS.
 template <>
-inline Vector<Real>& Vector<Real>::operator+=(const Vector<Real>& rhs) {
+inline auto Vector<Real>::operator+=(const Vector<Real>& rhs) -> Vector<Real>& {
 #ifndef NDEBUG
     if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
@@ -474,8 +482,8 @@ inline Vector<Real>& Vector<Real>::operator+=(const Vector<Real>& rhs) {
 /// \brief Specialisation of in-place addition of two complex Vectors, using
 /// CBLAS.
 template <>
-inline Vector<Complex>& Vector<Complex>::operator+=(
-        const Vector<Complex>& rhs) {
+inline auto Vector<Complex>::operator+=(const Vector<Complex>& rhs)
+        -> Vector<Complex>& {
 #ifndef NDEBUG
     if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
@@ -492,7 +500,7 @@ inline Vector<Complex>& Vector<Complex>::operator+=(
 /// \brief Specialisation of in-place subtraction of two real Vectors, using
 /// CBLAS.
 template <>
-inline Vector<Real>& Vector<Real>::operator-=(const Vector<Real>& rhs) {
+inline auto Vector<Real>::operator-=(const Vector<Real>& rhs) -> Vector<Real>& {
 #ifndef NDEBUG
     if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
@@ -508,8 +516,8 @@ inline Vector<Real>& Vector<Real>::operator-=(const Vector<Real>& rhs) {
 /// \brief Specialisation of in-place subtraction of two complex Vectors, using
 /// CBLAS.
 template <>
-inline Vector<Complex>& Vector<Complex>::operator-=(
-        const Vector<Complex>& rhs) {
+inline auto Vector<Complex>::operator-=(const Vector<Complex>& rhs)
+        -> Vector<Complex>& {
 #ifndef NDEBUG
     if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
@@ -526,7 +534,7 @@ inline Vector<Complex>& Vector<Complex>::operator-=(
 /// \brief Specialisation of in-place multiplication of a real `Vector` by a
 /// real scalar, using CBLAS.
 template <>
-inline Vector<Real>& Vector<Real>::operator*=(const Real& rhs) {
+inline auto Vector<Real>::operator*=(const Real& rhs) -> Vector<Real>& {
     // Computes rhs*(*this) (with a pointer shift of 1 between elements)
     cblas_dscal(storage.size(), rhs, storage.data(), 1);
     return *this;
@@ -535,7 +543,8 @@ inline Vector<Real>& Vector<Real>::operator*=(const Real& rhs) {
 /// \brief Specialisation of in-place multiplication of a complex `Vector` by a
 /// complex scalar, using CBLAS.
 template <>
-inline Vector<Complex>& Vector<Complex>::operator*=(const Complex& rhs) {
+inline auto Vector<Complex>::operator*=(const Complex& rhs)
+        -> Vector<Complex>& {
     // Computes rhs*(*this) (with a pointer shift of 1 between elements)
     cblas_zscal(storage.size(), &rhs, storage.data(), 1);
     return *this;
@@ -544,7 +553,7 @@ inline Vector<Complex>& Vector<Complex>::operator*=(const Complex& rhs) {
 /// \brief Specialisation of in-place division of a real `Vector` by a real
 /// scalar, using CBLAS.
 template <>
-inline Vector<Real>& Vector<Real>::operator/=(const Real& rhs) {
+inline auto Vector<Real>::operator/=(const Real& rhs) -> Vector<Real>& {
     // Computes (1./rhs)*(*this) (with a pointer shift of 1 between elements)
     cblas_dscal(storage.size(), 1./rhs, storage.data(), 1);
     return *this;
@@ -553,7 +562,8 @@ inline Vector<Real>& Vector<Real>::operator/=(const Real& rhs) {
 /// \brief Specialisation of in-place division of a complex `Vector` by a
 /// complex scalar using CBLAS.
 template <>
-inline Vector<Complex>& Vector<Complex>::operator/=(const Complex& rhs) {
+inline auto Vector<Complex>::operator/=(const Complex& rhs)
+        -> Vector<Complex>& {
     // Computes (1./rhs)*(*this) (with a pointer shift of 1 between elements)
     Complex a{1./rhs};
     cblas_zscal(storage.size(), &a, storage.data(), 1);
@@ -563,7 +573,7 @@ inline Vector<Complex>& Vector<Complex>::operator/=(const Complex& rhs) {
 /// \brief Specialisation of the L1-norm calculation for a real `Vector`, using
 /// CBLAS.
 template <>
-inline Real Vector<Real>::L1_norm() const {
+inline auto Vector<Real>::L1_norm() const -> Real {
     // Computes sum of absolute element values (with a pointer shift of 1
     // between elements)
     return cblas_dasum(storage.size(), storage.data(), 1);
@@ -572,7 +582,7 @@ inline Real Vector<Real>::L1_norm() const {
 /// \brief Specialisation of the L1-norm calculation for a complex `Vector`,
 /// using CBLAS.
 template <>
-inline Real Vector<Complex>::L1_norm() const {
+inline auto Vector<Complex>::L1_norm() const -> Real {
     // Computes sum of absolute real and imaginary element values (with a
     // pointer shift of 1 between elements). Note: this is not the same as the
     // usual definition of this norm
@@ -582,7 +592,7 @@ inline Real Vector<Complex>::L1_norm() const {
 /// \brief Specialisation of the L2-norm calculation for a real `Vector`, using
 /// CBLAS.
 template <>
-inline Real Vector<Real>::L2_norm() const {
+inline auto Vector<Real>::L2_norm() const -> Real {
     // Computes the Euclidean norm of the `Vector` (with a pointer shift of 1
     // between elements)
     return cblas_dnrm2(storage.size(), storage.data(), 1);
@@ -591,7 +601,7 @@ inline Real Vector<Real>::L2_norm() const {
 /// \brief Specialisation of the L2-norm calculation for a complex `Vector`,
 /// using CBLAS.
 template <>
-inline Real Vector<Complex>::L2_norm() const {
+inline auto Vector<Complex>::L2_norm() const -> Real {
     // Computes the Euclidean norm of the `Vector` (with a pointer shift of 1
     // between elements)
     return cblas_dznrm2(storage.size(), storage.data(), 1);

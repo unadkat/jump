@@ -16,7 +16,7 @@
 ///
 /// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
 /// return. Also handles the case that lhs is given an rvalue (NRVO).
-friend Vector operator+(Vector lhs, const Vector& rhs) {
+friend auto operator+(Vector lhs, const Vector& rhs) -> Vector {
     lhs += rhs;
     return lhs;
 }
@@ -26,7 +26,7 @@ friend Vector operator+(Vector lhs, const Vector& rhs) {
 ///
 /// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
 /// reference parameter (NRVO).
-friend Vector operator+(const Vector& lhs, Vector&& rhs) {
+friend auto operator+(const Vector& lhs, Vector&& rhs) -> Vector {
     rhs += lhs;
     return rhs;
 }
@@ -36,7 +36,7 @@ friend Vector operator+(const Vector& lhs, Vector&& rhs) {
 ///
 /// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
 /// return. Also handles the case that lhs is given an rvalue (NRVO).
-friend Vector operator-(Vector lhs, const Vector& rhs) {
+friend auto operator-(Vector lhs, const Vector& rhs) -> Vector {
     lhs -= rhs;
     return lhs;
 }
@@ -46,7 +46,7 @@ friend Vector operator-(Vector lhs, const Vector& rhs) {
 ///
 /// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
 /// reference parameter (NRVO).
-friend Vector operator-(const Vector& lhs, Vector&& rhs) {
+friend auto operator-(const Vector& lhs, Vector&& rhs) -> Vector {
     rhs *= T{-1};
     rhs += lhs;
     return rhs;
@@ -54,14 +54,14 @@ friend Vector operator-(const Vector& lhs, Vector&& rhs) {
 
 /// \relates Vector
 /// \brief Left-hand multiplication by scalar.
-friend Vector operator*(const T& lhs, Vector rhs) {
+friend auto operator*(const T& lhs, Vector rhs) -> Vector {
     rhs *= lhs;
     return rhs;
 }
 
 /// \relates Vector
 /// \brief Right-hand multiplication by scalar.
-friend Vector operator*(Vector lhs, const T& rhs) {
+friend auto operator*(Vector lhs, const T& rhs) -> Vector {
     lhs *= rhs;
     return lhs;
 }
@@ -71,7 +71,7 @@ friend Vector operator*(Vector lhs, const T& rhs) {
 ///
 /// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
 /// return. Also handles the case that lhs is given an rvalue (NRVO).
-friend Vector operator*(Vector lhs, const Vector& rhs) {
+friend auto operator*(Vector lhs, const Vector& rhs) -> Vector {
     lhs *= rhs;
     return lhs;
 }
@@ -81,14 +81,14 @@ friend Vector operator*(Vector lhs, const Vector& rhs) {
 ///
 /// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
 /// reference parameter (NRVO).
-friend Vector operator*(const Vector& lhs, Vector&& rhs) {
+friend auto operator*(const Vector& lhs, Vector&& rhs) -> Vector {
     rhs *= lhs;
     return rhs;
 }
 
 /// \relates Vector
 /// \brief Inner product of two Vectors.
-friend T dot(const Vector& lhs, const Vector& rhs) {
+friend auto dot(const Vector& lhs, const Vector& rhs) -> T {
 #ifndef NDEBUG
     if (lhs.size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
@@ -101,7 +101,7 @@ friend T dot(const Vector& lhs, const Vector& rhs) {
 
 /// \relates Vector
 /// \brief Right-hand division by scalar.
-friend Vector operator/(Vector lhs, const T& rhs) {
+friend auto operator/(Vector lhs, const T& rhs) -> Vector {
     lhs /= rhs;
     return lhs;
 }
@@ -111,7 +111,7 @@ friend Vector operator/(Vector lhs, const T& rhs) {
 ///
 /// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
 /// return. Also handles the case that lhs is given an rvalue (NRVO).
-friend Vector operator/(Vector lhs, const Vector& rhs) {
+friend auto operator/(Vector lhs, const Vector& rhs) -> Vector {
     lhs /= rhs;
     return lhs;
 }
@@ -122,7 +122,8 @@ friend Vector operator/(Vector lhs, const Vector& rhs) {
 
 #ifdef JUMP_HAS_CBLAS
 /// \brief Specialisation of the dot product for two real Vectors, using CBLAS.
-friend Real operator*(const Vector<Real>& lhs, const Vector<Real>& rhs) {
+friend auto operator*(const Vector<Real>& lhs, const Vector<Real>& rhs)
+        -> Real {
 #ifndef NDEBUG
     if (lhs.size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
@@ -136,8 +137,8 @@ friend Real operator*(const Vector<Real>& lhs, const Vector<Real>& rhs) {
 
 /// \brief Specialisation of the dot product for two complex Vectors, using
 /// CBLAS.
-friend Complex operator*(const Vector<Complex>& lhs,
-        const Vector<Complex>& rhs) {
+friend auto operator*(const Vector<Complex>& lhs, const Vector<Complex>& rhs)
+        -> Complex {
 #ifndef NDEBUG
     if (lhs.size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),

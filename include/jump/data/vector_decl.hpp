@@ -4,20 +4,14 @@
 #ifndef JUMP_VECTOR_DECL_HPP
 #define JUMP_VECTOR_DECL_HPP
 
-#include <algorithm>
-#include <cmath>
-#include <initializer_list>
-#include <numeric>
-#include <sstream>
-#include <string>
-#include <utility>
-#include <vector>
-
-#include "jump/autodiff/dual.hpp"
 #include "jump/debug/exception.hpp"
 #include "jump/utility/external.hpp"
 #include "jump/utility/types.hpp"
-#include "jump/utility/utility.hpp"
+
+#include <initializer_list>
+#include <numeric>
+#include <string>
+#include <vector>
 
 namespace jump {
 /// \brief Permissive encapulation of `std::vector` with arithmetic
@@ -55,24 +49,24 @@ struct Vector {
     /// \brief Resize the `Vector`.
     void resize(std::size_t size);
     /// \brief Return number of elements.
-    std::size_t size() const;
+    auto size() const -> std::size_t;
 
     /// \brief Defaulted spaceship operator.
     auto operator<=>(const Vector&) const = default;
 
     /// \brief Const element access.
-    const T& operator[](std::size_t index) const;
+    auto operator[](std::size_t index) const -> const T&;
     /// \brief Mutable element access.
-    T& operator[](std::size_t index);
+    auto operator[](std::size_t index) -> T&;
 
     /// \brief Const begin iterator for algorithms.
-    ConstIterator begin() const;
+    auto begin() const -> ConstIterator;
     /// \brief Const past-the-end iterator for algorithms.
-    ConstIterator end() const;
+    auto end() const -> ConstIterator;
     /// \brief Begin iterator for algorithms.
-    Iterator begin();
+    auto begin() -> Iterator;
     /// \brief Past-end-end iterator for algorithms.
-    Iterator end();
+    auto end() -> Iterator;
 
     /// \brief Fill with given value.
     void fill(const T& value);
@@ -80,33 +74,33 @@ struct Vector {
     void zero();
 
     /// \brief No operation on `Vector`.
-    const Vector& operator+() const;
+    auto operator+() const -> const Vector&;
     /// \brief Negate `Vector`.
-    Vector operator-() const;
+    auto operator-() const -> Vector;
     /// \brief Add two Vectors together in place.
-    Vector& operator+=(const Vector& rhs);
+    auto operator+=(const Vector& rhs) -> Vector&;
     /// \brief Subtract one `Vector` from another in place.
-    Vector& operator-=(const Vector& rhs);
+    auto operator-=(const Vector& rhs) -> Vector&;
     /// \brief Multiply by scalar in place.
-    Vector& operator*=(const T& rhs);
+    auto operator*=(const T& rhs) -> Vector&;
     /// \brief Elementwise product by another Vector.
-    Vector& operator*=(const Vector& rhs);
+    auto operator*=(const Vector& rhs) -> Vector&;
     /// \brief Divide by scalar in place.
-    Vector& operator/=(const T& rhs);
+    auto operator/=(const T& rhs) -> Vector&;
     /// \brief Elementwise division by another Vector.
-    Vector& operator/=(const Vector& rhs);
+    auto operator/=(const Vector& rhs) -> Vector&;
 
     /// \brief Return sum of element magnitudes.
-    Real L1_norm() const;
+    auto L1_norm() const -> Real;
     /// \brief Return Euclidean norm.
-    Real L2_norm() const;
+    auto L2_norm() const -> Real;
     /// \brief Return maximum magnitude over all elements.
-    Real Linf_norm() const;
+    auto Linf_norm() const -> Real;
 
     /// \brief Pointer to underlying data, for use with external libraries.
-    T* data();
+    auto data() -> T*;
     /// \brief Pointer to underlying data, for use with external libraries.
-    const T* data() const;
+    auto data() const -> const T*;
 
     /// \brief Populate with data in a `std::string`. Continue to read data
     /// until a `std::stringstream` fails to read a new value.
@@ -118,7 +112,7 @@ struct Vector {
 /// \relates Vector
 /// \brief Outputs `Vector` data to output stream in a single line with spaces.
 template <typename T, typename Os>
-Os& operator<<(Os& out, const Vector<T>& rhs);
+auto operator<<(Os& out, const Vector<T>& rhs) -> Os&;
 
 // ========================================================================
 // Exponentiation
@@ -126,15 +120,15 @@ Os& operator<<(Os& out, const Vector<T>& rhs);
 
 /// \relates Vector
 template <typename T>
-Vector<T> exp(Vector<T> v);
+auto exp(Vector<T> v) -> Vector<T>;
 
 /// \relates Vector
 template <typename T>
-Vector<T> log(Vector<T> v);
+auto log(Vector<T> v) -> Vector<T>;
 
 /// \relates Vector
 template <typename T>
-Vector<T> pow(Vector<T> v, T p);
+auto pow(Vector<T> v, T p) -> Vector<T>;
 
 // ========================================================================
 // Trigonometry
@@ -142,27 +136,27 @@ Vector<T> pow(Vector<T> v, T p);
 
 /// \relates Vector
 template <typename T>
-Vector<T> sin(Vector<T> v);
+auto sin(Vector<T> v) -> Vector<T>;
 
 /// \relates Vector
 template <typename T>
-Vector<T> cos(Vector<T> v);
+auto cos(Vector<T> v) -> Vector<T>;
 
 /// \relates Vector
 template <typename T>
-Vector<T> tan(Vector<T> v);
+auto tan(Vector<T> v) -> Vector<T>;
 
 /// \relates Vector
 template <typename T>
-Vector<T> asin(Vector<T> v);
+auto asin(Vector<T> v) -> Vector<T>;
 
 /// \relates Vector
 template <typename T>
-Vector<T> acos(Vector<T> v);
+auto acos(Vector<T> v) -> Vector<T>;
 
 /// \relates Vector
 template <typename T>
-Vector<T> atan(Vector<T> v);
+auto atan(Vector<T> v) -> Vector<T>;
 
 // ========================================================================
 // Hyperbolics
@@ -170,27 +164,27 @@ Vector<T> atan(Vector<T> v);
 
 /// \relates Vector
 template <typename T>
-Vector<T> sinh(Vector<T> v);
+auto sinh(Vector<T> v) -> Vector<T>;
 
 /// \relates Vector
 template <typename T>
-Vector<T> cosh(Vector<T> v);
+auto cosh(Vector<T> v) -> Vector<T>;
 
 /// \relates Vector
 template <typename T>
-Vector<T> tanh(Vector<T> v);
+auto tanh(Vector<T> v) -> Vector<T>;
 
 /// \relates Vector
 template <typename T>
-Vector<T> asinh(Vector<T> v);
+auto asinh(Vector<T> v) -> Vector<T>;
 
 /// \relates Vector
 template <typename T>
-Vector<T> acosh(Vector<T> v);
+auto acosh(Vector<T> v) -> Vector<T>;
 
 /// \relates Vector
 template <typename T>
-Vector<T> atanh(Vector<T> v);
+auto atanh(Vector<T> v) -> Vector<T>;
 
 // ========================================================================
 // Miscellaneous
@@ -198,11 +192,11 @@ Vector<T> atanh(Vector<T> v);
 
 /// \relates Vector
 template <typename T>
-Vector<T> abs(Vector<T> v);
+auto abs(Vector<T> v) -> Vector<T>;
 
 /// \relates Vector
 template <typename T>
-Vector<T> sgn(Vector<T> v);
+auto sgn(Vector<T> v) -> Vector<T>;
 }   // namespace jump
 
 #endif  // JUMP_VECTOR_DECL_HPP

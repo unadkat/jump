@@ -6,6 +6,8 @@
 
 #include "jump/data/dense_matrix_decl.hpp"
 
+#include "jump/autodiff/dual.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <format>

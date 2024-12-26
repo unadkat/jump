@@ -6,14 +6,16 @@
 
 #include "jump/data/eigendata_decl.hpp"
 
+#include "jump/debug/exception.hpp"
+
 namespace jump {
 /// After the population with the new eigenvalue/eigenvector pairs, the data is
 /// left unsorted with respect to the eigenvalues. It is up to the user to sort
 /// the data as required for their purposes.
 template <typename T>
-inline std::vector<Eigendatum<T>> combine_eigendata(
-        const std::vector<T>& eigenvalues,
-        const std::vector<Vector<T>>& eigenvectors) {
+inline auto combine_eigendata(const std::vector<T>& eigenvalues,
+        const std::vector<Vector<T>>& eigenvectors)
+        -> std::vector<Eigendatum<T>> {
 #ifndef NDEBUG
     if (eigenvalues.size() != eigenvectors.size())
         throw RuntimeError{Mismatch1DError{.name1 = "eigenvalues",
@@ -32,7 +34,8 @@ inline std::vector<Eigendatum<T>> combine_eigendata(
 /// If Re(w) < Re(z), or Re(w) = Re(z) and Im(w) < Im(z), we assert that w < z.
 /// This sets up a strict weak ordering in line with the requirements for
 /// `std::sort`.
-inline bool sort_eigendata_real(const Complex& lhs, const Complex& rhs) {
+inline auto sort_eigendata_real(const Complex& lhs, const Complex& rhs)
+        -> bool {
     return lhs.real() < rhs.real() ? true :
         (lhs.real() == rhs.real() ? lhs.imag() < rhs.imag() : false);
 }
@@ -40,7 +43,8 @@ inline bool sort_eigendata_real(const Complex& lhs, const Complex& rhs) {
 /// If Im(w) < Im(z), or Im(w) = Im(z) and Re(w) < Re(z), we assert that w < z.
 /// This sets up a strict weak ordering in line with the requirements for
 /// `std::sort`.
-inline bool sort_eigendata_imag(const Complex& lhs, const Complex& rhs) {
+inline auto sort_eigendata_imag(const Complex& lhs, const Complex& rhs)
+        -> bool {
     return lhs.imag() < rhs.imag() ? true :
         (lhs.imag() == rhs.imag() ? lhs.real() < rhs.real() : false);
 }

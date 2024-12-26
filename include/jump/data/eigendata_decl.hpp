@@ -4,11 +4,10 @@
 #ifndef JUMP_EIGENDATA_DECL_HPP
 #define JUMP_EIGENDATA_DECL_HPP
 
-#include <vector>
-
 #include "jump/data/vector.hpp"
-#include "jump/debug/exception.hpp"
 #include "jump/utility/types.hpp"
+
+#include <vector>
 
 namespace jump {
 /// \brief Simple struct to hold a complex eigenvalue and corresponding complex
@@ -16,7 +15,7 @@ namespace jump {
 template <typename T>
 struct Eigendatum {
     /// \brief Eigenvalue.
-    T value;
+    T value{};
     /// \brief Eigenvector corresponding to the stored eigenvalue.
     Vector<T> vector;
 };
@@ -24,15 +23,18 @@ struct Eigendatum {
 /// \brief Combine separate eigenvalue/eigenvector data from external solvers
 /// into a single vector.
 template <typename T>
-std::vector<Eigendatum<T>> combine_eigendata(const std::vector<T>& eigenvalues,
-        const std::vector<Vector<T>>& eigenvectors);
+auto combine_eigendata(const std::vector<T>& eigenvalues,
+        const std::vector<Vector<T>>& eigenvectors)
+        -> std::vector<Eigendatum<T>>;
 
 /// \brief Predicate for sorting eigendata by real part of associated
 /// eigenvalue.
-bool sort_complex_eigendata_real(const Complex& lhs, const Complex& rhs);
+auto sort_complex_eigendata_real(const Complex& lhs, const Complex& rhs)
+        -> bool;
 /// \brief Predicate for sorting eigendata by imaginary part of associated
 /// eigenvalue.
-bool sort_complex_eigendata_imag(const Complex& lhs, const Complex& rhs);
+auto sort_complex_eigendata_imag(const Complex& lhs, const Complex& rhs)
+        -> bool;
 }   // namespace jump
 
 #endif  // JUMP_EIGENDATA_DECL_HPP
