@@ -11,19 +11,19 @@
 
 using namespace jump;
 
-TestResult test_matrix_initialise_basic();
-TestResult test_matrix_initialise_chained();
-TestResult test_matrix_initialise_fail();
-TestResult test_matrix_arithmetic_basic();
-TestResult test_matrix_multiply();
-TestResult test_matrix_arithmetic_compound();
-TestResult test_matrix_arithmetic_fail();
-TestResult test_matrix_norms();
-TestResult test_matrix_access_in_range();
-TestResult test_matrix_dense_columns();
-TestResult test_matrix_access_fail();
+auto test_matrix_initialise_basic() -> TestResult;
+auto test_matrix_initialise_chained() -> TestResult;
+auto test_matrix_initialise_fail() -> TestResult;
+auto test_matrix_arithmetic_basic() -> TestResult;
+auto test_matrix_multiply() -> TestResult;
+auto test_matrix_arithmetic_compound() -> TestResult;
+auto test_matrix_arithmetic_fail() -> TestResult;
+auto test_matrix_norms() -> TestResult;
+auto test_matrix_access_in_range() -> TestResult;
+auto test_matrix_dense_columns() -> TestResult;
+auto test_matrix_access_fail() -> TestResult;
 
-inline TestSuiteL1 matrix_tests() {
+inline auto matrix_tests() -> TestSuiteL1 {
     TestSuiteL1 matrix_suite("matrix");
     std::vector<Test> tests;
 
@@ -61,7 +61,7 @@ inline TestSuiteL1 matrix_tests() {
     return matrix_suite;
 }
 
-inline TestResult test_matrix_initialise_basic() {
+inline auto test_matrix_initialise_basic() -> TestResult {
     TestResult result;
 
     RandomInt rng_int_low(10, 15);
@@ -146,7 +146,7 @@ inline TestResult test_matrix_initialise_basic() {
     return result;
 }
 
-inline TestResult test_matrix_initialise_chained() {
+inline auto test_matrix_initialise_chained() -> TestResult {
     TestResult result;
 
     RandomInt rng_int_low(10, 15);
@@ -276,7 +276,7 @@ inline TestResult test_matrix_initialise_chained() {
     return result;
 }
 
-inline TestResult test_matrix_initialise_fail() {
+inline auto test_matrix_initialise_fail() -> TestResult {
     TestResult result;
 
     RandomInt rng_int(10, 15);
@@ -439,7 +439,7 @@ inline TestResult test_matrix_initialise_fail() {
     return result;
 }
 
-inline TestResult test_matrix_arithmetic_basic() {
+inline auto test_matrix_arithmetic_basic() -> TestResult {
     TestResult result;
     RandomReal rng_real(0., 10.);
     RandomInt rng_int(10, 15);
@@ -507,7 +507,7 @@ inline TestResult test_matrix_arithmetic_basic() {
     return result;
 }
 
-inline TestResult test_matrix_multiply() {
+inline auto test_matrix_multiply() -> TestResult {
     TestResult result;
 
     // Test cases generated and verified externally using Python and numpy
@@ -732,7 +732,7 @@ inline TestResult test_matrix_multiply() {
     return result;
 }
 
-inline TestResult test_matrix_arithmetic_compound() {
+inline auto test_matrix_arithmetic_compound() -> TestResult {
     TestResult result;
     RandomReal rng_real(0., 10.);
     RandomInt rng_int(10, 15);
@@ -781,7 +781,7 @@ inline TestResult test_matrix_arithmetic_compound() {
     return result;
 }
 
-inline TestResult test_matrix_arithmetic_fail() {
+inline auto test_matrix_arithmetic_fail() -> TestResult {
     TestResult result;
 
     std::size_t size1{10}, size2{11};
@@ -978,7 +978,7 @@ inline TestResult test_matrix_arithmetic_fail() {
     return result;
 }
 
-inline TestResult test_matrix_norms() {
+inline auto test_matrix_norms() -> TestResult {
     TestResult result;
     RandomInt rng_int(10, 15);
 
@@ -1034,7 +1034,7 @@ inline TestResult test_matrix_norms() {
     return result;
 }
 
-inline TestResult test_matrix_access_in_range() {
+inline auto test_matrix_access_in_range() -> TestResult {
     TestResult result;
     RandomInt rng_int(10, 15);
 
@@ -1125,7 +1125,7 @@ inline TestResult test_matrix_access_in_range() {
     return result;
 }
 
-inline TestResult test_matrix_dense_columns() {
+inline auto test_matrix_dense_columns() -> TestResult {
     TestResult result;
     RandomReal rng_real(0., 10.);
     RandomInt rng_int(10, 15);
@@ -1164,7 +1164,7 @@ inline TestResult test_matrix_dense_columns() {
     return result;
 }
 
-inline TestResult test_matrix_access_fail() {
+inline auto test_matrix_access_fail() -> TestResult {
     TestResult result;
     RandomInt rng_int(10, 15);
 

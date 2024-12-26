@@ -17,16 +17,16 @@
 
 using namespace jump;
 
-TestResult test_linalg_banded_basic();
-TestResult test_linalg_banded_fail();
-TestResult test_linalg_banded_mismatch();
-TestResult test_linalg_dense_basic();
-TestResult test_linalg_dense_fail();
-TestResult test_linalg_dense_mismatch();
-TestResult test_linalg_gev_basic();
-TestResult test_linalg_gev_mismatch();
+auto test_linalg_banded_basic() -> TestResult;
+auto test_linalg_banded_fail() -> TestResult;
+auto test_linalg_banded_mismatch() -> TestResult;
+auto test_linalg_dense_basic() -> TestResult;
+auto test_linalg_dense_fail() -> TestResult;
+auto test_linalg_dense_mismatch() -> TestResult;
+auto test_linalg_gev_basic() -> TestResult;
+auto test_linalg_gev_mismatch() -> TestResult;
 
-inline TestSuiteL1 linear_algebra_tests() {
+inline auto linear_algebra_tests() -> TestSuiteL1 {
     TestSuiteL1 linear_algebra_suite("linear algebra");
     std::vector<Test> tests;
 
@@ -57,7 +57,7 @@ inline TestSuiteL1 linear_algebra_tests() {
     return linear_algebra_suite;
 }
 
-inline TestResult test_linalg_banded_basic() {
+inline auto test_linalg_banded_basic() -> TestResult {
     TestResult result;
 
     // Test cases generated and verified externally using Python and numpy
@@ -155,7 +155,7 @@ inline TestResult test_linalg_banded_basic() {
     return result;
 }
 
-inline TestResult test_linalg_banded_fail() {
+inline auto test_linalg_banded_fail() -> TestResult {
     TestResult result;
     RandomReal rng_real(0., 10.);
     std::size_t N{12}, bands{3};
@@ -199,7 +199,7 @@ inline TestResult test_linalg_banded_fail() {
     return result;
 }
 
-inline TestResult test_linalg_banded_mismatch() {
+inline auto test_linalg_banded_mismatch() -> TestResult {
     TestResult result;
 
     RandomInt rng_int(10, 15);
@@ -256,7 +256,7 @@ inline TestResult test_linalg_banded_mismatch() {
     return result;
 }
 
-inline TestResult test_linalg_dense_basic() {
+inline auto test_linalg_dense_basic() -> TestResult {
     TestResult result;
 
     // Test cases generated and verified externally using Python and numpy
@@ -365,7 +365,7 @@ inline TestResult test_linalg_dense_basic() {
     return result;
 }
 
-inline TestResult test_linalg_dense_fail() {
+inline auto test_linalg_dense_fail() -> TestResult {
     TestResult result;
     RandomReal rng_real(0., 10.);
     std::size_t N{12};
@@ -410,7 +410,7 @@ inline TestResult test_linalg_dense_fail() {
     return result;
 }
 
-inline TestResult test_linalg_dense_mismatch() {
+inline auto test_linalg_dense_mismatch() -> TestResult {
     TestResult result;
 
     RandomInt rng_int(10, 15);
@@ -467,7 +467,7 @@ inline TestResult test_linalg_dense_mismatch() {
     return result;
 }
 
-inline TestResult test_linalg_gev_basic() {
+inline auto test_linalg_gev_basic() -> TestResult {
     TestResult result;
 
     // Test cases generated and verified externally using Python and numpy
@@ -554,7 +554,7 @@ inline TestResult test_linalg_gev_basic() {
     return result;
 }
 
-inline TestResult test_linalg_gev_mismatch() {
+inline auto test_linalg_gev_mismatch() -> TestResult {
     TestResult result;
 
     RandomInt rng_int(10, 15);

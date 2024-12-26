@@ -11,8 +11,8 @@
 using namespace jump;
 
 template <std::size_t N, typename T>
-inline bool vector_compare(const Vector<Dual<N, T>>& dual_vector,
-        const Vector<T>& values, const Vector<T>& derivatives) {
+inline auto vector_compare(const Vector<Dual<N, T>>& dual_vector,
+        const Vector<T>& values, const Vector<T>& derivatives) -> bool {
     if (dual_vector.size() != values.size()
             || dual_vector.size() != derivatives.size()) {
         return false;
@@ -26,8 +26,8 @@ inline bool vector_compare(const Vector<Dual<N, T>>& dual_vector,
     return true;
 }
 
-inline std::pair<Vector<d1f64>, Vector<Real>> populate_real(Real min, Real max,
-        std::size_t N) {
+inline auto populate_real(Real min, Real max, std::size_t N)
+        -> std::pair<Vector<d1f64>, Vector<Real>> {
     std::pair<Vector<d1f64>, Vector<Real>> result;
     result.first.storage.assign(N, {0., 0});
     result.second.storage.assign(N, {});
@@ -40,8 +40,8 @@ inline std::pair<Vector<d1f64>, Vector<Real>> populate_real(Real min, Real max,
     return result;
 }
 
-inline std::pair<Vector<d1z64>, Vector<Complex>> populate_complex(Complex begin,
-        Complex end, std::size_t N) {
+inline auto populate_complex(Complex begin, Complex end, std::size_t N)
+        -> std::pair<Vector<d1z64>, Vector<Complex>> {
     std::pair<Vector<d1z64>, Vector<Complex>> result;
     result.first.storage.assign(N, {0., 0});
     result.second.storage.assign(N, {});
@@ -55,9 +55,9 @@ inline std::pair<Vector<d1z64>, Vector<Complex>> populate_complex(Complex begin,
     return result;
 }
 
-TestResult test_dual_arithmetic_basic();
+auto test_dual_arithmetic_basic() -> TestResult;
 
-inline TestSuiteL1 dual_tests() {
+inline auto dual_tests() -> TestSuiteL1 {
     TestSuiteL1 dual_suite("dual");
     std::vector<Test> tests;
 
@@ -68,7 +68,7 @@ inline TestSuiteL1 dual_tests() {
     return dual_suite;
 }
 
-inline TestResult test_dual_arithmetic_basic() {
+inline auto test_dual_arithmetic_basic() -> TestResult {
     TestResult result;
 
     RandomInt rng_int(91, 111);

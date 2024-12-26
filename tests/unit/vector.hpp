@@ -10,15 +10,15 @@
 
 using namespace jump;
 
-TestResult test_vector_arithmetic_basic();
-TestResult test_vector_arithmetic_compound();
-TestResult test_vector_inner_prod();
-TestResult test_vector_arithmetic_fail();
-TestResult test_vector_norms();
-TestResult test_vector_access_in_range();
-TestResult test_vector_access_fail();
+auto test_vector_arithmetic_basic() -> TestResult;
+auto test_vector_arithmetic_compound() -> TestResult;
+auto test_vector_inner_prod() -> TestResult;
+auto test_vector_arithmetic_fail() -> TestResult;
+auto test_vector_norms() -> TestResult;
+auto test_vector_access_in_range() -> TestResult;
+auto test_vector_access_fail() -> TestResult;
 
-inline TestSuiteL1 vector_tests() {
+inline auto vector_tests() -> TestSuiteL1 {
     TestSuiteL1 vector_suite("vector");
     std::vector<Test> tests;
 
@@ -46,7 +46,7 @@ inline TestSuiteL1 vector_tests() {
     return vector_suite;
 }
 
-inline TestResult test_vector_arithmetic_basic() {
+inline auto test_vector_arithmetic_basic() -> TestResult {
     TestResult result;
     RandomReal rng(0., 10.);
 
@@ -106,7 +106,7 @@ inline TestResult test_vector_arithmetic_basic() {
     return result;
 }
 
-inline TestResult test_vector_arithmetic_compound() {
+inline auto test_vector_arithmetic_compound() -> TestResult {
     TestResult result;
     RandomReal rng_real(0., 10.);
     RandomInt rng_int(10, 15);
@@ -135,7 +135,7 @@ inline TestResult test_vector_arithmetic_compound() {
     return result;
 }
 
-inline TestResult test_vector_inner_prod() {
+inline auto test_vector_inner_prod() -> TestResult {
     TestResult result;
     RandomInt rng_int(10, 15);
 
@@ -163,7 +163,7 @@ inline TestResult test_vector_inner_prod() {
     return result;
 }
 
-inline TestResult test_vector_arithmetic_fail() {
+inline auto test_vector_arithmetic_fail() -> TestResult {
     TestResult result;
 
     Vector<Real> var(5), vbr(6);
@@ -227,7 +227,7 @@ inline TestResult test_vector_arithmetic_fail() {
     return result;
 }
 
-inline TestResult test_vector_norms() {
+inline auto test_vector_norms() -> TestResult {
     TestResult result;
     RandomInt rng_int(10, 15);
 
@@ -258,7 +258,7 @@ inline TestResult test_vector_norms() {
     return result;
 }
 
-inline TestResult test_vector_access_in_range() {
+inline auto test_vector_access_in_range() -> TestResult {
     TestResult result;
     RandomInt rng_int(10, 15);
 
@@ -276,7 +276,7 @@ inline TestResult test_vector_access_in_range() {
     return result;
 }
 
-inline TestResult test_vector_access_fail() {
+inline auto test_vector_access_fail() -> TestResult {
     TestResult result;
     bool exception_caught{false};
     Vector<Complex> b(10, {1., 2.});
