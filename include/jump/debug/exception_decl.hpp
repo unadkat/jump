@@ -48,7 +48,7 @@ class RuntimeError : public std::exception {
 struct BasicError {
     const std::string type{"Runtime error"};
     const std::string details{"No details provided"};
-    std::string info() const;
+    auto info() const -> std::string;
 };
 
 /// \brief Data for FileIOError, including file name or directory which failed
@@ -56,7 +56,7 @@ struct BasicError {
 struct FileIOError {
     const std::string type{"File IO error"};
     const std::string resource;
-    std::string info() const;
+    auto info() const -> std::string;
 };
 
 /// \brief Data for InvalidArgumentError, should be passed information about the
@@ -66,7 +66,7 @@ struct InvalidArgumentError {
     const std::string argument;
     const std::string value;
     const std::string expected;
-    std::string info() const;
+    auto info() const -> std::string;
 };
 
 /// \brief Data for Range1DError, including name, access index, and size of 1D
@@ -76,7 +76,7 @@ struct Range1DError {
     const std::string name{"internal storage"};
     const std::size_t index{};
     const std::size_t size{};
-    std::string info() const;
+    auto info() const -> std::string;
 };
 
 /// \brief Data for Mismatch1DError, including names, access indices, and sizes
@@ -87,7 +87,7 @@ struct Mismatch1DError {
     const std::size_t size1{};
     const std::string name2{"internal storage"};
     const std::size_t size2{};
-    std::string info() const;
+    auto info() const -> std::string;
 };
 
 /// \brief Data for Range2DError, including name, access indices, and size of 2D
@@ -97,7 +97,7 @@ struct Range2DError {
     const std::string name{"internal storage"};
     const std::pair<std::size_t, std::size_t> indices;
     const std::pair<std::size_t, std::size_t> size;
-    std::string info() const;
+    auto info() const -> std::string;
 };
 
 /// \brief Data for Mismatch2DError, including names, acess indices, and sizes
@@ -108,7 +108,7 @@ struct Mismatch2DError {
     const std::pair<std::size_t, std::size_t> size1;
     const std::string name2{"internal storage"};
     const std::pair<std::size_t, std::size_t> size2;
-    std::string info() const;
+    auto info() const -> std::string;
 };
 }   // namespace jump
 
