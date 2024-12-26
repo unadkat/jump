@@ -6,6 +6,8 @@
 
 #include "jump/debug/exception_decl.hpp"
 
+#include <format>
+
 namespace jump {
 template <typename ErrorData>
 inline RuntimeError<ErrorData>::RuntimeError(ErrorData data,
@@ -17,18 +19,18 @@ inline RuntimeError<ErrorData>::RuntimeError(ErrorData data,
 }
 
 template <typename ErrorData>
-inline std::string& RuntimeError<ErrorData>::what() noexcept {
+inline auto RuntimeError<ErrorData>::what() noexcept -> std::string& {
     return m_message;
 }
 
 template <typename ErrorData>
-inline const char* RuntimeError<ErrorData>::what() const noexcept {
+inline auto RuntimeError<ErrorData>::what() const noexcept -> const char* {
     return m_message.c_str();
 }
 
 template <typename ErrorData>
-inline const std::source_location& RuntimeError<ErrorData>::where()
-    const noexcept {
+inline auto RuntimeError<ErrorData>::where() const noexcept
+        -> const std::source_location& {
     return m_source;
 }
 
@@ -43,36 +45,36 @@ inline void RuntimeError<ErrorData>::construct_message() {
         + m_data.info() + '\n';
 }
 
-inline std::string BasicError::info() const {
+inline auto BasicError::info() const -> std::string {
     return details;
 }
 
-inline std::string FileIOError::info() const {
+inline auto FileIOError::info() const -> std::string {
     return std::format("Resource \"{}\" failed to read/write", resource);
 }
 
-inline std::string InvalidArgumentError::info() const {
+inline auto InvalidArgumentError::info() const -> std::string {
     return std::format("Argument {} had invalid value {}\nExpected: {}",
             argument, value, expected);
 }
 
-inline std::string Range1DError::info() const {
+inline auto Range1DError::info() const -> std::string {
     return std::format("Attempted access at index {} in container {} (size {})",
             index, name, size);
 }
 
-inline std::string Mismatch1DError::info() const {
+inline auto Mismatch1DError::info() const -> std::string {
     return std::format("Mismatch between container {} (size {}) and "
             "container {} (size {})", name1, size1, name2, size2);
 }
 
-inline std::string Range2DError::info() const {
+inline auto Range2DError::info() const -> std::string {
     return std::format("Attempted access at index ({}, {}) in container {} "
             "(size ({}, {}))", indices.first, indices.second, name, size.first,
             size.second);
 }
 
-inline std::string Mismatch2DError::info() const {
+inline auto Mismatch2DError::info() const -> std::string {
     return std::format("Mismatch between container {} (size ({}, {})) and "
             "container {} (size ({}, {}))", name1, size1.first, size1.second,
             name2, size2.first, size2.second);

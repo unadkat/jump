@@ -5,7 +5,6 @@
 #define JUMP_EXCEPTION_DECL_HPP
 
 #include <exception>
-#include <format>
 #include <source_location>
 #include <string>
 
@@ -23,13 +22,13 @@ class RuntimeError : public std::exception {
 
         /// \brief Return the full error message (with banner) as a mutable
         /// string, in case catching code needs to add context and rethrow.
-        std::string& what() noexcept;
+        auto what() noexcept -> std::string&;
         /// \brief Overload for std::exception::what for quick output of error
         /// message on unhandled exception.
-        const char* what() const noexcept;
+        auto what() const noexcept -> const char*;
         /// \brief Return source information at location of the raised
         /// exception.
-        const std::source_location& where() const noexcept;
+        auto where() const noexcept -> const std::source_location&;
 
     private:
         /// \brief Construct full error message from constituent parts.
