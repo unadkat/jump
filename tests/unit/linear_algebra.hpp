@@ -52,7 +52,7 @@ inline auto linear_algebra_tests() {
     tests.back().register_item({"mismatch", &test_linalg_gev_mismatch});
 #endif  // NDEBUG
 
-    return TestSuite{"linear algebra", tests};
+    return TestSuite{"linear systems", tests};
 }
 
 inline auto test_linalg_banded_basic() -> TestResult {

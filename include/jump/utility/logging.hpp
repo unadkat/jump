@@ -7,134 +7,73 @@
 #include "jump/utility/logging_decl.hpp"
 
 namespace jump {
-inline bool Log::colours{true};
-
-inline auto Log::black(const std::string& message) -> std::string {
-    if (colours) {
-        return "\033[30m" + message + "\033[0m";
-    } else {
-        return message;
-    }
+inline auto Log::black(const std::string& message) -> ColourMessage {
+    return {ANSIColour::black, message};
 }
 
-inline auto Log::red(const std::string& message) -> std::string {
-    if (colours) {
-        return "\033[31m" + message + "\033[0m";
-    } else {
-        return message;
-    }
+inline auto Log::red(const std::string& message) -> ColourMessage {
+    return {ANSIColour::red, message};
 }
 
-inline auto Log::green(const std::string& message) -> std::string {
-    if (colours) {
-        return "\033[32m" + message + "\033[0m";
-    } else {
-        return message;
-    }
+inline auto Log::green(const std::string& message) -> ColourMessage {
+    return {ANSIColour::green, message};
 }
 
-inline auto Log::yellow(const std::string& message) -> std::string {
-    if (colours) {
-        return "\033[33m" + message + "\033[0m";
-    } else {
-        return message;
-    }
+inline auto Log::yellow(const std::string& message) -> ColourMessage {
+    return {ANSIColour::yellow, message};
 }
 
-inline auto Log::blue(const std::string& message) -> std::string {
-    if (colours) {
-        return "\033[34m" + message + "\033[0m";
-    } else {
-        return message;
-    }
+inline auto Log::blue(const std::string& message) -> ColourMessage {
+    return {ANSIColour::blue, message};
 }
 
-inline auto Log::magenta(const std::string& message) -> std::string {
-    if (colours) {
-        return "\033[35m" + message + "\033[0m";
-    } else {
-        return message;
-    }
+inline auto Log::magenta(const std::string& message) -> ColourMessage {
+    return {ANSIColour::magenta, message};
 }
 
-inline auto Log::cyan(const std::string& message) -> std::string {
-    if (colours) {
-        return "\033[36m" + message + "\033[0m";
-    } else {
-        return message;
-    }
+inline auto Log::cyan(const std::string& message) -> ColourMessage {
+    return {ANSIColour::cyan, message};
 }
 
-inline auto Log::white(const std::string& message) -> std::string {
-    if (colours) {
-        return "\033[37m" + message + "\033[0m";
-    } else {
-        return message;
-    }
+inline auto Log::white(const std::string& message) -> ColourMessage {
+    return {ANSIColour::white, message};
 }
 
-inline auto Log::bright_black(const std::string& message) -> std::string {
-    if (colours) {
-        return "\033[1;30m" + message + "\033[0m";
-    } else {
-        return message;
-    }
+inline auto Log::bright_black(const std::string& message) -> ColourMessage {
+    return {ANSIColour::bright_black, message};
 }
 
-inline auto Log::bright_red(const std::string& message) -> std::string {
-    if (colours) {
-        return "\033[1;31m" + message + "\033[0m";
-    } else {
-        return message;
-    }
+inline auto Log::bright_red(const std::string& message) -> ColourMessage {
+    return {ANSIColour::bright_red, message};
 }
 
-inline auto Log::bright_green(const std::string& message) -> std::string {
-    if (colours) {
-        return "\033[1;32m" + message + "\033[0m";
-    } else {
-        return message;
-    }
+inline auto Log::bright_green(const std::string& message) -> ColourMessage {
+    return {ANSIColour::bright_green, message};
 }
 
-inline auto Log::bright_yellow(const std::string& message) -> std::string {
-    if (colours) {
-        return "\033[1;33m" + message + "\033[0m";
-    } else {
-        return message;
-    }
+inline auto Log::bright_yellow(const std::string& message) -> ColourMessage {
+    return {ANSIColour::bright_yellow, message};
 }
 
-inline auto Log::bright_blue(const std::string& message) -> std::string {
-    if (colours) {
-        return "\033[1;34m" + message + "\033[0m";
-    } else {
-        return message;
-    }
+inline auto Log::bright_blue(const std::string& message) -> ColourMessage {
+    return {ANSIColour::bright_blue, message};
 }
 
-inline auto Log::bright_magenta(const std::string& message) -> std::string {
-    if (colours) {
-        return "\033[1;35m" + message + "\033[0m";
-    } else {
-        return message;
-    }
+inline auto Log::bright_magenta(const std::string& message) -> ColourMessage {
+    return {ANSIColour::bright_magenta, message};
 }
 
-inline auto Log::bright_cyan(const std::string& message) -> std::string {
-    if (colours) {
-        return "\033[1;36m" + message + "\033[0m";
-    } else {
-        return message;
-    }
+inline auto Log::bright_cyan(const std::string& message) -> ColourMessage {
+    return {ANSIColour::bright_cyan, message};
 }
 
-inline auto Log::bright_white(const std::string& message) -> std::string {
-    if (colours) {
-        return "\033[1;37m" + message + "\033[0m";
-    } else {
-        return message;
-    }
+inline auto Log::bright_white(const std::string& message) -> ColourMessage {
+    return {ANSIColour::bright_white, message};
+}
+
+inline auto operator<<(std::ostream& out, const ColourMessage& rhs)
+        -> std::ostream& {
+    return out << rhs.ansi << rhs.message << ANSIColour::none;
 }
 }   // namespace jump
 

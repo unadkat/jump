@@ -24,16 +24,21 @@ inline void TestReporter::trace(const TestResult& results,
                 results.passed + results.failed)};
         auto skips{std::format("{} skipped", results.skipped)};
 
+        std::clog << '\"' << current << "\": ";
         if (results.failed > 0) {
-            passes = Log::red(passes);
+            std::clog << Log::red(passes);
         } else if (results.passed > 0) {
-            passes = Log::green(passes);
+            std::clog << Log::green(passes);
+        } else {
+            std::clog << passes;
         }
+        std::clog << ", ";
         if (results.skipped > 0) {
-            skips = Log::yellow(skips);
+            std::clog << Log::yellow(skips);
+        } else {
+            std::clog << skips;
         }
-
-        std::clog << std::format("\"{}\": {}, {}\n", current, passes, skips);
+        std::clog << '\n';
     }
     for (const auto& sub : results.sub_results) {
         trace(sub, current);
@@ -47,17 +52,22 @@ inline void TestReporter::summarise(const TestResult& results) const {
             flat.passed + flat.failed)};
     auto skips{std::format("{} skipped", flat.skipped)};
 
+    std::clog << "Overall results for \"" << results.name << "\":\n";
     if (flat.failed > 0) {
-        passes = Log::red(passes);
+        std::clog << Log::red(passes);
     } else if (flat.passed > 0) {
-        passes = Log::green(passes);
+        std::clog << Log::green(passes);
+    } else {
+        std::clog << passes;
     }
+    std::clog << ", ";
     if (flat.skipped > 0) {
-        skips = Log::yellow(skips);
+        std::clog << Log::yellow(skips);
+    } else {
+        std::clog << skips;
     }
+    std::clog << '\n';
 
-    std::clog << std::format("Overall results for \"{}\":\n{}, {}\n",
-            results.name, passes, skips);
     if (flat.failed_tests.size() > 0) {
         std::clog << "Failed tests:\n";
         for (const auto& fail : flat.failed_tests) {
