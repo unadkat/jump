@@ -1,5 +1,5 @@
 set(all_test_sources
-    test.cpp
+    jump_tests.cpp
 )
 
 add_custom_target(tests)
