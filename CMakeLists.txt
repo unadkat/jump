@@ -16,13 +16,17 @@ set(use_lapacke True)
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+include(sourcelist.cmake)
+add_library(jump STATIC ${sources})
+target_include_directories(jump PUBLIC include)
 if(use_cblas)
     add_compile_definitions(JUMP_USE_CBLAS)
+    target_link_libraries(jump PUBLIC blas)
 endif()
 if(use_lapacke)
     add_compile_definitions(JUMP_USE_LAPACKE)
+    target_link_libraries(jump PUBLIC lapacke)
 endif()
 
-add_custom_target(tests)
 add_subdirectory(./tests EXCLUDE_FROM_ALL)
 
