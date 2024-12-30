@@ -21,7 +21,7 @@ class FileSystem {
         /// \brief Use current working directory as root folder for all input
         /// and output files opened by this object, optionally take a
         /// subdirectory location to be used.
-        FileSystem(const std::string& path = "");
+        explicit FileSystem(const std::string& path = "");
         /// \brief Deleted copy constructor to protect data integrity.
         FileSystem(const FileSystem& source) = delete;
         /// \brief Default move constructor to allow moves (preserves data

@@ -13,6 +13,7 @@ int main(int argc, char** argv) {
     bool do_trace{false};
     args.get("trace", do_trace);
     args.get('t', do_trace);
+    std::clog << args << std::endl;
 
     TestSuite data_tests{"data", std::vector{vector_tests(), matrix_tests()}};
     TestSuite autodiff_tests{"autodiff", dual_tests()};

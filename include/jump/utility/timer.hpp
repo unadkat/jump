@@ -5,6 +5,7 @@
 #define JUMP_TIMER_HPP
 
 #include <chrono>
+#include <ostream>
 #include <string>
 
 namespace jump {
@@ -17,7 +18,7 @@ class Timer {
 
         /// \brief Construct the `Timer` in a stopped state, with a given task
         /// description, and an elapsed time of zero.
-        Timer(std::string task = "");
+        explicit Timer(std::string task = "");
 
         /// \brief Start a new timing session (preserving the stored elapsed
         /// time), if the `Timer` is stopped, otherwise do nothing.
@@ -68,8 +69,7 @@ class Timer {
 
 /// \relates Timer
 /// \brief Print summary of timing results to a stream.
-template <typename Os>
-inline auto operator<<(Os& out, const Timer& rhs) -> Os&;
+auto operator<<(std::ostream& out, const Timer& rhs) -> std::ostream&;
 }   // namespace jump
 
 #endif  // JUMP_TIMER_HPP

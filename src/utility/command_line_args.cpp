@@ -7,7 +7,6 @@
 
 #include <algorithm>
 #include <cctype>
-#include <sstream>
 
 namespace jump {
 /// Reads options (string prefixed by "--") and flags (single alpha chars),
@@ -78,29 +77,6 @@ auto CommandLineArgs::get(const char& flag, bool& storage) -> bool {
     }
 }
 
-/// Templated extraction of option values allows on-the-fly conversion of the
-/// stored data (in a `std::string`) so it may be stored in the user-supplied
-/// variable. If an argument is extracted, mark it as having been recognised.
-template <typename T>
-auto CommandLineArgs::get(const std::string& option, T& storage) -> bool {
-    if (auto it{std::ranges::find(m_options, option, &Option::option)};
-            it != m_options.end()) {
-        // Don't overwrite passed variable yet
-        T converted;
-        std::stringstream ss{it->value};
-        ss >> converted;
-        // Check conversion fail/badbit
-        if (ss.fail()) {
-            return (it->read = false);
-        } else {
-            storage = converted;
-            return (it->read = true);
-        }
-    } else {
-        return false;
-    }
-}
-
 /// Query if a specified option appears in the command-line arguments (whether
 /// supplied with an accompanying value or not). If the argument exists, mark it
 /// as having been recognised.
@@ -114,8 +90,8 @@ auto CommandLineArgs::get(const std::string& option, bool& storage) -> bool {
     }
 }
 
-template <typename Os>
-auto operator<<(Os& out, const CommandLineArgs& rhs) -> Os& {
+auto operator<<(std::ostream& out, const CommandLineArgs& rhs)
+        -> std::ostream& {
     std::ostringstream oss_flags, oss_options;
 
     for (const auto& x : rhs.m_flags) {
@@ -127,11 +103,17 @@ auto operator<<(Os& out, const CommandLineArgs& rhs) -> Os& {
             << (x.read ? Log::green("extracted") : Log::red("not extracted"));
     }
 
-    if (oss_flags.tellp() > 0) {
-        out << "Flags:" << oss_flags << '\n';
+    const std::string& flags_string{oss_flags.str()};
+    const std::string& options_string{oss_options.str()};
+    bool output_flags{flags_string.size() > 0};
+    if (output_flags) {
+        out << "Flags:" << flags_string;
     }
-    if (oss_options.tellp() > 0) {
-        out << "Options(value):" << oss_options;
+    if (options_string.size() > 0) {
+        if (output_flags) {
+            out << '\n';
+        }
+        out << "Options(value):" << options_string;
     }
 
     return out;

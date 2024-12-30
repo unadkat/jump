@@ -4,6 +4,8 @@
 #ifndef JUMP_COMMAND_LINE_ARGS_HPP
 #define JUMP_COMMAND_LINE_ARGS_HPP
 
+#include <ostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -13,7 +15,7 @@ namespace jump {
 class CommandLineArgs {
     public:
         /// \brief Reads command-line arguments at construction.
-        CommandLineArgs(int argc, char** const argv);
+        explicit CommandLineArgs(int argc, char** const argv);
 
         /// \brief Attempt extraction of flag and indicate success.
         auto get(const char& flag, bool& storage) -> bool;
@@ -22,8 +24,8 @@ class CommandLineArgs {
         auto get(const std::string& option, T& storage) -> bool;
 
         /// \brief Print list of extracted flags and options to a stream.
-        template <typename Os> friend
-        auto operator<<(Os& out, const CommandLineArgs& rhs) -> Os&;
+        friend auto operator<<(std::ostream& out, const CommandLineArgs& rhs)
+                -> std::ostream&;
 
     private:
         /// \brief Stores a flag (single character only) and whether this flag
@@ -46,6 +48,34 @@ class CommandLineArgs {
         /// \brief Collection of options read from the command line.
         std::vector<Option> m_options;
 };
+
+// ========================================================================
+// Implementation
+// ========================================================================
+
+/// Templated extraction of option values allows on-the-fly conversion of the
+/// stored data (in a `std::string`) so it may be stored in the user-supplied
+/// variable. If an argument is extracted, mark it as having been recognised.
+template <typename T>
+inline auto CommandLineArgs::get(const std::string& option, T& storage)
+        -> bool {
+    if (auto it{std::ranges::find(m_options, option, &Option::option)};
+            it != m_options.end()) {
+        // Don't overwrite passed variable yet
+        T converted;
+        std::stringstream ss{it->value};
+        ss >> converted;
+        // Check conversion fail/badbit
+        if (ss.fail()) {
+            return (it->read = false);
+        } else {
+            storage = converted;
+            return (it->read = true);
+        }
+    } else {
+        return false;
+    }
+}
 }   // namespace jump
 
 #endif  // JUMP_COMMAND_LINE_ARGS_HPP

@@ -98,8 +98,7 @@ auto Timer::formatted_time(Clock::duration time) const -> std::string {
 }
 
 /// \relates Timer
-template <typename Os>
-auto operator<<(Os& out, const Timer& rhs) -> Os& {
+auto operator<<(std::ostream& out, const Timer& rhs) -> std::ostream& {
     if (rhs.task() != "") {
         out << rhs.task() << '\n';
     }

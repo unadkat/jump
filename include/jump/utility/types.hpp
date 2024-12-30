@@ -20,7 +20,6 @@ struct is_complex<std::complex<T>> : public std::true_type {
 
 template <typename T>
 inline constexpr bool is_complex_v = is_complex<T>::value;
-
 }   // namespace jump
 
 #endif  // JUMP_TYPES_HPP
