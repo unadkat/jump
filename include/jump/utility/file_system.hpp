@@ -4,91 +4,80 @@
 #ifndef JUMP_FILE_SYSTEM_HPP
 #define JUMP_FILE_SYSTEM_HPP
 
-#include "jump/utility/file_system_decl.hpp"
-
-#include "jump/debug/exception.hpp"
+#include <filesystem>
+#include <fstream>
+#include <ios>
+#include <map>
+#include <memory>
+#include <string>
 
 namespace jump {
-inline FileSystem::FileSystem(const std::string& path) :
-    m_root{"./" + path} {
+/// \brief Deals with the storage of input and output file streams, and ensures
+/// that files are closed appropriately when finished with.
+class FileSystem {
+    public:
+        using FileMode = std::ios_base::openmode;
 
-    if (!std::filesystem::exists(m_root)) {
-        if (!std::filesystem::create_directories(m_root)) {
-            throw RuntimeError{FileIOError{.resource = m_root.native()}};
-        }
-    }
-}
+        /// \brief Use current working directory as root folder for all input
+        /// and output files opened by this object, optionally take a
+        /// subdirectory location to be used.
+        FileSystem(const std::string& path = "");
+        /// \brief Deleted copy constructor to protect data integrity.
+        FileSystem(const FileSystem& source) = delete;
+        /// \brief Default move constructor to allow moves (preserves data
+        /// integrity).
+        FileSystem(FileSystem&& source) = default;
 
-/// Any time we open a file (be it for input or output), we must supply an
-/// explicit access specifier so that no files are accidentally overwritten or
-/// written to instead of read from, etc. Files can be opened for input or
-/// output (or both), and in the case of output they can be opened for appending
-/// data or truncation (overwriting). This gives the five different options:
-/// input, output (truncation), output(append), input/output (truncation), and
-/// input/output (append).
-///
-/// Check to see if the specified handle is already registered, and throw an
-/// error if this is the case. If it is not already registered, attempt to open
-/// a file with the requested access mode at the provided file location. Throw
-/// an error if the file cannot be successfully opened, otherwise insert the new
-/// file stream into the internal container.
-inline void FileSystem::open(const std::string& key,
-        const std::string& filename, const std::ios_base::openmode& mode) {
-    if (m_files.find(key) != m_files.end()) {
-        throw RuntimeError{InvalidArgumentError{.argument = "key", .value = key,
-            .expected = "unused key"}};
-    }
+        /// \brief Deleted copy assignment to protect data integrity.
+        FileSystem& operator=(const FileSystem& rhs) = delete;
+        /// \brief Default move assignment allows moves (preserves data
+        /// integrity).
+        FileSystem& operator=(FileSystem&& rhs) = default;
 
-    auto file{std::make_pair(key, std::make_unique<std::fstream>(
-                m_root/filename, mode))};
-    if (!(file.second->is_open() && file.second->good())) {
-        throw RuntimeError{FileIOError{
-            .resource = (m_root/filename).native()}};
-    }
-    m_files.insert(std::move(file));
-}
+        /// \brief Open file with a specified filename (relative to the root
+        /// directory), with a given handle, and an explicit access specifier.
+        void open(const std::string& key, const std::string& filename,
+                const std::ios_base::openmode& mode);
+        /// \brief Close file with the given handle.
+        void close(const std::string& key);
+        /// \brief Close all open files.
+        void close_all();
 
-inline void FileSystem::close(const std::string& key) {
-    if (auto it{m_files.find(key)}; it != m_files.end()) {
-        m_files.erase(it);
-    } else {
-        throw RuntimeError{InvalidArgumentError{.argument = "key", .value = key,
-            .expected = "valid key"}};
-    }
-}
+        /// \brief Open file with a specified filename (relative to the root
+        /// directory) for quick data output (in truncation mode), without
+        /// explicitly storing the file handle for later access.
+        auto quick_write(const std::string& filename) const -> std::fstream;
+        /// \brief Open file with a specified filename (relative to the root
+        /// directory) for quick data reading, without explicitly storing the
+        /// file handle for later access.
+        auto quick_read(const std::string& filename) const -> std::fstream;
 
-inline void FileSystem::close_all() {
-    m_files.clear();
-}
+        /// \brief Return file stream corresponding to the supplied handle, if
+        /// it exists, otherwise throw an exception.
+        auto operator()(const std::string& key) -> std::fstream&;
 
-inline auto FileSystem::quick_write(const std::string& filename) const
-        -> std::fstream {
-    std::fstream file{m_root/filename, mode_out_trunc};
-    if (!(file.is_open() && file.good())) {
-        throw RuntimeError{FileIOError{
-            .resource = (m_root/filename).native()}};
-    }
-    return file;
-}
+        /// \brief File mode for input.
+        static constexpr FileMode mode_in{std::ios_base::in};
+        /// \brief File mode for output (truncation).
+        static constexpr FileMode mode_out_trunc{std::ios_base::out
+            | std::ios_base::trunc};
+        /// \brief File mode for output (append).
+        static constexpr FileMode mode_out_app{std::ios_base::out
+            | std::ios_base::app};
+        /// \brief File mode for input and output (truncation).
+        static constexpr FileMode mode_random_trunc{std::ios_base::in
+            | std::ios_base::out | std::ios_base::trunc};
+        /// \brief File mode for input and output (append).
+        static constexpr FileMode mode_random_app{std::ios_base::in
+            | std::ios_base::out | std::ios_base::app};
 
-inline auto FileSystem::quick_read(const std::string& filename) const
-        -> std::fstream {
-    std::fstream file{m_root/filename, mode_in};
-    if (!(file.is_open() && file.good())) {
-        throw RuntimeError{FileIOError{
-            .resource = (m_root/filename).native()}};
-    }
-    return file;
-}
-
-inline auto FileSystem::operator()(const std::string& key) -> std::fstream& {
-    if (auto it{m_files.find(key)}; it != m_files.end()) {
-        return *(it->second);
-    } else {
-        throw RuntimeError{InvalidArgumentError{.argument = "key", .value = key,
-            .expected = "valid key"}};
-    }
-}
+    private:
+        /// \brief Stores file streams as shared pointers indexed by a
+        /// user-supplied handle.
+        std::map<std::string, std::unique_ptr<std::fstream>> m_files;
+        /// \brief The root directory to use for all input and output files.
+        std::filesystem::path m_root;
+};
 }   // namespace jump
 
 #endif  // JUMP_FILE_SYSTEM_HPP

@@ -4,16 +4,50 @@
 #ifndef JUMP_RANDOM_HPP
 #define JUMP_RANDOM_HPP
 
-#include "jump/utility/random_decl.hpp"
-
 #include "jump/data/banded_matrix.hpp"
 #include "jump/data/dense_matrix.hpp"
 #include "jump/data/vector.hpp"
 
 #include <complex>
+#include <random>
 #include <utility>
 
 namespace jump {
+/// \brief Supplies easy random number generation capabilities, with a templated
+/// type for the random numbers and underlying distribution.
+template <typename T, template <typename> typename Distribution>
+class RandomNumbers {
+    public:
+        /// \brief Seeds the default random engine that is later used to
+        /// generate random numbers from the templated distribution, forwarding
+        /// whatever arguments are needed.
+        template <typename... Args>
+        RandomNumbers(Args&&... args);
+
+        /// \brief Generate a random number of the templated type and
+        /// distribution.
+        auto generate() -> T;
+
+    private:
+        /// \brief The engine that generates the random seed data which is in
+        /// turn used to provide numbers from a chosen distribution.
+        std::default_random_engine m_engine;
+        Distribution<T> m_distribution;
+};
+
+template <typename Rng, typename T>
+void randomise(Rng& rng, T& item);
+
+template <typename Rng, typename... Ts>
+void randomise(Rng& rng, Ts& ...items);
+
+using RandomReal = RandomNumbers<double, std::uniform_real_distribution>;
+using RandomInt = RandomNumbers<long, std::uniform_int_distribution>;
+
+// ========================================================================
+// Implementation
+// ========================================================================
+
 /// Note that T must be appropriate for the chosen distribution, i.e. an
 /// integral type for `std::uniform_int_distribution`, etc.
 template <typename T, template <typename> typename Distribution>

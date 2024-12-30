@@ -4,15 +4,24 @@
 #ifndef JUMP_IO_HPP
 #define JUMP_IO_HPP
 
-#include "jump/utility/io_decl.hpp"
-
 #include "jump/debug/exception.hpp"
 
 #include <ios>
+#include <string>
 
 namespace jump {
+/// \brief Read all the content of the given fstream into a std::string. Note:
+/// parameter is a universal reference to be able to bind to both lvalue- and
+/// rvalue-references.
 template <typename Fs>
-auto read_file_contents(Fs&& in) -> std::string {
+auto read_file_contents(Fs&& in) -> std::string;
+
+// ========================================================================
+// Implementation
+// ========================================================================
+
+template <typename Fs>
+inline auto read_file_contents(Fs&& in) -> std::string {
     // Reset in::gcount in case the file has been read from before. If this
     // fails for any reason we should have not goodbit
     in.peek();
