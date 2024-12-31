@@ -4,109 +4,39 @@
 #ifndef JUMP_BANDED_LINEAR_SYSTEM_HPP
 #define JUMP_BANDED_LINEAR_SYSTEM_HPP
 
-#include "jump/linear_algebra/banded_linear_system_decl.hpp"
-
-#include "jump/debug/exception.hpp"
-#include "jump/utility/external.hpp"
-#include "jump/utility/types.hpp"
-
-#include <format>
-#include <vector>
+#include "jump/data/banded_matrix.hpp"
+#include "jump/data/vector.hpp"
+#include "jump/linear_algebra/linear_system_base.hpp"
 
 namespace jump {
+/// \brief A linear system \f$A\vec{x}=\vec{b}\f$, where \f$A\f$ is a matrix and
+/// \f$\vec{b}\f$ is a right-hand side vector. Upon solving, we have the
+/// solution \f$x\f$.
 template <typename T>
-inline BandedLinearSystem<T>::BandedLinearSystem(BandedMatrix<T>& A,
-        Vector<T>& b) :
-    m_A{A},
-    m_b{b} {
-#ifndef NDEBUG
-    if (A.num_columns() != b.size()) {
-        throw RuntimeError{Mismatch2DError{.name1 = "A", .size1 = A.size(),
-            .name2 = "b", .size2 = {b.size(), 1}}};
-    }
-#endif  // NDEBUG
-}
+class BandedLinearSystem : public LinearSystemBase {
+    public:
+        /// \brief Initialise the linear system with references to the
+        /// `BandedMatrix` and `Vector` in \f$A\vec{x}=\vec{b}\f$.
+        BandedLinearSystem(BandedMatrix<T>& A, Vector<T>& b);
 
-/// We delegate the solution to the external linear algebra library, otherwise
-/// throw an error.
-template <typename T>
-inline void BandedLinearSystem<T>::solve() {
+        /// \brief Solve the linear system.
+        virtual void solve() override;
+        /// \brief Return the number of equations in the linear system.
+        virtual auto order() const -> std::size_t override;
+
+    private:
 #ifdef JUMP_HAS_LAPACKE
-    solve_lapacke();
-#else
-    throw RuntimeError{BasicError{.details =
-        "Native solution of dense linear system has not been implemented"}};
+        /// \brief Call the external solver for this linear system type.
+        void solve_lapacke();
 #endif  // JUMP_HAS_LAPACKE
-}
 
-template <typename T>
-inline auto BandedLinearSystem<T>::order() const -> std::size_t {
-    return m_A.num_rows();
-}
-
-#ifdef JUMP_HAS_LAPACKE
-/// Call the external solver for a real-valued problem.
-template <>
-inline void BandedLinearSystem<Real>::solve_lapacke() {
-#ifndef NDEBUG
-    if (m_A.num_columns() != m_b.size()) {
-        throw RuntimeError{Mismatch2DError{.name1 = "m_A", .size1 = m_A.size(),
-            .name2 = "m_b", .size2 = {m_b.size(), 1}}};
-    }
-#endif  // NDEBUG
-
-    // Number of equations in linear system
-    auto n{static_cast<lapack_int>(order())};
-    // Number of bands
-    auto k{static_cast<lapack_int>(m_A.num_bands())};
-    // Leading dimension of internal banded storage
-    lapack_int ldab{3*k + 1};
-    // Return information
-    lapack_int info{0};
-    // Pivot information
-    std::vector<lapack_int> ipiv(n);
-
-    // Solve Ax = b and stores the result in b
-    info = LAPACKE_dgbsv(LAPACK_COL_MAJOR, n, k, k, 1, m_A.data(), ldab,
-            ipiv.data(), m_b.data(), n);
-    if (info != 0) {
-        throw RuntimeError{BasicError{
-            .details = std::format("LAPACKE_dgbsv returned info = {}", info)}};
-    }
-}
-
-/// Call the external solver for a complex-valued problem.
-template <>
-inline void BandedLinearSystem<Complex>::solve_lapacke() {
-#ifndef NDEBUG
-    if (m_A.num_columns() != m_b.size()) {
-        throw RuntimeError{Mismatch2DError{.name1 = "m_A", .size1 = m_A.size(),
-            .name2 = "m_b", .size2 = {m_b.size(), 1}}};
-    }
-#endif  // NDEBUG
-
-    // Number of equations in linear system
-    auto n{static_cast<lapack_int>(order())};
-    // Number of bands
-    auto k{static_cast<lapack_int>(m_A.num_bands())};
-    // Leading dimension of internal banded storage
-    lapack_int ldab{3*k + 1};
-    // Return information
-    lapack_int info{0};
-    // Pivot information
-    std::vector<lapack_int> ipiv(n);
-
-    // Solve Ax = b and stores the result in b
-    info = LAPACKE_zgbsv(LAPACK_COL_MAJOR, n, k, k, 1,
-            reinterpret_cast<lapack_complex_double*>(m_A.data()), ldab,
-            ipiv.data(),
-            reinterpret_cast<lapack_complex_double*>(m_b.data()), n);
-    if (info != 0) {
-        throw RuntimeError{BasicError{
-            .details = std::format("LAPACKE_zgbsv returned info = {}", info)}};
-    }
-}
-#endif  // JUMP_HAS_LAPACKE
+    private:
+        /// \brief Reference to the matrix \f$A\f$.
+        BandedMatrix<T>& m_A;
+        /// \brief Reference to the right-hand side `Vector` \f$b\f$. Upon
+        /// calling `solve`, this will contain the solution.
+        Vector<T>& m_b;
+};
 }   // namespace jump
 
 #endif  // JUMP_BANDED_LINEAR_SYSTEM_HPP
