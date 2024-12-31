@@ -1,12 +1,12 @@
 #ifndef JUMP_TESTS_DUAL_HPP
 #define JUMP_TESTS_DUAL_HPP
 
-#include <cmath>
-
 #include "jump/autodiff/dual.hpp"
 #include "jump/data/vector.hpp"
 #include "jump/utility/random.hpp"
 #include "jump/testing/testing.hpp"
+
+#include <cmath>
 
 using namespace jump;
 

@@ -1,9 +1,6 @@
 #ifndef JUMP_TESTS_LINEAR_ALGEBRA_HPP
 #define JUMP_TESTS_LINEAR_ALGEBRA_HPP
 
-#include <algorithm>
-#include <vector>
-
 #include "jump/data/banded_matrix.hpp"
 #include "jump/data/dense_matrix.hpp"
 #include "jump/data/eigendata.hpp"
@@ -14,6 +11,9 @@
 #include "jump/linear_algebra/generalised_eigenvalue_system.hpp"
 #include "jump/testing/testing.hpp"
 #include "jump/utility/random.hpp"
+
+#include <algorithm>
+#include <vector>
 
 using namespace jump;
 

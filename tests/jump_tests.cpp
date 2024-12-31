@@ -1,9 +1,9 @@
-#include "jump/jump.hpp"
-
 #include "unit/dual.hpp"
 #include "unit/linear_algebra.hpp"
 #include "unit/matrix.hpp"
 #include "unit/vector.hpp"
+
+#include "jump/jump.hpp"
 
 #include <iostream>
 

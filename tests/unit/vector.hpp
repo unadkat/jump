@@ -1,12 +1,12 @@
 #ifndef JUMP_TESTS_VECTOR_HPP
 #define JUMP_TESTS_VECTOR_HPP
 
-#include <numeric>
-
 #include "jump/data/vector.hpp"
 #include "jump/debug/exception.hpp"
 #include "jump/testing/testing.hpp"
 #include "jump/utility/random.hpp"
+
+#include <numeric>
 
 using namespace jump;
 
