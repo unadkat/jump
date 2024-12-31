@@ -4,9 +4,9 @@
 #ifndef JUMP_TESTING_HPP
 #define JUMP_TESTING_HPP
 
-#include "jump/testing/heirarchy.hpp"
 #include "jump/testing/reporter.hpp"
 #include "jump/testing/test_result.hpp"
+#include "jump/testing/test_suite.hpp"
 
 #endif  // JUMP_TESTING_HPP
 

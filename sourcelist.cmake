@@ -1,4 +1,7 @@
 set(sources
+    src/testing/reporter.cpp
+    src/testing/test_result.cpp
+    src/testing/test_suite.cpp
     src/utility/command_line_args.cpp
     src/utility/file_system.cpp
     src/utility/logging.cpp

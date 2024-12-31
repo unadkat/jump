@@ -5,6 +5,8 @@
 #include "unit/matrix.hpp"
 #include "unit/vector.hpp"
 
+#include <iostream>
+
 using namespace jump;
 
 int main(int argc, char** argv) {

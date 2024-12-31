@@ -4,56 +4,68 @@
 #ifndef JUMP_TEST_RESULT_HPP
 #define JUMP_TEST_RESULT_HPP
 
-#include "jump/testing/test_result_decl.hpp"
-
 #include "jump/autodiff/dual.hpp"
 #include "jump/data/banded_matrix.hpp"
 #include "jump/data/dense_matrix.hpp"
+#include "jump/utility/types.hpp"
 #include "jump/data/vector.hpp"
 #include "jump/debug/exception.hpp"
 
 #include <cmath>
 #include <complex>
 #include <limits>
+#include <string>
+#include <vector>
 
 namespace jump {
-inline auto TestResult::has_info() const -> bool {
-    return passed + failed + skipped > 0;
-}
+struct TestResult {
+    /// \brief Stores name of test entity.
+    std::string name;
+    /// \brief Stores results of subtests (if this is empty, the structure is a
+    /// leaf in the result structure of a set of tests).
+    std::vector<TestResult> sub_results;
 
-inline void TestResult::operator+=(const TestResult& rhs) {
-    passed += rhs.passed;
-    failed += rhs.failed;
-    skipped += rhs.skipped;
-    failed_tests.insert(failed_tests.end(), rhs.failed_tests.begin(),
-            rhs.failed_tests.end());
-    skipped_tests.insert(skipped_tests.end(), rhs.skipped_tests.begin(),
-            rhs.skipped_tests.end());
-}
+    /// \brief Stores number of passed tests.
+    std::size_t passed{};
+    /// \brief Stores number of failed tests.
+    std::size_t failed{};
+    /// \brief Stores number of skipped tests.
+    std::size_t skipped{};
+    /// \brief Stores list of names of failed tests.
+    std::vector<std::string> failed_tests;
+    /// \brief Stores list of names of skipped tests.
+    std::vector<std::string> skipped_tests;
 
-inline void TestResult::add_check(bool expr, std::string fail_name) {
-    if (expr) {
-        ++passed;
-    } else {
-        ++failed;
-        failed_tests.push_back(std::move(fail_name));
-    }
-}
+    /// \brief Indicates if this instance has some data to report (in addition
+    /// to any children).
+    auto has_info() const -> bool;
+    /// \brief Add new set of results to the existing set (intended for a leaf).
+    /// Results for subtests should be pushed onto the sub_results collection.
+    void operator+=(const TestResult& result);
+    /// \brief Helper function to append result tracker with success or fail
+    /// (with name of failed test), for adding results to an existing leaf.
+    void add_check(bool expr, std::string fail_name);
 
-inline auto TestResult::pass() -> TestResult {
-    return {.name = {}, .sub_results = {}, .passed = 1, .failed = 0,
-        .skipped = 0, .failed_tests = {}, .skipped_tests = {}};
-}
+    /// \brief Generate a basic passed test.
+    static auto pass() -> TestResult;
+    /// \brief Generate a failed test and pass the failing test name on.
+    static auto fail(std::string name = "") -> TestResult;
+    /// \brief Generate a skipped test and pass the skipped test name on.
+    static auto skip(std::string name = "") -> TestResult;
+};
 
-inline auto TestResult::fail(std::string name) -> TestResult {
-    return {.name = {}, .sub_results = {}, .passed = 0, .failed = 1,
-        .skipped = 0, .failed_tests = {name}, .skipped_tests = {}};
-}
+inline Real epsilon_relative{1e-6};
+inline Real epsilon_absolute{1e-12};
 
-inline auto TestResult::skip(std::string name) -> TestResult {
-    return {.name = {}, .sub_results = {}, .passed = 0, .failed = 0,
-        .skipped = 1, .failed_tests = {}, .skipped_tests = {name}};
-}
+template <typename T>
+auto approx(const T& lhs, const T& rhs) -> bool;
+
+template <typename T>
+auto vanishes(const T& x) -> bool;
+
+// ========================================================================
+// Implementation
+// ========================================================================
 
 template <typename T>
 inline auto approx(const T& lhs, const T& rhs) -> bool {

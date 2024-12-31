@@ -15,7 +15,7 @@ namespace jump {
 class CommandLineArgs {
     public:
         /// \brief Reads command-line arguments at construction.
-        explicit CommandLineArgs(int argc, char** const argv);
+        CommandLineArgs(int argc, char** const argv);
 
         /// \brief Attempt extraction of flag and indicate success.
         auto get(const char& flag, bool& storage) -> bool;
