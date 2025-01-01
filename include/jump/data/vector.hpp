@@ -5,23 +5,320 @@
 #ifndef JUMP_VECTOR_HPP
 #define JUMP_VECTOR_HPP
 
-#include "jump/data/vector_decl.hpp"
-
 #include "jump/autodiff/dual.hpp"
+#include "jump/debug/error_data.hpp"
+#include "jump/debug/exception.hpp"
+#include "jump/utility/external.hpp"
+#include "jump/utility/types.hpp"
 #include "jump/utility/utility.hpp"
 
 #include <algorithm>
 #include <cmath>
+#include <initializer_list>
+#include <numeric>
+#include <ostream>
 #include <sstream>
+#include <string>
+#include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace jump {
-/// \class Vector
-/// Most operations are simply passed through to the underlying `std::vector`
-/// storage, but arithmetic operations are implemented in two forms. Generally,
-/// a simple default version for all basic `Vector` operations is provided, but
-/// in the case of the preprocessor definition `JUMP_HAS_CBLAS` we will offload
-/// to a local cblas implementation.
+/// \brief Permissive encapulation of `std::vector` with arithmetic
+/// operators enabled.
+template <typename T>
+struct Vector {
+    /// \brief Internal contiguous storage.
+    std::vector<T> storage;
+
+    /// \brief Iterator for algorithms.
+    using Iterator = typename std::vector<T>::iterator;
+    /// \brief Iterator for algorithms.
+    using ConstIterator = typename std::vector<T>::const_iterator;
+
+    /// \brief Construct a `Vector` with a given size (empty by default) filled
+    /// with the given item (`T{0}` by default).
+    explicit Vector(std::size_t size = 0, const T& value = T{0});
+    /// \brief Construct a `Vector` from a brace-enclosed list.
+    Vector(std::initializer_list<T>&& list);
+    /// \brief Construct a `Vector` via a pair of iterators.
+    template <typename InputIt>
+    Vector(InputIt first, InputIt last);
+
+    /// \brief Conversion operator to promote a real-valued `Vector` to a
+    /// complex-valued one.
+    operator Vector<Complex>() const;
+
+    /// \brief Set size and fill with a given value.
+    void assign(std::size_t size, const T& value = T{0});
+    /// \brief Set data via pair of iterators.
+    template <class InputIt>
+    void assign(InputIt first, InputIt last);
+    /// \brief Empty the `Vector`.
+    void clear();
+    /// \brief Resize the `Vector`.
+    void resize(std::size_t size);
+    /// \brief Return number of elements.
+    auto size() const -> std::size_t;
+
+    /// \brief Defaulted spaceship operator.
+    auto operator<=>(const Vector&) const = default;
+
+    /// \brief Const element access.
+    auto operator[](std::size_t index) const -> const T&;
+    /// \brief Mutable element access.
+    auto operator[](std::size_t index) -> T&;
+
+    /// \brief Const begin iterator for algorithms.
+    auto begin() const -> ConstIterator;
+    /// \brief Const past-the-end iterator for algorithms.
+    auto end() const -> ConstIterator;
+    /// \brief Begin iterator for algorithms.
+    auto begin() -> Iterator;
+    /// \brief Past-end-end iterator for algorithms.
+    auto end() -> Iterator;
+
+    /// \brief Fill with given value.
+    void fill(const T& value);
+    /// \brief Fill vector with zeroes.
+    void zero();
+
+    /// \brief No operation on `Vector`.
+    auto operator+() const -> const Vector&;
+    /// \brief Negate `Vector`.
+    auto operator-() const -> Vector;
+    /// \brief Add two Vectors together in place.
+    auto operator+=(const Vector& rhs) -> Vector&;
+    /// \brief Subtract one `Vector` from another in place.
+    auto operator-=(const Vector& rhs) -> Vector&;
+    /// \brief Multiply by scalar in place.
+    auto operator*=(const T& rhs) -> Vector&;
+    /// \brief Elementwise product by another Vector.
+    auto operator*=(const Vector& rhs) -> Vector&;
+    /// \brief Divide by scalar in place.
+    auto operator/=(const T& rhs) -> Vector&;
+    /// \brief Elementwise division by another Vector.
+    auto operator/=(const Vector& rhs) -> Vector&;
+
+    /// \brief Return sum of element magnitudes.
+    auto L1_norm() const -> Real;
+    /// \brief Return Euclidean norm.
+    auto L2_norm() const -> Real;
+    /// \brief Return maximum magnitude over all elements.
+    auto Linf_norm() const -> Real;
+
+    /// \brief Pointer to underlying data, for use with external libraries.
+    auto data() -> T*;
+    /// \brief Pointer to underlying data, for use with external libraries.
+    auto data() const -> const T*;
+
+    /// \brief Populate with data in a `std::string`. Continue to read data
+    /// until a `std::stringstream` fails to read a new value.
+    void operator<<(std::string data);
+};
+
+/// \relates Vector
+/// \brief Outputs `Vector` data to output stream in a single line with spaces.
+template <typename T>
+auto operator<<(std::ostream& out, const Vector<T>& rhs) -> std::ostream&;
+
+/// \relates Vector
+/// \brief Addition of two Vectors.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator+(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
+
+/// \relates Vector
+/// \brief Difference of two Vectors.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator-(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
+
+/// \relates Vector
+/// \brief Left-hand multiplication by scalar.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator*(const T& lhs, const Vector<U>& rhs) -> Vector<R>;
+
+/// \relates Vector
+/// \brief Right-hand multiplication by scalar.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator*(const Vector<T>& lhs, const U& rhs) -> Vector<R>;
+
+/// \relates Vector
+/// \brief Elementwise product of two Vectors.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator*(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
+
+/// \relates Vector
+/// \brief Inner product of two Vectors.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto dot(const Vector<T>& lhs, const Vector<U>& rhs) -> R;
+
+/// \relates Vector
+/// \brief Right-hand division by scalar.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator/(const Vector<T>& lhs, const U& rhs) -> Vector<R>;
+
+/// \relates Vector
+/// \brief Elementwise division of two Vectors.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator/(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
+
+/// \relates Vector
+/// \brief Addition of two Vectors.
+template <typename T>
+auto operator+(Vector<T> lhs, const Vector<T>& rhs) -> Vector<T>;
+
+/// \relates Vector
+/// \brief Addition of two Vectors.
+template <typename T>
+auto operator+(const Vector<T>& lhs, Vector<T>&& rhs) -> Vector<T>;
+
+/// \relates Vector
+/// \brief Difference of two Vectors.
+template <typename T>
+auto operator-(Vector<T> lhs, const Vector<T>& rhs) -> Vector<T>;
+
+/// \relates Vector
+/// \brief Difference of two Vectors.
+template <typename T>
+auto operator-(const Vector<T>& lhs, Vector<T>&& rhs) -> Vector<T>;
+
+/// \relates Vector
+/// \brief Left-hand multiplication by scalar.
+template <typename T>
+auto operator*(const T& lhs, Vector<T> rhs) -> Vector<T>;
+
+/// \relates Vector
+/// \brief Right-hand multiplication by scalar.
+template <typename T>
+auto operator*(Vector<T> lhs, const T& rhs) -> Vector<T>;
+
+/// \relates Vector
+/// \brief Elementwise product of two Vectors.
+template <typename T>
+auto operator*(Vector<T> lhs, const Vector<T>& rhs) -> Vector<T>;
+
+/// \relates Vector
+/// \brief Elementwise product of two Vectors.
+template <typename T>
+auto operator*(const Vector<T>& lhs, Vector<T>&& rhs) -> Vector<T>;
+
+/// \relates Vector
+/// \brief Inner product of two Vectors.
+template <typename T>
+auto dot(const Vector<T>& lhs, const Vector<T>& rhs) -> T;
+
+/// \relates Vector
+/// \brief Right-hand division by scalar.
+template <typename T>
+auto operator/(Vector<T> lhs, const T& rhs) -> Vector<T>;
+
+/// \relates Vector
+/// \brief Elementwise division of two Vectors.
+template <typename T>
+auto operator/(Vector<T> lhs, const Vector<T>& rhs) -> Vector<T>;
+
+// ========================================================================
+// CBLAS
+// ========================================================================
+
+#ifdef JUMP_HAS_CBLAS
+/// \relates Vector
+/// \brief Specialisation of the dot product for two real Vectors, using CBLAS.
+auto dot(const Vector<Real>& lhs, const Vector<Real>& rhs) -> Real;
+
+/// \relates Vector
+/// \brief Specialisation of the dot product for two complex Vectors, using
+/// CBLAS.
+auto dot(const Vector<Complex>& lhs, const Vector<Complex>& rhs) -> Complex;
+#endif  // JUMP_HAS_CBLAS
+
+// ========================================================================
+// Exponentiation
+// ========================================================================
+
+/// \relates Vector
+template <typename T>
+auto exp(Vector<T> v) -> Vector<T>;
+
+/// \relates Vector
+template <typename T>
+auto log(Vector<T> v) -> Vector<T>;
+
+/// \relates Vector
+template <typename T>
+auto pow(Vector<T> v, T p) -> Vector<T>;
+
+// ========================================================================
+// Trigonometry
+// ========================================================================
+
+/// \relates Vector
+template <typename T>
+auto sin(Vector<T> v) -> Vector<T>;
+
+/// \relates Vector
+template <typename T>
+auto cos(Vector<T> v) -> Vector<T>;
+
+/// \relates Vector
+template <typename T>
+auto tan(Vector<T> v) -> Vector<T>;
+
+/// \relates Vector
+template <typename T>
+auto asin(Vector<T> v) -> Vector<T>;
+
+/// \relates Vector
+template <typename T>
+auto acos(Vector<T> v) -> Vector<T>;
+
+/// \relates Vector
+template <typename T>
+auto atan(Vector<T> v) -> Vector<T>;
+
+// ========================================================================
+// Hyperbolics
+// ========================================================================
+
+/// \relates Vector
+template <typename T>
+auto sinh(Vector<T> v) -> Vector<T>;
+
+/// \relates Vector
+template <typename T>
+auto cosh(Vector<T> v) -> Vector<T>;
+
+/// \relates Vector
+template <typename T>
+auto tanh(Vector<T> v) -> Vector<T>;
+
+/// \relates Vector
+template <typename T>
+auto asinh(Vector<T> v) -> Vector<T>;
+
+/// \relates Vector
+template <typename T>
+auto acosh(Vector<T> v) -> Vector<T>;
+
+/// \relates Vector
+template <typename T>
+auto atanh(Vector<T> v) -> Vector<T>;
+
+// ========================================================================
+// Miscellaneous
+// ========================================================================
+
+/// \relates Vector
+template <typename T>
+auto abs(Vector<T> v) -> Vector<T>;
+
+/// \relates Vector
+template <typename T>
+auto sgn(Vector<T> v) -> Vector<T>;
+
+// ========================================================================
+// Implementation
+// ========================================================================
 
 template <typename T>
 inline Vector<T>::Vector(std::size_t size, const T& value) :
@@ -284,12 +581,228 @@ inline void Vector<T>::operator<<(std::string data) {
 }
 
 /// \relates Vector
-template <typename T, typename Os>
-inline auto operator<<(Os& out, const Vector<T>& rhs) -> Os& {
+template <typename T>
+inline auto operator<<(std::ostream& out, const Vector<T>& rhs)
+        -> std::ostream& {
     for (const auto& x : rhs) {
         out << x << ' ';
     }
     return out;
+}
+
+/// \relates Vector
+/// \brief Addition of two Vectors.
+template <typename T, typename U, typename R>
+inline auto operator+(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        Vector<R> result{rhs};
+        result += lhs;
+        return result;
+    } else {
+        Vector<R> result{lhs};
+        result += rhs;
+        return result;
+    }
+}
+
+/// \relates Vector
+/// \brief Difference of two Vectors.
+template <typename T, typename U, typename R>
+inline auto operator-(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        Vector<R> result{rhs};
+        result *= R{-1};
+        result += lhs;
+        return result;
+    } else {
+        Vector<R> result{lhs};
+        result -= rhs;
+        return result;
+    }
+}
+
+/// \relates Vector
+/// \brief Left-hand multiplication by scalar.
+template <typename T, typename U, typename R>
+inline auto operator*(const T& lhs, const Vector<U>& rhs) -> Vector<R> {
+    Vector<R> result{rhs};
+    result *= lhs;
+    return result;
+}
+
+/// \relates Vector
+/// \brief Right-hand multiplication by scalar.
+template <typename T, typename U, typename R>
+inline auto operator*(const Vector<T>& lhs, const U& rhs) -> Vector<R> {
+    Vector<R> result{lhs};
+    result *= rhs;
+    return result;
+}
+
+/// \relates Vector
+/// \brief Elementwise product of two Vectors.
+template <typename T, typename U, typename R>
+inline auto operator*(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        Vector<R> result{rhs};
+        result *= lhs;
+        return result;
+    } else {
+        Vector<R> result{lhs};
+        result *= rhs;
+        return result;
+    }
+}
+
+/// \relates Vector
+/// \brief Inner product of two Vectors.
+template <typename T, typename U, typename R>
+inline auto dot(const Vector<T>& lhs, const Vector<U>& rhs) -> R {
+    if constexpr (std::is_same_v<T, R>) {
+        Vector<R> new_rhs{rhs};
+        return dot(lhs, new_rhs);
+    } else if constexpr(std::is_same_v<U, R>) {
+        Vector<R> new_lhs{lhs};
+        return dot(new_lhs, rhs);
+    } else {
+        Vector<R> new_lhs{lhs};
+        Vector<R> new_rhs{rhs};
+        return dot(new_lhs, new_rhs);
+    }
+}
+
+/// \relates Vector
+/// \brief Right-hand division by scalar.
+template <typename T, typename U, typename R>
+inline auto operator/(const Vector<T>& lhs, const U& rhs) -> Vector<R> {
+    Vector<R> result{lhs};
+    result /= rhs;
+    return result;
+}
+
+/// \relates Vector
+/// \brief Elementwise division of two Vectors.
+template <typename T, typename U, typename R>
+inline auto operator/(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R> {
+    Vector<R> result{lhs};
+    result /= rhs;
+    return result;
+}
+
+/// \relates Vector
+/// \brief Addition of two Vectors.
+///
+/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
+/// return. Also handles the case that lhs is given an rvalue (NRVO).
+template <typename T>
+inline auto operator+(Vector<T> lhs, const Vector<T>& rhs) -> Vector<T> {
+    lhs += rhs;
+    return lhs;
+}
+
+/// \relates Vector
+/// \brief Addition of two Vectors.
+///
+/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
+/// reference parameter (NRVO).
+template <typename T>
+inline auto operator+(const Vector<T>& lhs, Vector<T>&& rhs) -> Vector<T> {
+    rhs += lhs;
+    return rhs;
+}
+
+/// \relates Vector
+/// \brief Difference of two Vectors.
+///
+/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
+/// return. Also handles the case that lhs is given an rvalue (NRVO).
+template <typename T>
+inline auto operator-(Vector<T> lhs, const Vector<T>& rhs) -> Vector<T> {
+    lhs -= rhs;
+    return lhs;
+}
+
+/// \relates Vector
+/// \brief Difference of two Vectors.
+///
+/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
+/// reference parameter (NRVO).
+template <typename T>
+inline auto operator-(const Vector<T>& lhs, Vector<T>&& rhs) -> Vector<T> {
+    rhs *= T{-1};
+    rhs += lhs;
+    return rhs;
+}
+
+/// \relates Vector
+/// \brief Left-hand multiplication by scalar.
+template <typename T>
+inline auto operator*(const T& lhs, Vector<T> rhs) -> Vector<T> {
+    rhs *= lhs;
+    return rhs;
+}
+
+/// \relates Vector
+/// \brief Right-hand multiplication by scalar.
+template <typename T>
+inline auto operator*(Vector<T> lhs, const T& rhs) -> Vector<T> {
+    lhs *= rhs;
+    return lhs;
+}
+
+/// \relates Vector
+/// \brief Elementwise product of two Vectors.
+///
+/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
+/// return. Also handles the case that lhs is given an rvalue (NRVO).
+template <typename T>
+inline auto operator*(Vector<T> lhs, const Vector<T>& rhs) -> Vector<T> {
+    lhs *= rhs;
+    return lhs;
+}
+
+/// \relates Vector
+/// \brief Elementwise product of two Vectors.
+///
+/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
+/// reference parameter (NRVO).
+template <typename T>
+inline auto operator*(const Vector<T>& lhs, Vector<T>&& rhs) -> Vector<T> {
+    rhs *= lhs;
+    return rhs;
+}
+
+/// \relates Vector
+/// \brief Inner product of two Vectors.
+template <typename T>
+inline auto dot(const Vector<T>& lhs, const Vector<T>& rhs) -> T {
+#ifndef NDEBUG
+    if (lhs.size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    return std::inner_product(lhs.begin(), lhs.end(), rhs.begin(), T{0});
+}
+
+/// \relates Vector
+/// \brief Right-hand division by scalar.
+template <typename T>
+inline auto operator/(Vector<T> lhs, const T& rhs) -> Vector<T> {
+    lhs /= rhs;
+    return lhs;
+}
+
+/// \relates Vector
+/// \brief Elementwise division of two Vectors.
+///
+/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
+/// return. Also handles the case that lhs is given an rvalue (NRVO).
+template <typename T>
+inline auto operator/(Vector<T> lhs, const Vector<T>& rhs) -> Vector<T> {
+    lhs /= rhs;
+    return lhs;
 }
 
 // ========================================================================
@@ -298,7 +811,7 @@ inline auto operator<<(Os& out, const Vector<T>& rhs) -> Os& {
 
 /// \relates Vector
 template <typename T>
-auto exp(Vector<T> v) -> Vector<T> {
+inline auto exp(Vector<T> v) -> Vector<T> {
     using std::exp;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return exp(x); });
@@ -307,7 +820,7 @@ auto exp(Vector<T> v) -> Vector<T> {
 
 /// \relates Vector
 template <typename T>
-auto log(Vector<T> v) -> Vector<T> {
+inline auto log(Vector<T> v) -> Vector<T> {
     using std::log;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return log(x); });
@@ -316,7 +829,7 @@ auto log(Vector<T> v) -> Vector<T> {
 
 /// \relates Vector
 template <typename T>
-auto pow(Vector<T> v, T p) -> Vector<T> {
+inline auto pow(Vector<T> v, T p) -> Vector<T> {
     using std::pow;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return pow(x, p); });
@@ -329,7 +842,7 @@ auto pow(Vector<T> v, T p) -> Vector<T> {
 
 /// \relates Vector
 template <typename T>
-auto sin(Vector<T> v) -> Vector<T> {
+inline auto sin(Vector<T> v) -> Vector<T> {
     using std::sin;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return sin(x); });
@@ -338,7 +851,7 @@ auto sin(Vector<T> v) -> Vector<T> {
 
 /// \relates Vector
 template <typename T>
-auto cos(Vector<T> v) -> Vector<T> {
+inline auto cos(Vector<T> v) -> Vector<T> {
     using std::cos;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return cos(x); });
@@ -347,7 +860,7 @@ auto cos(Vector<T> v) -> Vector<T> {
 
 /// \relates Vector
 template <typename T>
-auto tan(Vector<T> v) -> Vector<T> {
+inline auto tan(Vector<T> v) -> Vector<T> {
     using std::tan;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return tan(x); });
@@ -356,7 +869,7 @@ auto tan(Vector<T> v) -> Vector<T> {
 
 /// \relates Vector
 template <typename T>
-auto asin(Vector<T> v) -> Vector<T> {
+inline auto asin(Vector<T> v) -> Vector<T> {
     using std::asin;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return asin(x); });
@@ -365,7 +878,7 @@ auto asin(Vector<T> v) -> Vector<T> {
 
 /// \relates Vector
 template <typename T>
-auto acos(Vector<T> v) -> Vector<T> {
+inline auto acos(Vector<T> v) -> Vector<T> {
     using std::acos;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return acos(x); });
@@ -374,7 +887,7 @@ auto acos(Vector<T> v) -> Vector<T> {
 
 /// \relates Vector
 template <typename T>
-auto atan(Vector<T> v) -> Vector<T> {
+inline auto atan(Vector<T> v) -> Vector<T> {
     using std::atan;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return atan(x); });
@@ -387,7 +900,7 @@ auto atan(Vector<T> v) -> Vector<T> {
 
 /// \relates Vector
 template <typename T>
-auto sinh(Vector<T> v) -> Vector<T> {
+inline auto sinh(Vector<T> v) -> Vector<T> {
     using std::sinh;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return sinh(x); });
@@ -396,7 +909,7 @@ auto sinh(Vector<T> v) -> Vector<T> {
 
 /// \relates Vector
 template <typename T>
-auto cosh(Vector<T> v) -> Vector<T> {
+inline auto cosh(Vector<T> v) -> Vector<T> {
     using std::cosh;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return cosh(x); });
@@ -405,7 +918,7 @@ auto cosh(Vector<T> v) -> Vector<T> {
 
 /// \relates Vector
 template <typename T>
-auto tanh(Vector<T> v) -> Vector<T> {
+inline auto tanh(Vector<T> v) -> Vector<T> {
     using std::tanh;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return tanh(x); });
@@ -414,7 +927,7 @@ auto tanh(Vector<T> v) -> Vector<T> {
 
 /// \relates Vector
 template <typename T>
-auto asinh(Vector<T> v) -> Vector<T> {
+inline auto asinh(Vector<T> v) -> Vector<T> {
     using std::asinh;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return asinh(x); });
@@ -423,7 +936,7 @@ auto asinh(Vector<T> v) -> Vector<T> {
 
 /// \relates Vector
 template <typename T>
-auto acosh(Vector<T> v) -> Vector<T> {
+inline auto acosh(Vector<T> v) -> Vector<T> {
     using std::acosh;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return acosh(x); });
@@ -432,7 +945,7 @@ auto acosh(Vector<T> v) -> Vector<T> {
 
 /// \relates Vector
 template <typename T>
-auto atanh(Vector<T> v) -> Vector<T> {
+inline auto atanh(Vector<T> v) -> Vector<T> {
     using std::atanh;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return atanh(x); });
@@ -445,7 +958,7 @@ auto atanh(Vector<T> v) -> Vector<T> {
 
 /// \relates Vector
 template <typename T>
-auto abs(Vector<T> v) -> Vector<T> {
+inline auto abs(Vector<T> v) -> Vector<T> {
     using std::abs;
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return abs(x); });
@@ -454,7 +967,7 @@ auto abs(Vector<T> v) -> Vector<T> {
 
 /// \relates Vector
 template <typename T>
-auto sgn(Vector<T> v) -> Vector<T> {
+inline auto sgn(Vector<T> v) -> Vector<T> {
     std::transform(v.begin(), v.end(), v.begin(),
             [&](const T& x) { return sgn(x); });
     return v;
@@ -606,6 +1119,35 @@ inline auto Vector<Complex>::L2_norm() const -> Real {
     // Computes the Euclidean norm of the `Vector` (with a pointer shift of 1
     // between elements)
     return cblas_dznrm2(storage.size(), storage.data(), 1);
+}
+
+/// \brief Specialisation of the dot product for two real Vectors, using CBLAS.
+auto dot(const Vector<Real>& lhs, const Vector<Real>& rhs) -> Real {
+#ifndef NDEBUG
+    if (lhs.size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    // Computes dot product lhs*rhs (with a pointer shift of 1 between elements)
+    return cblas_ddot(lhs.size(), lhs.data(), 1, rhs.data(), 1);
+}
+
+/// \brief Specialisation of the dot product for two complex Vectors, using
+/// CBLAS.
+auto dot(const Vector<Complex>& lhs, const Vector<Complex>& rhs) -> Complex {
+#ifndef NDEBUG
+    if (lhs.size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    // Computes dot product lhs*rhs (with a pointer shift of 1 between elements)
+    Complex result;
+    cblas_zdotu_sub(lhs.size(), lhs.data(), 1, rhs.data(), 1, &result);
+    return result;
 }
 #endif  // JUMP_HAS_CBLAS
 }   // namespace jump
