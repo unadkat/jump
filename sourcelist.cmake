@@ -1,4 +1,5 @@
 set(sources
+    src/data/eigendata.cpp
     src/debug/error_data.cpp
     src/linear_algebra/banded_linear_system.cpp
     src/linear_algebra/dense_linear_system.cpp
