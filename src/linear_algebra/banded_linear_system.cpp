@@ -109,6 +109,7 @@ void BandedLinearSystem<Complex>::solve_lapacke() {
 // ========================================================================
 // Instantiation
 // ========================================================================
+
 template class BandedLinearSystem<Real>;
 template class BandedLinearSystem<Complex>;
 }   // namespace jump

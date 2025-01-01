@@ -1122,7 +1122,7 @@ inline auto Vector<Complex>::L2_norm() const -> Real {
 }
 
 /// \brief Specialisation of the dot product for two real Vectors, using CBLAS.
-auto dot(const Vector<Real>& lhs, const Vector<Real>& rhs) -> Real {
+inline auto dot(const Vector<Real>& lhs, const Vector<Real>& rhs) -> Real {
 #ifndef NDEBUG
     if (lhs.size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
@@ -1136,7 +1136,8 @@ auto dot(const Vector<Real>& lhs, const Vector<Real>& rhs) -> Real {
 
 /// \brief Specialisation of the dot product for two complex Vectors, using
 /// CBLAS.
-auto dot(const Vector<Complex>& lhs, const Vector<Complex>& rhs) -> Complex {
+inline auto dot(const Vector<Complex>& lhs, const Vector<Complex>& rhs)
+        -> Complex {
 #ifndef NDEBUG
     if (lhs.size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),

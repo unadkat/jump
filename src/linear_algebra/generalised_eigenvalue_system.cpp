@@ -138,6 +138,7 @@ void GeneralisedEigenvalueSystem<Complex>::solve_lapacke() {
 // ========================================================================
 // Instantiation
 // ========================================================================
+
 template class GeneralisedEigenvalueSystem<Complex>;
 }   // namespace jump
 

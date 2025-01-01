@@ -101,6 +101,7 @@ void DenseLinearSystem<Complex>::solve_lapacke() {
 // ========================================================================
 // Instantiation
 // ========================================================================
+
 template class DenseLinearSystem<Real>;
 template class DenseLinearSystem<Complex>;
 }   // namespace jump
