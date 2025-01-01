@@ -6,6 +6,7 @@
 
 #include "jump/data/eigendata_decl.hpp"
 
+#include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
 
 namespace jump {

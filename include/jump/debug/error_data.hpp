@@ -1,49 +1,13 @@
 // This file forms part of Jump (Jay's Utilities and Mathematical Primitives)
 // Copyright (C) Jay Unadkat 2024. Released under GPL-3.0-or-later (see COPYING)
 
-#ifndef JUMP_EXCEPTION_DECL_HPP
-#define JUMP_EXCEPTION_DECL_HPP
+#ifndef JUMP_ERROR_DATA_HPP
+#define JUMP_ERROR_DATA_HPP
 
-#include <exception>
-#include <source_location>
 #include <string>
+#include <utility>
 
-namespace jump {
-/// \brief Custom exception class to give information about general runtime
-/// errors. The template parameter is to package specific information about the
-/// type of error being thrown.
-template <typename ErrorData>
-class RuntimeError : public std::exception {
-    public:
-        /// \brief Construct error of specified type with details of the problem
-        /// and the source information at that location.
-        RuntimeError(ErrorData data, std::source_location source =
-                std::source_location::current());
-
-        /// \brief Return the full error message (with banner) as a mutable
-        /// string, in case catching code needs to add context and rethrow.
-        auto what() noexcept -> std::string&;
-        /// \brief Overload for std::exception::what for quick output of error
-        /// message on unhandled exception.
-        auto what() const noexcept -> const char*;
-        /// \brief Return source information at location of the raised
-        /// exception.
-        auto where() const noexcept -> const std::source_location&;
-
-    private:
-        /// \brief Construct full error message from constituent parts.
-        void construct_message();
-
-    private:
-        /// \brief Package of data for the exception being raised.
-        ErrorData m_data;
-        /// \brief Full error message (with banner).
-        std::string m_message;
-        /// \brief Details about the source location where the error occurred.
-        std::source_location m_source;
-        // TODO: add std::stacktrace when available
-};
-
+namespace jump{
 /// \brief Data for basic RuntimeError.
 struct BasicError {
     const std::string type{"Runtime error"};
@@ -112,5 +76,5 @@ struct Mismatch2DError {
 };
 }   // namespace jump
 
-#endif  // JUMP_EXCEPTION_DECL_HPP
+#endif  // JUMP_ERROR_DATA_HPP
 

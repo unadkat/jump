@@ -2,6 +2,7 @@
 #define JUMP_TESTS_VECTOR_HPP
 
 #include "jump/data/vector.hpp"
+#include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
 #include "jump/testing/testing.hpp"
 #include "jump/utility/random.hpp"

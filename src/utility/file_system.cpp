@@ -3,6 +3,7 @@
 
 #include "jump/utility/file_system.hpp"
 
+#include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
 
 namespace jump {

@@ -6,6 +6,7 @@
 
 #include "jump/autodiff/dual_decl.hpp"
 
+#include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
 #include "jump/utility/utility.hpp"
 

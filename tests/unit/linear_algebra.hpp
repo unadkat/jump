@@ -5,6 +5,7 @@
 #include "jump/data/dense_matrix.hpp"
 #include "jump/data/eigendata.hpp"
 #include "jump/data/vector.hpp"
+#include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
 #include "jump/linear_algebra/banded_linear_system.hpp"
 #include "jump/linear_algebra/dense_linear_system.hpp"

@@ -12,6 +12,7 @@
 #include "jump/data/matrix_base.hpp"
 #include "jump/data/vector.hpp"
 
+#include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
 
 #include "jump/linear_algebra/banded_linear_system.hpp"

@@ -5,7 +5,8 @@
 #include "jump/data/banded_matrix_decl.hpp"
 #include "jump/data/dense_matrix.hpp"
 #include "jump/data/vector.hpp"
-#include "jump/debug/exception_decl.hpp"
+#include "jump/debug/error_data.hpp"
+#include "jump/debug/exception.hpp"
 #include "jump/testing/testing.hpp"
 #include "jump/utility/random.hpp"
 

@@ -4,6 +4,7 @@
 #ifndef JUMP_IO_HPP
 #define JUMP_IO_HPP
 
+#include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
 
 #include <ios>

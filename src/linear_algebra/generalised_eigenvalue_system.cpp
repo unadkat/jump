@@ -3,6 +3,7 @@
 
 #include "jump/linear_algebra/generalised_eigenvalue_system.hpp"
 
+#include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
 #include "jump/utility/external.hpp"
 #include "jump/utility/types.hpp"

@@ -4,11 +4,51 @@
 #ifndef JUMP_EXCEPTION_HPP
 #define JUMP_EXCEPTION_HPP
 
-#include "jump/debug/exception_decl.hpp"
-
+#include <exception>
 #include <format>
+#include <source_location>
+#include <string>
 
 namespace jump {
+/// \brief Custom exception class to give information about general runtime
+/// errors. The template parameter is to package specific information about the
+/// type of error being thrown.
+template <typename ErrorData>
+class RuntimeError : public std::exception {
+    public:
+        /// \brief Construct error of specified type with details of the problem
+        /// and the source information at that location.
+        RuntimeError(ErrorData data, std::source_location source =
+                std::source_location::current());
+
+        /// \brief Return the full error message (with banner) as a mutable
+        /// string, in case catching code needs to add context and rethrow.
+        auto what() noexcept -> std::string&;
+        /// \brief Overload for std::exception::what for quick output of error
+        /// message on unhandled exception.
+        auto what() const noexcept -> const char*;
+        /// \brief Return source information at location of the raised
+        /// exception.
+        auto where() const noexcept -> const std::source_location&;
+
+    private:
+        /// \brief Construct full error message from constituent parts.
+        void construct_message();
+
+    private:
+        /// \brief Package of data for the exception being raised.
+        ErrorData m_data;
+        /// \brief Full error message (with banner).
+        std::string m_message;
+        /// \brief Details about the source location where the error occurred.
+        std::source_location m_source;
+        // TODO: add std::stacktrace when available
+};
+
+// ========================================================================
+// Implementation
+// ========================================================================
+
 template <typename ErrorData>
 inline RuntimeError<ErrorData>::RuntimeError(ErrorData data,
         std::source_location source) :
@@ -43,41 +83,6 @@ inline void RuntimeError<ErrorData>::construct_message() {
                 m_source.column())
         + "--------------------------------------------------\n"
         + m_data.info() + '\n';
-}
-
-inline auto BasicError::info() const -> std::string {
-    return details;
-}
-
-inline auto FileIOError::info() const -> std::string {
-    return std::format("Resource \"{}\" failed to read/write", resource);
-}
-
-inline auto InvalidArgumentError::info() const -> std::string {
-    return std::format("Argument {} had invalid value {}\nExpected: {}",
-            argument, value, expected);
-}
-
-inline auto Range1DError::info() const -> std::string {
-    return std::format("Attempted access at index {} in container {} (size {})",
-            index, name, size);
-}
-
-inline auto Mismatch1DError::info() const -> std::string {
-    return std::format("Mismatch between container {} (size {}) and "
-            "container {} (size {})", name1, size1, name2, size2);
-}
-
-inline auto Range2DError::info() const -> std::string {
-    return std::format("Attempted access at index ({}, {}) in container {} "
-            "(size ({}, {}))", indices.first, indices.second, name, size.first,
-            size.second);
-}
-
-inline auto Mismatch2DError::info() const -> std::string {
-    return std::format("Mismatch between container {} (size ({}, {})) and "
-            "container {} (size ({}, {}))", name1, size1.first, size1.second,
-            name2, size2.first, size2.second);
 }
 }   // namespace jump
 

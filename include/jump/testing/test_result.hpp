@@ -9,6 +9,7 @@
 #include "jump/data/dense_matrix.hpp"
 #include "jump/utility/types.hpp"
 #include "jump/data/vector.hpp"
+#include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
 
 #include <cmath>

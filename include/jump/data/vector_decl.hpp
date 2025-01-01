@@ -4,6 +4,7 @@
 #ifndef JUMP_VECTOR_DECL_HPP
 #define JUMP_VECTOR_DECL_HPP
 
+#include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
 #include "jump/utility/external.hpp"
 #include "jump/utility/types.hpp"
