@@ -83,21 +83,20 @@ inline auto test_vector_arithmetic_basic() -> TestResult {
         result.add_check(approx(vans_z, vcz), "subtract complex");
     }
     {
-        // TODO: Real vector multiplication by complex scalar
         Real ans_r{ar*br};
         Vector<Real> vans_r(5, ans_r), vcr{var*br};
         Complex brZ{br};
         Vector<Complex> vans_rZ{vans_r};
-//        Vector<Complex> vcrZ1{var*brZ};
-//        Vector<Complex> vcrZ2{brZ*var};
+        Vector<Complex> vcrZ1{var*brZ};
+        Vector<Complex> vcrZ2{brZ*var};
         Complex ans_z{az*bz};
         Vector<Complex> vans_z(5, ans_z), vcz{vaz*bz};
 
         result.add_check(approx(vans_r, vcr), "scale real");
-//        result.add_check(vanishes((vans_rZ - vcrZ1).L2_norm()),
-//                "scale real-complex");
-//        result.add_check(vanishes((vans_rZ - vcrZ2).L2_norm()),
-//                "scale complex-real");
+        result.add_check(vanishes((vans_rZ - vcrZ1).L2_norm()),
+                "scale real-complex");
+        result.add_check(vanishes((vans_rZ - vcrZ2).L2_norm()),
+                "scale complex-real");
         result.add_check(approx(vans_z, vcz), "scale complex");
     }
 
