@@ -41,13 +41,12 @@ struct Vector {
     explicit Vector(std::size_t size = 0, const T& value = T{0});
     /// \brief Construct a `Vector` from a brace-enclosed list.
     Vector(std::initializer_list<T>&& list);
+    /// \brief Templated copy constructor
+    template <typename U>
+    Vector(const Vector<U>& other);
     /// \brief Construct a `Vector` via a pair of iterators.
     template <typename InputIt>
     Vector(InputIt first, InputIt last);
-
-    /// \brief Conversion operator to promote a real-valued `Vector` to a
-    /// complex-valued one.
-    operator Vector<Complex>() const;
 
     /// \brief Set size and fill with a given value.
     void assign(std::size_t size, const T& value = T{0});
@@ -330,6 +329,12 @@ inline Vector<T>::Vector(std::initializer_list<T>&& list) :
     storage(std::forward<std::initializer_list<T>>(list)) {
 }
 
+template <typename T>
+template <typename U>
+inline Vector<T>::Vector(const Vector<U>& other) :
+    storage(other.begin(), other.end()) {
+}
+
 /// Useful when extracting columns from a matrix, for example. Combined with a
 /// way of getting iterators to the internal storage locations representing the
 /// top and bottom of a given matrix column, this is the fastest way of
@@ -337,20 +342,7 @@ inline Vector<T>::Vector(std::initializer_list<T>&& list) :
 template <typename T>
 template <class InputIt>
 inline Vector<T>::Vector(InputIt first, InputIt last) :
-    storage(std::move(first), std::move(last)) {
-}
-
-/// Initialises a complex-valued `Vector` of the correct size and loops through
-/// it to convert the real-valued elements in the source `Vector`. This is not
-/// terribly efficient but the only way of achieving the promotion easily.
-template <>
-inline Vector<Real>::operator Vector<Complex>() const {
-    const std::size_t N{size()};
-    Vector<Complex> result(N);
-    for (std::size_t i{0}; i < N; ++i) {
-        result[i] = Complex{storage[i]};
-    }
-    return result;
+    storage(first, last) {
 }
 
 template <typename T>
@@ -361,7 +353,7 @@ inline void Vector<T>::assign(std::size_t size, const T& value) {
 template <typename T>
 template <class InputIt>
 inline void Vector<T>::assign(InputIt first, InputIt last) {
-    storage.assign(std::move(first), std::move(last));
+    storage.assign(first, last);
 }
 
 template <typename T>
@@ -659,15 +651,11 @@ inline auto operator*(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R> {
 template <typename T, typename U, typename R>
 inline auto dot(const Vector<T>& lhs, const Vector<U>& rhs) -> R {
     if constexpr (std::is_same_v<T, R>) {
-        Vector<R> new_rhs{rhs};
-        return dot(lhs, new_rhs);
+        return dot(lhs, Vector<R>{rhs});
     } else if constexpr(std::is_same_v<U, R>) {
-        Vector<R> new_lhs{lhs};
-        return dot(new_lhs, rhs);
+        return dot(Vector<R>{lhs}, rhs);
     } else {
-        Vector<R> new_lhs{lhs};
-        Vector<R> new_rhs{rhs};
-        return dot(new_lhs, new_rhs);
+        return dot(Vector<R>{lhs}, Vector<R>{rhs});
     }
 }
 
