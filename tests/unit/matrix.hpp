@@ -2,7 +2,6 @@
 #define JUMP_TESTS_MATRIX_HPP
 
 #include "jump/data/banded_matrix.hpp"
-#include "jump/data/banded_matrix_decl.hpp"
 #include "jump/data/dense_matrix.hpp"
 #include "jump/data/vector.hpp"
 #include "jump/debug/error_data.hpp"
