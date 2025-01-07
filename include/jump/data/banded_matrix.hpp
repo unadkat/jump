@@ -5,18 +5,202 @@
 #ifndef JUMP_BANDED_MATRIX_HPP
 #define JUMP_BANDED_MATRIX_HPP
 
-#include "jump/data/banded_matrix_decl.hpp"
+#include "jump/data/matrix_base.hpp"
+#include "jump/data/vector.hpp"
+#include "jump/debug/error_data.hpp"
+#include "jump/debug/exception.hpp"
+#include "jump/utility/types.hpp"
 
 #include <format>
 #include <sstream>
+#include <string>
+#include <type_traits>
 #include <utility>
 
 namespace jump {
-/// \var BandedMatrix::m_storage
-/// In short, the interal storage takes the form of a dense matrix with
-/// `num_columns()` columns and `1 + 3*#num_bands()` rows. Refer to the
-/// <a href="http://www.netlib.org/lapack/lug/node124.html">LAPACK User
-/// Guide</a> for further details about the band storage scheme.
+/// \brief Banded square matrix for use with LAPACKE.
+template <typename T>
+class BandedMatrix : public MatrixBase<T> {
+    public:
+        /// \brief Iterator for algorithms.
+        using Iterator = typename Vector<T>::Iterator;
+        /// \brief Iterator for algorithms.
+        using ConstIterator = typename Vector<T>::ConstIterator;
+
+        /// \brief Construct a square matrix with the given number of diagonals
+        /// on each side of the leading diagonal.
+        explicit BandedMatrix(std::size_t size = 0, std::size_t num_bands = 0);
+        /// \brief Constuct a matrix with the given Vector data, specifying a
+        /// consistent size.
+        BandedMatrix(std::size_t size, std::size_t num_bands,
+                Vector<T> underlying_data);
+
+        /// \brief Conversion operator to promote a real-valued `BandedMatrix`
+        /// to a complex-valued one.
+        operator BandedMatrix<Complex>() const;
+
+        /// \brief Initialise matrix with the given size and number of
+        /// off-leading diagonal diagonals.
+        void assign(std::size_t size, std::size_t num_bands);
+        /// \brief Initialise a matrix with the given Vector data, specifying a
+        /// consistent size.
+        void assign(std::size_t size, std::size_t num_bands,
+                Vector<T> underlying_data);
+        /// \brief Set matrix storage with the given Vector data, which must
+        /// match the existing container size.
+        void assign(Vector<T> underlying_data);
+        /// \brief Set data via a pair of iterators.
+        template <class InputIt>
+        void assign(InputIt first, InputIt last);
+        /// \brief Return number of off-leading diagonal diagonals.
+        auto num_bands() const -> std::size_t;
+        /// \brief Return size of internal storage.
+        virtual auto num_elements() const -> std::size_t override;
+
+        /// \brief Defaulted spaceship operator.
+        auto operator<=>(const BandedMatrix&) const = default;
+
+        /// \brief Const element access, always returns temporary value.
+        auto operator[](std::size_t row, std::size_t column) const -> T;
+        /// \brief Mutable element access.
+        auto get_unsafe(std::size_t row, std::size_t column) -> T&;
+        /// \brief Element setter, returns flag for success.
+        [[nodiscard]] auto set(std::size_t row, std::size_t column,
+                const T& value) -> bool;
+
+        /// \brief Const iterator for algorithms.
+        auto begin() const -> ConstIterator;
+        /// \brief Const iterator for algorithms.
+        auto end() const -> ConstIterator;
+        /// \brief Iterator for algorithms.
+        auto begin() -> Iterator;
+        /// \brief Iterator for algorithms.
+        auto end() -> Iterator;
+
+        /// \brief Fill matrix with given value.
+        void fill(const T& value);
+        /// \brief Zero the matrix.
+        virtual void zero() override;
+
+        /// \brief No operation on matrix.
+        auto operator+() const -> const BandedMatrix&;
+        /// \brief Negate matrix.
+        auto operator-() const -> BandedMatrix;
+        /// \brief Add two matrices together in place.
+        auto operator+=(const BandedMatrix& rhs) -> BandedMatrix&;
+        /// \brief Subtract a matrix from another in place.
+        auto operator-=(const BandedMatrix& rhs) -> BandedMatrix&;
+        /// \brief Multiply matrix by scalar in place.
+        auto operator*=(const T& k) -> BandedMatrix&;
+        /// \brief Divide matrix by scalar in place.
+        auto operator/=(const T& k) -> BandedMatrix&;
+
+        /// \brief Pointer to underlying data, for use with external libraries.
+        auto data() -> T*;
+        /// \brief Pointer to underlying data, for use with external libraries.
+        auto data() const -> const T*;
+        /// \brief Const reference to underlying Vector (column-major).
+        auto as_vector() const -> const Vector<T>&;
+
+        /// \brief Populate with data from a `std::string`. Noting that data
+        /// storage is assumed to be column-major, matrices stored as strings
+        /// will be assumed to be a transpose matrix.
+        virtual void operator<<(std::string data) override;
+        /// \brief Matrix serialisation to a string.
+        virtual auto as_string() const -> std::string override;
+
+    private:
+        /// \brief Maximum number of diagonals on either side of the leading
+        /// diagonal that are permitted to contain non-zero elements.
+        ///
+        /// In short, the interal storage takes the form of a dense matrix with
+        /// `num_columns()` columns and `1 + 3*#num_bands()` rows. Refer to the
+        /// <a href="http://www.netlib.org/lapack/lug/node124.html">LAPACK User
+        /// Guide</a> for further details about the band storage scheme.
+        std::size_t m_num_bands{0};
+        /// \brief Internal contiguous storage.
+        Vector<T> m_storage;
+};
+
+/// \relates BandedMatrix
+/// \brief Addition of two BandedMatrices.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator+(const BandedMatrix<T>& lhs, const BandedMatrix<U>& rhs)
+        -> BandedMatrix<R>;
+
+/// \relates BandedMatrix
+/// \brief Difference of two BandedMatrices.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator-(const BandedMatrix<T>& lhs, const BandedMatrix<U>& rhs)
+        -> BandedMatrix<R>;
+
+/// \relates BandedMatrix
+/// \brief Right-hand-side multiplication by vector.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator*(const BandedMatrix<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
+
+/// \relates BandedMatrix
+/// \brief Left-hand multiplication by scalar.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator*(const T& lhs, BandedMatrix<U>& rhs) -> BandedMatrix<R>;
+
+/// \relates BandedMatrix
+/// \brief Right-hand multiplication by scalar.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator*(const BandedMatrix<T>& lhs, const U& rhs) -> BandedMatrix<R>;
+
+/// \relates BandedMatrix
+/// \brief Division by a scalar.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator/(const BandedMatrix<T>& lhs, const U& rhs) -> BandedMatrix<R>;
+
+/// \relates BandedMatrix
+/// \brief Addition of two BandedMatrices.
+template <typename T>
+auto operator+(BandedMatrix<T> lhs, const BandedMatrix<T>& rhs)
+        -> BandedMatrix<T>;
+
+/// \relates BandedMatrix
+/// \brief Addition of two BandedMatrices.
+template <typename T>
+auto operator+(const BandedMatrix<T>& lhs, BandedMatrix<T>&& rhs)
+        -> BandedMatrix<T>;
+
+/// \relates BandedMatrix
+/// \brief Difference of two BandedMatrices.
+template <typename T>
+auto operator-(BandedMatrix<T> lhs, const BandedMatrix<T>& rhs)
+        -> BandedMatrix<T>;
+
+/// \relates BandedMatrix
+/// \brief Difference of two BandedMatrices.
+template <typename T>
+auto operator-(const BandedMatrix<T>& lhs, BandedMatrix<T>&& rhs)
+        -> BandedMatrix<T>;
+
+/// \relates BandedMatrix
+/// \brief Right-hand-side multiplication by vector.
+template <typename T>
+auto operator*(const BandedMatrix<T>& lhs, const Vector<T>& rhs) -> Vector<T>;
+
+/// \relates BandedMatrix
+/// \brief Left-hand multiplication by scalar.
+template <typename T>
+auto operator*(const T& lhs, BandedMatrix<T> rhs) -> BandedMatrix<T>;
+
+/// \relates BandedMatrix
+/// \brief Right-hand multiplication by scalar.
+template <typename T>
+auto operator*(BandedMatrix<T> lhs, const T& rhs) -> BandedMatrix<T>;
+
+/// \relates BandedMatrix
+/// \brief Division by a scalar.
+template <typename T>
+auto operator/(BandedMatrix<T> lhs, const T& rhs) -> BandedMatrix<T>;
+
+// ========================================================================
+// Implementation
+// ========================================================================
 
 /// Note that the internal storage takes the form of a dense matrix with
 /// `num_columns()` columns and `1 + 3*#num_bands()` rows.
@@ -350,6 +534,176 @@ inline auto BandedMatrix<T>::as_string() const -> std::string {
     }
 
     return oss.str();
+}
+
+/// \relates BandedMatrix
+/// \brief Addition of two BandedMatrices.
+template <typename T, typename U, typename R>
+inline auto operator+(const BandedMatrix<T>& lhs, const BandedMatrix<U>& rhs)
+        -> BandedMatrix<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        BandedMatrix<R> result{rhs};
+        result += lhs;
+        return result;
+    } else {
+        BandedMatrix<R> result{lhs};
+        result += rhs;
+        return result;
+    }
+}
+
+/// \relates BandedMatrix
+/// \brief Difference of two BandedMatrices.
+template <typename T, typename U, typename R>
+inline auto operator-(const BandedMatrix<T>& lhs, const BandedMatrix<U>& rhs)
+        -> BandedMatrix<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        BandedMatrix<R> result{rhs};
+        result *= R{-1};
+        result += lhs;
+        return result;
+    } else {
+        BandedMatrix<R> result{lhs};
+        result -= rhs;
+        return result;
+    }
+}
+
+/// \relates BandedMatrix
+/// \brief Right-hand-side multiplication by vector.
+template <typename T, typename U, typename R>
+inline auto operator*(const BandedMatrix<T>& lhs, const Vector<U>& rhs)
+        -> Vector<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        return lhs*Vector<R>{rhs};
+    } else {
+        return BandedMatrix<R>{lhs}*rhs;
+    }
+}
+
+/// \relates BandedMatrix
+/// \brief Left-hand multiplication by scalar.
+template <typename T, typename U, typename R>
+inline auto operator*(const T& lhs, BandedMatrix<U>& rhs) -> BandedMatrix<R> {
+    BandedMatrix<R> result{rhs};
+    result *= lhs;
+    return result;
+}
+
+/// \relates BandedMatrix
+/// \brief Right-hand multiplication by scalar.
+template <typename T, typename U, typename R>
+inline auto operator*(const BandedMatrix<T>& lhs, const U& rhs)
+        -> BandedMatrix<R> {
+    BandedMatrix<R> result{lhs};
+    result *= rhs;
+    return result;
+}
+
+/// \relates BandedMatrix
+/// \brief Division by a scalar.
+template <typename T, typename U, typename R>
+inline auto operator/(const BandedMatrix<T>& lhs, const U& rhs)
+        -> BandedMatrix<R> {
+    BandedMatrix<R> result{lhs};
+    result /= rhs;
+    return result;
+}
+
+/// \relates BandedMatrix
+/// \brief Addition of two BandedMatrices.
+///
+/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
+/// return. Also handles the case that lhs is given an rvalue (NRVO).
+template <typename T>
+inline auto operator+(BandedMatrix<T> lhs, const BandedMatrix<T>& rhs)
+        -> BandedMatrix<T> {
+    lhs += rhs;
+    return lhs;
+}
+
+/// \relates BandedMatrix
+/// \brief Addition of two BandedMatrices.
+///
+/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
+/// reference parameter (NRVO).
+template <typename T>
+inline auto operator+(const BandedMatrix<T>& lhs, BandedMatrix<T>&& rhs)
+        -> BandedMatrix<T> {
+    rhs += lhs;
+    return rhs;
+}
+
+/// \relates BandedMatrix
+/// \brief Difference of two BandedMatrices.
+///
+/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
+/// return. Also handles the case that lhs is given an rvalue (NRVO).
+template <typename T>
+inline auto operator-(BandedMatrix<T> lhs, const BandedMatrix<T>& rhs)
+        -> BandedMatrix<T> {
+    lhs -= rhs;
+    return lhs;
+}
+
+/// \relates BandedMatrix
+/// \brief Difference of two BandedMatrices.
+///
+/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
+/// reference parameter (NRVO).
+template <typename T>
+inline auto operator-(const BandedMatrix<T>& lhs, BandedMatrix<T>&& rhs)
+        -> BandedMatrix<T> {
+    rhs *= T{-1};
+    rhs += lhs;
+    return rhs;
+}
+
+/// \relates BandedMatrix
+/// \brief Right-hand-side multiplication by vector.
+template <typename T>
+inline auto operator*(const BandedMatrix<T>& lhs, const Vector<T>& rhs)
+        -> Vector<T> {
+#ifndef NDEBUG
+    if (lhs.num_columns() != rhs.size()) {
+        throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = {rhs.size(), 1}}};
+    }
+#endif  // NDEBUG
+
+    std::size_t N{lhs.num_rows()}, X{lhs.num_columns()};
+    Vector<T> result(N);
+    for (std::size_t i{0}; i < X; ++i) {
+        for (std::size_t row{0}; row < N; ++row) {
+            result[row] += lhs[row, i]*rhs[i];
+        }
+    }
+
+    return result;
+}
+
+/// \relates BandedMatrix
+/// \brief Left-hand multiplication by scalar.
+template <typename T>
+inline auto operator*(const T& lhs, BandedMatrix<T> rhs) -> BandedMatrix<T> {
+    rhs *= lhs;
+    return rhs;
+}
+
+/// \relates BandedMatrix
+/// \brief Right-hand multiplication by scalar.
+template <typename T>
+inline auto operator*(BandedMatrix<T> lhs, const T& rhs) -> BandedMatrix<T> {
+    lhs *= rhs;
+    return lhs;
+}
+
+/// \relates BandedMatrix
+/// \brief Division by a scalar.
+template <typename T>
+inline auto operator/(BandedMatrix<T> lhs, const T& rhs) -> BandedMatrix<T> {
+    lhs /= rhs;
+    return lhs;
 }
 }   // namespace jump
 
