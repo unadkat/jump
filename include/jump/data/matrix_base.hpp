@@ -18,6 +18,8 @@ class MatrixBase {
         MatrixBase(std::size_t size = 0);
         /// \brief Construct a general matrix with the given size.
         MatrixBase(std::size_t num_rows, std::size_t num_columns);
+        /// \brief Construct a general matrix with the given size.
+        MatrixBase(const std::pair<std::size_t, std::size_t>& size);
         /// \brief Virtual destructor for base class.
         virtual ~MatrixBase() = default;
 
@@ -76,6 +78,13 @@ inline MatrixBase<T>::MatrixBase(std::size_t num_rows,
         std::size_t num_columns) :
     m_num_rows{num_rows},
     m_num_columns{num_columns} {
+}
+
+template <typename T>
+inline MatrixBase<T>::MatrixBase(
+        const std::pair<std::size_t, std::size_t>& size) :
+    m_num_rows{size.first},
+    m_num_columns{size.second} {
 }
 
 template <typename T>

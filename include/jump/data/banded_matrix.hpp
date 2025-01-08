@@ -34,10 +34,9 @@ class BandedMatrix : public MatrixBase<T> {
         /// consistent size.
         BandedMatrix(std::size_t size, std::size_t num_bands,
                 Vector<T> underlying_data);
-
-        /// \brief Conversion operator to promote a real-valued `BandedMatrix`
-        /// to a complex-valued one.
-        operator BandedMatrix<Complex>() const;
+        /// \brief Templated copy constructor
+        template <typename U>
+        BandedMatrix(const BandedMatrix<U>& other);
 
         /// \brief Initialise matrix with the given size and number of
         /// off-leading diagonal diagonals.
@@ -229,13 +228,12 @@ inline BandedMatrix<T>::BandedMatrix(std::size_t size, std::size_t num_bands,
     }
 }
 
-/// Initialises a complex-valued `BandedMatrix` of the correct size and
-/// delegates conversion of elements to the underlying `Vector`.
-template <>
-inline BandedMatrix<Real>::operator BandedMatrix<Complex>() const {
-    BandedMatrix<Complex> result;
-    result.assign(num_rows(), num_bands(), m_storage);
-    return result;
+template <typename T>
+template <typename U>
+inline BandedMatrix<T>::BandedMatrix(const BandedMatrix<U>& other) :
+    MatrixBase<T>{other.size()},
+    m_num_bands{other.num_bands()} {
+    m_storage = other.as_vector();
 }
 
 /// Note that the internal storage takes the form of a dense matrix with
