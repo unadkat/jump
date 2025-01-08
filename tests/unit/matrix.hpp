@@ -450,6 +450,10 @@ inline auto test_matrix_arithmetic_basic() -> TestResult {
     auto diff_r = k1 - k2;
     auto sum_z = kz1 + kz2;
     auto diff_z = kz1 - kz2;
+    auto sum_zr = kz1 + k2;
+    auto sum_rz = k1 + kz2;
+    auto diff_zr = kz1 - k2;
+    auto diff_rz = k1 - kz2;
 
     {
         BandedMatrix<Real> Ar{size, 3}, Br{Ar};
@@ -468,9 +472,19 @@ inline auto test_matrix_arithmetic_basic() -> TestResult {
         result.add_check(approx((Ar - Br), ans_r), "subtract banded real");
 
         BandedMatrix<Complex> ans_z{size, 3};
+        ans_z.fill(sum_rz);
+        result.add_check(approx((Ar + Bz), ans_z), "add banded real-complex");
+        ans_z.fill(sum_zr);
+        result.add_check(approx((Az + Br), ans_z), "add banded complex-real");
         ans_z.fill(sum_z);
         result.add_check(approx((Az + Bz), ans_z), "add banded complex");
 
+        ans_z.fill(diff_rz);
+        result.add_check(approx((Ar - Bz), ans_z),
+                "subtract banded real-complex");
+        ans_z.fill(diff_zr);
+        result.add_check(approx((Az - Br), ans_z),
+                "subtract banded complex-real");
         ans_z.fill(diff_z);
         result.add_check(approx((Az - Bz), ans_z),
                 "subtract banded complex");
@@ -630,7 +644,6 @@ inline auto test_matrix_multiply() -> TestResult {
                 "dense complex matrix-matrix case 1");
     }
     {
-        // TODO: Real banded matrix multiplication by complex vector
         // (10x10 (3 bands)) x (10x1)
         Vector<Real> A_data{
              0.000,  0.000,  0.000,  0.000,  0.000,  0.000, -9.649,  5.705,
@@ -660,10 +673,9 @@ inline auto test_matrix_multiply() -> TestResult {
         BandedMatrix<Complex> Az{A};
         Vector<Complex> bz{b}, Abz{Ab};
 
-        result.add_check(approx(A*b, Ab),
-                "banded real matrix-vector case 1");
-//        result.add_check(vanishes(((A*bz) - Abz).L2_norm()),
-//                "banded real-complex matrix-vector case 1");
+        result.add_check(approx(A*b, Ab), "banded real matrix-vector case 1");
+        result.add_check(approx(A*bz, Abz),
+                "banded real-complex matrix-vector case 1");
         result.add_check(approx(Az*b, Abz),
                 "banded complex-real matrix-vector case 1");
     }
