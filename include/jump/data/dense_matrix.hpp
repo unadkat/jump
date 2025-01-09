@@ -5,18 +5,26 @@
 #ifndef JUMP_DENSE_MATRIX_HPP
 #define JUMP_DENSE_MATRIX_HPP
 
-#include "jump/data/dense_matrix_decl.hpp"
-
 #include "jump/autodiff/dual.hpp"
+#include "jump/data/matrix_base.hpp"
+#include "jump/data/vector.hpp"
+#include "jump/debug/error_data.hpp"
+#include "jump/debug/exception.hpp"
+#include "jump/utility/external.hpp"
+#include "jump/utility/types.hpp"
 
 #include <algorithm>
 #include <cmath>
 #include <format>
 #include <numeric>
 #include <sstream>
+#include <string>
+#include <utility>
 
 namespace jump {
-/// \class DenseMatrix
+/// \brief Stores all elements of a general \f$m\f$ by \f$n\f$ matrix, with
+/// common arithmetic operations enabled.
+///
 /// Implements the internal storage of a dense matrix by storing all elements of
 /// an \f$m\f$ by \f$n\f$ matrix as a contiguous `Vector` of length \f$nm\f$. In
 /// particular, the element in the matrix occupying row \f$i\f$th and column
@@ -29,12 +37,123 @@ namespace jump {
 /// simple default version is provided, but in the case of the preprocessor
 /// definition `JUMP_HAS_CBLAS` existing we instead use an appropriate CBLAS
 /// routine.
+template <typename T>
+class DenseMatrix : public MatrixBase<T> {
+    public:
+        /// \brief Iterator for algorithms.
+        using Iterator = typename Vector<T>::Iterator;
+        /// \brief Iterator for algorithms.
+        using ConstIterator = typename Vector<T>::ConstIterator;
 
-/// \var DenseMatrix::m_storage
-/// The internal storage for a dense matrix consists of a contiguous `Vector`
-/// containing `num_rows()*#num_columns()` elements. The matrix elements are
-/// stored in column-major format, so that the element at row `i` and column `j`
-/// appears at location `m_storage[j*num_rows() + i]`.
+        /// \brief Construct square matrix with the given size.
+        explicit DenseMatrix(std::size_t size = 0);
+        /// \brief Construct a general matrix with the given size.
+        DenseMatrix(std::size_t num_rows, std::size_t num_columns);
+        /// \brief Constuct a matrix with the given Vector data, specifying a
+        /// consistent size.
+        DenseMatrix(std::size_t num_rows, std::size_t num_columns,
+                Vector<T> underlying_data);
+
+        /// \brief Conversion operator to promote a real-valued `DenseMatrix`
+        /// to a complex-valued one.
+        operator DenseMatrix<Complex>() const;
+
+        /// \brief Initialise a square matrix with the given size.
+        void assign(std::size_t size);
+        /// \brief Initialise a general matrix with the given size.
+        void assign(std::size_t num_rows, std::size_t num_columns);
+        /// \brief Initialise a matrix with the given Vector data, specifying a
+        /// consistent size.
+        void assign(std::size_t num_rows, std::size_t num_columns,
+                Vector<T> underlying_data);
+        /// \brief Set matrix storage with the given Vector data, which must
+        /// match the existing container size.
+        void assign(Vector<T> underlying_data);
+        /// \brief Set data via a pair of iterators.
+        template <class InputIt>
+        void assign(InputIt first, InputIt last);
+        /// \brief Return size of internal storage.
+        auto num_elements() const -> std::size_t override;
+
+        /// \brief Defaulted spaceship operator.
+        auto operator<=>(const DenseMatrix&) const = default;
+
+        /// \brief Const element access.
+        auto operator[](std::size_t row, std::size_t column) const -> const T&;
+        /// \brief Mutable element access.
+        auto operator[](std::size_t row, std::size_t column) -> T&;
+
+        /// \brief Const iterator for algorithms.
+        auto begin() const -> ConstIterator;
+        /// \brief Const iterator for algorithms.
+        auto end() const -> ConstIterator;
+        /// \brief Iterator for algorithms.
+        auto begin() -> Iterator;
+        /// \brief Iterator for algorithms.
+        auto end() -> Iterator;
+        /// \brief Return iterators to extract/manipulate a column.
+        auto column_iterators(std::size_t column)
+                -> std::pair<Iterator, Iterator>;
+        /// \brief Return iterators to extract/manipulate a column.
+        auto column_iterators(std::size_t column) const
+                -> std::pair<ConstIterator, ConstIterator>;
+
+        /// \brief Fill matrix with given value.
+        void fill(const T& value);
+        /// \brief Zero the matrix.
+        virtual void zero() override;
+
+        /// \brief No operation on matrix.
+        auto operator+() const -> const DenseMatrix&;
+        /// \brief Negate matrix.
+        auto operator-() const -> DenseMatrix;
+        /// \brief Add two matrices together in place.
+        auto operator+=(const DenseMatrix& rhs) -> DenseMatrix&;
+        /// \brief Subtract a matrix from another in place.
+        auto operator-=(const DenseMatrix& rhs) -> DenseMatrix&;
+        /// \brief Multiply matrix by scalar in place.
+        auto operator*=(const T& k) -> DenseMatrix&;
+        /// \brief Multiply matrix by another in place
+        auto operator*=(const DenseMatrix& rhs) -> DenseMatrix&;
+        /// \brief Divide matrix by scalar in place.
+        auto operator/=(const T& k) -> DenseMatrix&;
+
+        /// \brief Return sum of element magnitudes in a column.
+        auto column_L1_norm(std::size_t column) const -> Real;
+        /// \brief Return Euclidean norm of a column.
+        auto column_L2_norm(std::size_t column) const -> Real;
+        /// \brief Return maximum magnitude over all elements in a column.
+        auto column_Linf_norm(std::size_t column) const -> Real;
+
+        /// \brief Pointer to underlying data, for use with external libraries.
+        auto data() -> T*;
+        /// \brief Pointer to underlying data, for use with external libraries.
+        auto data() const -> const T*;
+        /// \brief Const reference to underlying Vector (column-major).
+        auto as_vector() const -> const Vector<T>&;
+
+        /// \brief Populate with data from a `std::string`. Noting that data
+        /// storage is assumed to be column-major, matrices stored as strings
+        /// will be assumed to be a transpose matrix.
+        virtual void operator<<(std::string data) override;
+        /// \brief Matrix serialisation to a string.
+        virtual auto as_string() const -> std::string override;
+
+        /// \brief Return identity matrix of specified size.
+        static auto identity(std::size_t size) -> DenseMatrix;
+
+        #include "jump/data/dense_matrix_friends.hpp"
+
+    private:
+        /// \brief Internal contiguous storage.
+        ///
+        /// The internal storage for a dense matrix consists of a contiguous
+        /// `Vector` containing `num_rows()*#num_columns()` elements. The matrix
+        /// elements are stored in column-major format, so that the element at
+        /// row `i` and column `j` appears at location
+        /// `m_storage[j*num_rows() + i]`.
+        Vector<T> m_storage;
+};
 
 template <typename T>
 inline DenseMatrix<T>::DenseMatrix(std::size_t size) :
