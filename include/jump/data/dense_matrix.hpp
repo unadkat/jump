@@ -142,8 +142,6 @@ class DenseMatrix : public MatrixBase<T> {
         /// \brief Return identity matrix of specified size.
         static auto identity(std::size_t size) -> DenseMatrix;
 
-        #include "jump/data/dense_matrix_friends.hpp"
-
     private:
         /// \brief Internal contiguous storage.
         ///
@@ -154,6 +152,95 @@ class DenseMatrix : public MatrixBase<T> {
         /// `m_storage[j*num_rows() + i]`.
         Vector<T> m_storage;
 };
+
+/// \relates DenseMatrix
+/// \brief Addition of two DenseMatrices.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator+(const DenseMatrix<T>& lhs, const DenseMatrix<U>& rhs)
+        -> DenseMatrix<R>;
+
+/// \relates DenseMatrix
+/// \brief Difference of two DenseMatrices.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator-(const DenseMatrix<T>& lhs, const DenseMatrix<U>& rhs)
+        -> DenseMatrix<R>;
+
+/// \relates DenseMatrix
+/// \brief Right-hand-side multiplication by vector.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator*(const DenseMatrix<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
+
+/// \relates DenseMatrix
+/// \brief Left-hand multiplication by scalar.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator*(const T& lhs, const DenseMatrix<U>& rhs) -> DenseMatrix<R>;
+
+/// \relates DenseMatrix
+/// \brief Right-hand multiplication by scalar.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator*(const DenseMatrix<T>& lhs, const U& rhs) -> DenseMatrix<R>;
+
+/// \relates DenseMatrix
+/// \brief Multiplication of two DenseMatrices.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator*(const DenseMatrix<T>& lhs, const DenseMatrix<U>& rhs)
+        -> DenseMatrix<R>;
+
+/// \relates DenseMatrix
+/// \brief Division by a scalar.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator/(const DenseMatrix<T>& lhs, const U& rhs) -> DenseMatrix<R>;
+
+/// \relates DenseMatrix
+/// \brief Addition of two DenseMatrices.
+template <typename T>
+auto operator+(DenseMatrix<T> lhs, const DenseMatrix<T>& rhs) -> DenseMatrix<T>;
+
+/// \relates DenseMatrix
+/// \brief Addition of two DenseMatrices.
+template <typename T>
+auto operator+(const DenseMatrix<T>& lhs, DenseMatrix<T>&& rhs)
+        -> DenseMatrix<T>;
+
+/// \relates DenseMatrix
+/// \brief Difference of two DenseMatrices.
+template <typename T>
+auto operator-(DenseMatrix<T> lhs, const DenseMatrix<T>& rhs) -> DenseMatrix<T>;
+
+/// \relates DenseMatrix
+/// \brief Difference of two DenseMatrices.
+template <typename T>
+auto operator-(const DenseMatrix<T>& lhs, DenseMatrix<T>&& rhs)
+        -> DenseMatrix<T>;
+
+/// \relates DenseMatrix
+/// \brief Right-hand-side multiplication by vector.
+template <typename T>
+auto operator*(const DenseMatrix<T>& lhs, const Vector<T>& rhs) -> Vector<T>;
+
+/// \relates DenseMatrix
+/// \brief Left-hand multiplication by scalar.
+template <typename T>
+auto operator*(const T& lhs, DenseMatrix<T> rhs) -> DenseMatrix<T>;
+
+/// \relates DenseMatrix
+/// \brief Right-hand multiplication by scalar.
+template <typename T>
+auto operator*(DenseMatrix<T> lhs, const T& rhs) -> DenseMatrix<T>;
+
+/// \relates DenseMatrix
+/// \brief Multiplication of two DenseMatrices.
+template <typename T>
+auto operator*(DenseMatrix<T> lhs, const DenseMatrix<T>& rhs) -> DenseMatrix<T>;
+
+/// \relates DenseMatrix
+/// \brief Division by a scalar.
+template <typename T>
+auto operator/(DenseMatrix<T> lhs, const T& rhs) -> DenseMatrix<T>;
+
+// ========================================================================
+// Implementation
+// ========================================================================
 
 template <typename T>
 inline DenseMatrix<T>::DenseMatrix(std::size_t size) :
@@ -544,6 +631,213 @@ inline auto DenseMatrix<T>::identity(std::size_t size) -> DenseMatrix {
     return I;
 }
 
+/// \relates DenseMatrix
+/// \brief Addition of two DenseMatrices.
+template <typename T, typename U, typename R>
+inline auto operator+(const DenseMatrix<T>& lhs, const DenseMatrix<U>& rhs)
+        -> DenseMatrix<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        DenseMatrix<R> result{rhs};
+        result += lhs;
+        return result;
+    } else {
+        DenseMatrix<R> result{lhs};
+        result += rhs;
+        return result;
+    }
+}
+
+/// \relates DenseMatrix
+/// \brief Difference of two DenseMatrices.
+template <typename T, typename U, typename R>
+inline auto operator-(const DenseMatrix<T>& lhs, const DenseMatrix<U>& rhs)
+        -> DenseMatrix<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        DenseMatrix<R> result{rhs};
+        result *= R{-1};
+        result += lhs;
+        return result;
+    } else {
+        DenseMatrix<R> result{lhs};
+        result -= rhs;
+        return result;
+    }
+}
+
+/// \relates DenseMatrix
+/// \brief Right-hand-side multiplication by vector.
+template <typename T, typename U, typename R>
+inline auto operator*(const DenseMatrix<T>& lhs, const Vector<U>& rhs)
+        -> Vector<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        return lhs*Vector<R>{rhs};
+    } else {
+        return DenseMatrix<R>{lhs}*rhs;
+    }
+}
+
+/// \relates DenseMatrix
+/// \brief Left-hand multiplication by scalar.
+template <typename T, typename U, typename R>
+inline auto operator*(const T& lhs, const DenseMatrix<U>& rhs)
+        -> DenseMatrix<R> {
+    DenseMatrix<R> result{rhs};
+    result *= lhs;
+    return result;
+}
+
+/// \relates DenseMatrix
+/// \brief Right-hand multiplication by scalar.
+template <typename T, typename U, typename R>
+inline auto operator*(const DenseMatrix<T>& lhs, const U& rhs)
+        -> DenseMatrix<R> {
+    DenseMatrix<R> result{lhs};
+    result *= rhs;
+    return result;
+}
+
+/// \relates DenseMatrix
+/// \brief Multiplication of two DenseMatrices.
+template <typename T, typename U, typename R>
+inline auto operator*(const DenseMatrix<T>& lhs, const DenseMatrix<U>& rhs)
+        -> DenseMatrix<R> {
+#ifndef NDEBUG
+    if (lhs.num_columns() != rhs.num_rows()) {
+        throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    // TODO: ranges
+    std::size_t N{lhs.num_rows()}, M{rhs.num_columns()};
+    std::size_t X{lhs.num_columns()};
+    DenseMatrix<R> result{N, M};
+    for (std::size_t col{0}; col < M; ++col) {
+        for (std::size_t row{0}; row < N; ++row) {
+            for (std::size_t i{0}; i < X; ++i) {
+                result[row, col] += lhs[row, i]*rhs[i, col];
+            }
+        }
+    }
+
+    return result;
+}
+
+/// \relates DenseMatrix
+/// \brief Division by a scalar.
+template <typename T, typename U, typename R>
+inline auto operator/(const DenseMatrix<T>& lhs, const U& rhs)
+        -> DenseMatrix<R> {
+    DenseMatrix<R> result{lhs};
+    result /= rhs;
+    return result;
+}
+
+/// \relates DenseMatrix
+/// \brief Addition of two DenseMatrices.
+///
+/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
+/// return. Also handles the case that lhs is given an rvalue (NRVO).
+template <typename T>
+inline auto operator+(DenseMatrix<T> lhs, const DenseMatrix<T>& rhs)
+        -> DenseMatrix<T> {
+    lhs += rhs;
+    return lhs;
+}
+
+/// \relates DenseMatrix
+/// \brief Addition of two DenseMatrices.
+///
+/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
+/// reference parameter (NRVO).
+template <typename T>
+inline auto operator+(const DenseMatrix<T>& lhs, DenseMatrix<T>&& rhs)
+        -> DenseMatrix<T> {
+    rhs += lhs;
+    return rhs;
+}
+
+/// \relates DenseMatrix
+/// \brief Difference of two DenseMatrices.
+///
+/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
+/// return. Also handles the case that lhs is given an rvalue (NRVO).
+template <typename T>
+inline auto operator-(DenseMatrix<T> lhs, const DenseMatrix<T>& rhs)
+        -> DenseMatrix<T> {
+    lhs -= rhs;
+    return lhs;
+}
+
+/// \relates DenseMatrix
+/// \brief Difference of two DenseMatrices.
+///
+/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
+/// reference parameter (NRVO).
+template <typename T>
+inline auto operator-(const DenseMatrix<T>& lhs, DenseMatrix<T>&& rhs)
+        -> DenseMatrix<T> {
+    rhs *= T{-1};
+    rhs += lhs;
+    return rhs;
+}
+
+/// \relates DenseMatrix
+/// \brief Right-hand-side multiplication by vector.
+template <typename T>
+inline auto operator*(const DenseMatrix<T>& lhs, const Vector<T>& rhs)
+        -> Vector<T> {
+#ifndef NDEBUG
+    if (lhs.num_columns() != rhs.size()) {
+        throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = {rhs.size(), 1}}};
+    }
+#endif  // NDEBUG
+
+    std::size_t N{lhs.num_rows()}, X{lhs.num_columns()};
+    Vector<T> result(N);
+    for (std::size_t i{0}; i < X; ++i) {
+        for (std::size_t row{0}; row < N; ++row) {
+            result[row] += lhs[row, i]*rhs[i];
+        }
+    }
+
+    return result;
+}
+
+/// \relates DenseMatrix
+/// \brief Left-hand multiplication by scalar.
+template <typename T>
+inline auto operator*(const T& lhs, DenseMatrix<T> rhs) -> DenseMatrix<T> {
+    rhs *= lhs;
+    return rhs;
+}
+
+/// \relates DenseMatrix
+/// \brief Right-hand multiplication by scalar.
+template <typename T>
+inline auto operator*(DenseMatrix<T> lhs, const T& rhs) -> DenseMatrix<T> {
+    lhs *= rhs;
+    return lhs;
+}
+
+/// \relates DenseMatrix
+/// \brief Multiplication of two DenseMatrices.
+template <typename T>
+inline auto operator*(DenseMatrix<T> lhs, const DenseMatrix<T>& rhs)
+        -> DenseMatrix<T> {
+    lhs *= rhs;
+    return lhs;
+}
+
+/// \relates DenseMatrix
+/// \brief Division by a scalar.
+template <typename T>
+inline auto operator/(DenseMatrix<T> lhs, const T& rhs) -> DenseMatrix<T> {
+    lhs /= rhs;
+    return lhs;
+}
+
 // ========================================================================
 // CBLAS
 // ========================================================================
@@ -575,7 +869,7 @@ inline auto DenseMatrix<Real>::operator*=(const DenseMatrix<Real>& rhs)
 /// CBLAS.
 template <>
 inline auto DenseMatrix<Complex>::operator*=(const DenseMatrix<Complex>& rhs)
-        -> DenseMatrix<Complex>& {
+        -> DenseMatrix& {
 #ifndef NDEBUG
     if (this->num_columns() != rhs.num_rows()) {
         throw RuntimeError{Mismatch2DError{.size1 = this->size(),
@@ -665,6 +959,47 @@ inline auto DenseMatrix<Complex>::column_L2_norm(std::size_t column) const
     // between elements)
     return cblas_dznrm2(this->m_num_rows,
             &(*(m_storage.begin() + this->m_num_rows*column)), 1);
+}
+
+/// \relates DenseMatrix
+/// \brief Specialisation of multiplication of a real `DenseMatrix` by a real
+/// Vector, using CBLAS.
+inline auto operator*(const DenseMatrix<Real>& lhs, const Vector<Real>& rhs)
+        -> Vector<Real> {
+#ifndef NDEBUG
+    if (lhs.num_columns() != rhs.size()) {
+        throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = {rhs.size(), 1}}};
+    }
+#endif  // NDEBUG
+
+    // Computes 1.*lhs*rhs + 0. (with a pointer shift of 1 between elements)
+    Vector<Real> result(lhs.num_rows());
+    cblas_dgemv(CblasColMajor, CblasNoTrans, lhs.num_rows(), lhs.num_columns(),
+            1., lhs.data(), lhs.num_rows(), rhs.data(), 1, 0., result.data(),
+            1);
+    return result;
+}
+
+/// \relates DenseMatrix
+/// \brief Specialisation of multiplication of a complex `DenseMatrix` by a
+/// complex Vector, using CBLAS.
+inline auto operator*(const DenseMatrix<Complex>& lhs,
+        const Vector<Complex>& rhs) -> Vector<Complex> {
+#ifndef NDEBUG
+    if (lhs.num_columns() != rhs.size()) {
+        throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = {rhs.size(), 1}}};
+    }
+#endif  // NDEBUG
+
+    // Computes 1.*lhs*rhs + 0. (with a pointer shift of 1 between elements)
+    Vector<Complex> result(lhs.num_rows());
+    Complex alpha{1.}, beta{0.};
+    cblas_zgemv(CblasColMajor, CblasNoTrans, lhs.num_rows(), lhs.num_columns(),
+            &alpha, lhs.data(), lhs.num_rows(), rhs.data(), 1, &beta,
+            result.data(), 1);
+    return result;
 }
 #endif  // JUMP_HAS_CBLAS
 }   // namespace jump

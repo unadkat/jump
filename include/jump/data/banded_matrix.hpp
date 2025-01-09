@@ -9,7 +9,6 @@
 #include "jump/data/vector.hpp"
 #include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
-#include "jump/utility/types.hpp"
 
 #include <format>
 #include <sstream>
