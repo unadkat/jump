@@ -19,6 +19,7 @@
 #include <numeric>
 #include <sstream>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 namespace jump {
@@ -53,10 +54,9 @@ class DenseMatrix : public MatrixBase<T> {
         /// consistent size.
         DenseMatrix(std::size_t num_rows, std::size_t num_columns,
                 Vector<T> underlying_data);
-
-        /// \brief Conversion operator to promote a real-valued `DenseMatrix`
-        /// to a complex-valued one.
-        operator DenseMatrix<Complex>() const;
+        /// \brief Templated copy constructor
+        template <typename U>
+        DenseMatrix(const DenseMatrix<U>& other);
 
         /// \brief Initialise a square matrix with the given size.
         void assign(std::size_t size);
@@ -272,13 +272,11 @@ inline DenseMatrix<T>::DenseMatrix(std::size_t num_rows,
     }
 }
 
-/// Initialises a complex-valued `DenseMatrix` of the correct size and delegates
-/// conversion of elements to the underlying `Vector`.
-template <>
-inline DenseMatrix<Real>::operator DenseMatrix<Complex>() const {
-    DenseMatrix<Complex> result;
-    result.assign(num_rows(), num_columns(), m_storage);
-    return result;
+template <typename T>
+template <typename U>
+inline DenseMatrix<T>::DenseMatrix(const DenseMatrix<U>& other) :
+    MatrixBase<T>{other.size()} {
+    m_storage = other.as_vector();
 }
 
 template <typename T>
