@@ -41,12 +41,21 @@ struct Vector {
     explicit Vector(std::size_t size = 0, const T& value = T{0});
     /// \brief Construct a `Vector` from a brace-enclosed list.
     Vector(std::initializer_list<T>&& list);
+    /// \brief Default copy constructor
+    Vector(const Vector& other) = default;
     /// \brief Templated copy constructor
     template <typename U>
     Vector(const Vector<U>& other);
     /// \brief Construct a `Vector` via a pair of iterators.
     template <typename InputIt>
     Vector(InputIt first, InputIt last);
+    /// \brief Default move constructor
+    Vector(Vector&& other) = default;
+
+    /// \brief Default copy assignment
+    auto operator=(const Vector& other) -> Vector& = default;
+    /// \brief Default move assignment
+    auto operator=(Vector&& other) -> Vector& = default;
 
     /// \brief Set size and fill with a given value.
     void assign(std::size_t size, const T& value = T{0});

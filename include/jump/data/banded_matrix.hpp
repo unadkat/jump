@@ -33,9 +33,18 @@ class BandedMatrix : public MatrixBase<T> {
         /// consistent size.
         BandedMatrix(std::size_t size, std::size_t num_bands,
                 Vector<T> underlying_data);
+        /// \brief Default copy constructor
+        BandedMatrix(const BandedMatrix& other) = default;
         /// \brief Templated copy constructor
         template <typename U>
         BandedMatrix(const BandedMatrix<U>& other);
+        /// \brief Default move constructor
+        BandedMatrix(BandedMatrix&& other) = default;
+
+        /// \brief Default copy assignment
+        auto operator=(const BandedMatrix& other) -> BandedMatrix& = default;
+        /// \brief Default move assignment
+        auto operator=(BandedMatrix&& other) -> BandedMatrix& = default;
 
         /// \brief Initialise matrix with the given size and number of
         /// off-leading diagonal diagonals.

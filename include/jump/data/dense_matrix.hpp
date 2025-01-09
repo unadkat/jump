@@ -54,9 +54,18 @@ class DenseMatrix : public MatrixBase<T> {
         /// consistent size.
         DenseMatrix(std::size_t num_rows, std::size_t num_columns,
                 Vector<T> underlying_data);
+        /// \brief Default copy constructor
+        DenseMatrix(const DenseMatrix& other) = default;
         /// \brief Templated copy constructor
         template <typename U>
         DenseMatrix(const DenseMatrix<U>& other);
+        /// \brief Default move constructor
+        DenseMatrix(DenseMatrix&& other) = default;
+
+        /// \brief Default copy assignment
+        auto operator=(const DenseMatrix& other) -> DenseMatrix& = default;
+        /// \brief Default move assignment
+        auto operator=(DenseMatrix&& other) -> DenseMatrix& = default;
 
         /// \brief Initialise a square matrix with the given size.
         void assign(std::size_t size);
