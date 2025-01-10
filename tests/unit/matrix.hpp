@@ -506,9 +506,19 @@ inline auto test_matrix_arithmetic_basic() -> TestResult {
         result.add_check(approx((Ar - Br), ans_r), "subtract dense real");
 
         DenseMatrix<Complex> ans_z{size, size2};
+        ans_z.fill(sum_rz);
+        result.add_check(approx((Ar + Bz), ans_z), "add dense real-complex");
+        ans_z.fill(sum_zr);
+        result.add_check(approx((Az + Br), ans_z), "add dense complex-real");
         ans_z.fill(sum_z);
         result.add_check(approx((Az + Bz), ans_z), "add dense complex");
 
+        ans_z.fill(diff_rz);
+        result.add_check(approx((Ar - Bz), ans_z),
+                "subtract dense real-complex");
+        ans_z.fill(diff_zr);
+        result.add_check(approx((Az - Br), ans_z),
+                "subtract dense complex-real");
         ans_z.fill(diff_z);
         result.add_check(approx((Az - Bz), ans_z),
                 "subtract dense complex");
@@ -589,7 +599,6 @@ inline auto test_matrix_multiply() -> TestResult {
                 "dense complex matrix-matrix case 1");
     }
     {
-        // TODO: Real dense matrix multiplication by complex vector
         // (5x6) x (6x1)
         Vector<Real> A_data{
             -6.495, 7.421, 2.715, -4.091, 4.558,
@@ -612,8 +621,8 @@ inline auto test_matrix_multiply() -> TestResult {
 
         result.add_check(approx(A*b, Ab),
                 "dense real matrix-vector case 1");
-//        result.add_check(vanishes(((A*bz) - Abz).L2_norm()),
-//                "dense real-complex matrix-vector case 1");
+        result.add_check(approx(A*bz, Abz),
+                "dense real-complex matrix-vector case 1");
         result.add_check(approx(Az*b, Abz),
                 "dense complex-real matrix-vector case 1");
     }
@@ -640,8 +649,7 @@ inline auto test_matrix_multiply() -> TestResult {
 
         DenseMatrix<Complex> A{7, 4, std::move(A_data)};
 
-        result.add_check(approx(A*b, Ab),
-                "dense complex matrix-matrix case 1");
+        result.add_check(approx(A*b, Ab), "dense complex matrix-vector case 1");
     }
     {
         // (10x10 (3 bands)) x (10x1)
