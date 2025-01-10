@@ -5,15 +5,213 @@
 #ifndef JUMP_DUAL_HPP
 #define JUMP_DUAL_HPP
 
-#include "jump/autodiff/dual_decl.hpp"
-
 #include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
+#include "jump/utility/types.hpp"
 #include "jump/utility/utility.hpp"
 
+#include <array>
 #include <cmath>
+#include <ostream>
 
 namespace jump {
+/// \brief An augmented number type that can be used to automatically
+/// differentiate numerical expressions in which it appears. Primarily used to
+/// effect an automatic linearisation of equation systems for an iterated
+/// solution process.
+template <std::size_t N, typename T>
+struct Dual {
+    /// \brief The value of the number (Real or Complex) to which dual
+    /// component(s) is/are added.
+    T value{0};
+    /// \brief The array of `N` distinct dual components of matching type to the
+    /// leading-order part (Real or Complex).
+    std::array<T, N> dual{};
+
+    /// \brief Construct a `Dual` with a given leading-order part and vanishing
+    /// dual components.
+    Dual(const T& x = T{0});
+    /// \brief Construct a `Dual` with given leading-order and dual parts.
+    Dual(const T& x, const std::array<T, N>& d);
+    /// \brief Construct a `Dual` with a given leading-order part and a single
+    /// non-zero dual part.
+    Dual(const T& x, std::size_t index, const T& d = T{1});
+    /// \brief Default copy constructor
+    Dual(const Dual& other) = default;
+    /// \brief Templated copy constructor
+    template <typename U>
+    Dual(const Dual<N, U>& other);
+    /// \brief Default move constructor
+    Dual(Dual&& other) = default;
+
+    /// \brief Default copy assignment
+    auto operator=(const Dual& other) -> Dual& = default;
+    /// \brief Default move assignment
+    auto operator=(Dual&& other) -> Dual& = default;
+
+    /// \brief Defaulted spaceship operator.
+    auto operator<=>(const Dual&) const = default;
+
+    /// \brief No operation on `Dual`.
+    auto operator+() const -> Dual;
+    /// \brief Negate `Dual`.
+    auto operator-() const -> Dual;
+    /// \brief Add one `Dual` to another in place.
+    auto operator+=(const Dual& rhs) -> Dual&;
+    /// \brief Subtract one `Dual` from another in place.
+    auto operator-=(const Dual& rhs) -> Dual&;
+    /// \brief Multiply one `Dual` by another in place.
+    auto operator*=(const Dual& rhs) -> Dual&;
+    /// \brief Divide one `Dual` by another in place.
+    auto operator/=(const Dual& rhs) -> Dual&;
+};
+
+/// \relates Jump::Dual
+template <std::size_t N, typename T>
+auto operator<<(std::ostream& out, const Dual<N, T>& rhs) -> std::ostream&;
+
+// ========================================================================
+// Arithmetic
+// ========================================================================
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto operator+(Dual<N, T> lhs, const Dual<N, T>& rhs) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto operator+(const Dual<N, T>& lhs, Dual<N, T>&& rhs) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto operator-(Dual<N, T> lhs, const Dual<N, T>& rhs) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto operator-(const Dual<N, T>& lhs, Dual<N, T>&& rhs) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto operator*(Dual<N, T> lhs, const Dual<N, T>& rhs) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto operator*(const Dual<N, T>& lhs, Dual<N, T>&& rhs) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto operator/(Dual<N, T> lhs, const Dual<N, T>& rhs) -> Dual<N, T>;
+
+// ========================================================================
+// Exponentiation
+// ========================================================================
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto exp(Dual<N, T> x) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto log(Dual<N, T> x) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto pow(Dual<N, T> x, Dual<N, T> p) -> Dual<N, T>;
+
+// ========================================================================
+// Trigonometry
+// ========================================================================
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto sin(Dual<N, T> x) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto cos(Dual<N, T> x) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto tan(Dual<N, T> x) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto asin(Dual<N, T> x) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto acos(Dual<N, T> x) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto atan(Dual<N, T> x) -> Dual<N, T>;
+
+// ========================================================================
+// Hyperbolics
+// ========================================================================
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto sinh(Dual<N, T> x) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto cosh(Dual<N, T> x) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto tanh(Dual<N, T> x) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto asinh(Dual<N, T> x) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto acosh(Dual<N, T> x) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto atanh(Dual<N, T> x) -> Dual<N, T>;
+
+// ========================================================================
+// Miscellaneous
+// ========================================================================
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto abs(Dual<N, T> x) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T>
+auto sgn(Dual<N, T> x) -> Dual<N, T>;
+
+// ========================================================================
+// Type traits and aliases
+// ========================================================================
+
+template <typename>
+struct is_dual : public std::false_type {
+};
+
+template <std::size_t N, typename T>
+struct is_dual<Dual<N, T>> : public std::true_type {
+};
+
+template <typename T>
+inline constexpr bool is_dual_v = is_dual<T>::value;
+
+using d1f64 = Dual<1, Real>;
+using d2f64 = Dual<2, Real>;
+using d3f64 = Dual<3, Real>;
+using d1z64 = Dual<1, Complex>;
+using d2z64 = Dual<2, Complex>;
+using d3z64 = Dual<3, Complex>;
+
+// ========================================================================
+// Implementation
+// ========================================================================
+
 /// \class Dual
 /// Denote a dual number (with a single dual component) as
 /// \f$\h{x}=x+x'\epsilon\f$, where \f$x\f$ is the leading-order part and
@@ -174,18 +372,11 @@ inline Dual<N, T>::Dual(const T& x, std::size_t index, const T& d) :
     dual[index] = d;
 }
 
-/// \brief Conversion operator to promote a real-valued `Dual` to a
-/// complex-valued one.
-///
-/// Initialises a complex-valued `Dual` using explicit conversion of Real to
-/// Complex types.
 template <std::size_t N, typename T>
-inline Dual<N, T>::operator Dual<N, Complex>() const {
-    Dual<N, Complex> result{value};
-    for (std::size_t i{0}; i < N; ++i) {
-        result.dual[i] = Complex{dual[i]};
-    }
-    return result;
+template <typename U>
+inline Dual<N, T>::Dual(const Dual<N, U>& other) :
+    value{other.value},
+    dual{other.dual} {
 }
 
 template <std::size_t N, typename T>
@@ -265,8 +456,9 @@ inline auto Dual<N, T>::operator/=(const Dual<N, T>& rhs) -> Dual& {
 }
 
 /// \relates Jump::Dual
-template <std::size_t N, typename T, typename Os>
-inline auto operator<<(Os& out, const Dual<N, T>& rhs) -> Os& {
+template <std::size_t N, typename T>
+inline auto operator<<(std::ostream& out, const Dual<N, T>& rhs)
+        -> std::ostream& {
     out << "(" << rhs.value << ", {";
     if constexpr (N > 0) {
         out << rhs.dual[0];
@@ -277,6 +469,60 @@ inline auto operator<<(Os& out, const Dual<N, T>& rhs) -> Os& {
         }
     }
     return out << "})";
+}
+
+// ========================================================================
+// Arithmetic
+// ========================================================================
+
+/// \relates Dual
+template <std::size_t N, typename T>
+inline auto operator+(Dual<N, T> lhs, const Dual<N, T>& rhs) -> Dual<N, T> {
+    lhs += rhs;
+    return lhs;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T>
+inline auto operator+(const Dual<N, T>& lhs, Dual<N, T>&& rhs) -> Dual<N, T> {
+    rhs += lhs;
+    return rhs;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T>
+inline auto operator-(Dual<N, T> lhs, const Dual<N, T>& rhs) -> Dual<N, T> {
+    lhs -= rhs;
+    return lhs;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T>
+inline auto operator-(const Dual<N, T>& lhs, Dual<N, T>&& rhs) -> Dual<N, T> {
+    rhs *= T{-1};
+    rhs += lhs;
+    return rhs;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T>
+inline auto operator*(Dual<N, T> lhs, const Dual<N, T>& rhs) -> Dual<N, T> {
+    lhs *= rhs;
+    return lhs;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T>
+inline auto operator*(const Dual<N, T>& lhs, Dual<N, T>&& rhs) -> Dual<N, T> {
+    rhs *= lhs;
+    return rhs;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T>
+inline auto operator/(Dual<N, T> lhs, const Dual<N, T>& rhs) -> Dual<N, T> {
+    lhs /= rhs;
+    return lhs;
 }
 
 // ========================================================================
