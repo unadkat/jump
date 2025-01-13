@@ -22,20 +22,25 @@ struct Eigendatum {
 };
 
 /// \brief Combine separate eigenvalue/eigenvector data from external solvers
-/// into a single vector.
+/// into a single vector. Data is copied so source is unaffected.
 template <typename T>
-auto combine_eigendata(const std::vector<T>& eigenvalues,
+auto copy_eigendata(const std::vector<T>& eigenvalues,
         const std::vector<Vector<T>>& eigenvectors)
         -> std::vector<Eigendatum<T>>;
+/// \brief Combine separate eigenvalue/eigenvector data from external solvers
+/// into a single vector. Data is moved from source which thus invalidated.
+template <typename T>
+auto move_eigendata(const std::vector<T>& eigenvalues,
+        std::vector<Vector<T>>&& eigenvectors)
+        -> std::vector<Eigendatum<T>>;
+
 
 /// \brief Predicate for sorting eigendata by real part of associated
 /// eigenvalue.
-auto sort_eigendata_real(const Complex& lhs, const Complex& rhs)
-        -> bool;
+auto sort_eigendata_real(const Complex& lhs, const Complex& rhs) -> bool;
 /// \brief Predicate for sorting eigendata by imaginary part of associated
 /// eigenvalue.
-auto sort_eigendata_imag(const Complex& lhs, const Complex& rhs)
-        -> bool;
+auto sort_eigendata_imag(const Complex& lhs, const Complex& rhs) -> bool;
 }   // namespace jump
 
 #endif  // JUMP_EIGENDATA_HPP

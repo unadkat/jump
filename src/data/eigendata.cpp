@@ -12,7 +12,7 @@ namespace jump {
 /// left unsorted with respect to the eigenvalues. It is up to the user to sort
 /// the data as required for their purposes.
 template <typename T>
-auto combine_eigendata(const std::vector<T>& eigenvalues,
+auto copy_eigendata(const std::vector<T>& eigenvalues,
         const std::vector<Vector<T>>& eigenvectors)
         -> std::vector<Eigendatum<T>> {
 #ifndef NDEBUG
@@ -23,9 +23,33 @@ auto combine_eigendata(const std::vector<T>& eigenvalues,
 #endif  // NDEBUG
 
     // TODO: rewrite when std::ranges::to is available to convert from view
-    std::vector<Eigendatum<T>> result;
-    for (std::size_t i{0}, size{eigenvalues.size()}; i < size; ++i) {
-        result.push_back(Eigendatum<T>{eigenvalues[i], eigenvectors[i]});
+    std::vector<Eigendatum<T>> result(eigenvalues.size());
+    for (std::size_t i{0}; i < result.size(); ++i) {
+        result[i].value = eigenvalues[i];
+        result[i].vector = eigenvectors[i];
+    }
+    return result;
+}
+
+/// After the population with the new eigenvalue/eigenvector pairs, the data is
+/// left unsorted with respect to the eigenvalues. It is up to the user to sort
+/// the data as required for their purposes.
+template <typename T>
+auto move_eigendata(const std::vector<T>& eigenvalues,
+        std::vector<Vector<T>>&& eigenvectors)
+        -> std::vector<Eigendatum<T>> {
+#ifndef NDEBUG
+    if (eigenvalues.size() != eigenvectors.size())
+        throw RuntimeError{Mismatch1DError{.name1 = "eigenvalues",
+            .size1 = eigenvalues.size(), .name2 = "eigenvectors",
+            .size2 = eigenvectors.size()}};
+#endif  // NDEBUG
+
+    // TODO: rewrite when std::ranges::to is available to convert from view
+    std::vector<Eigendatum<T>> result(eigenvalues.size());
+    for (std::size_t i{0}; i < result.size(); ++i) {
+        result[i].value = eigenvalues[i];
+        result[i].vector = std::move(eigenvectors[i]);
     }
     return result;
 }
@@ -33,8 +57,7 @@ auto combine_eigendata(const std::vector<T>& eigenvalues,
 /// If Re(w) < Re(z), or Re(w) = Re(z) and Im(w) < Im(z), we assert that w < z.
 /// This sets up a strict weak ordering in line with the requirements for
 /// `std::sort`.
-auto sort_eigendata_real(const Complex& lhs, const Complex& rhs)
-        -> bool {
+auto sort_eigendata_real(const Complex& lhs, const Complex& rhs) -> bool {
     return lhs.real() < rhs.real() ? true :
         (lhs.real() == rhs.real() ? lhs.imag() < rhs.imag() : false);
 }
@@ -42,8 +65,7 @@ auto sort_eigendata_real(const Complex& lhs, const Complex& rhs)
 /// If Im(w) < Im(z), or Im(w) = Im(z) and Re(w) < Re(z), we assert that w < z.
 /// This sets up a strict weak ordering in line with the requirements for
 /// `std::sort`.
-auto sort_eigendata_imag(const Complex& lhs, const Complex& rhs)
-        -> bool {
+auto sort_eigendata_imag(const Complex& lhs, const Complex& rhs) -> bool {
     return lhs.imag() < rhs.imag() ? true :
         (lhs.imag() == rhs.imag() ? lhs.real() < rhs.real() : false);
 }
@@ -54,9 +76,11 @@ auto sort_eigendata_imag(const Complex& lhs, const Complex& rhs)
 
 template struct Eigendatum<Complex>;
 
-template auto combine_eigendata<Complex>(
-        const std::vector<Complex>& eigenvalues,
+template auto copy_eigendata<Complex>(const std::vector<Complex>& eigenvalues,
         const std::vector<Vector<Complex>>& eigenvectors)
+        -> std::vector<Eigendatum<Complex>>;
+template auto move_eigendata<Complex>(const std::vector<Complex>& eigenvalues,
+        std::vector<Vector<Complex>>&& eigenvectors)
         -> std::vector<Eigendatum<Complex>>;
 }   // namespace jump
 
