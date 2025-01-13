@@ -11,7 +11,6 @@
 #include <algorithm>
 #include <functional>
 #include <string>
-#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -21,8 +20,7 @@ class AtomicTest {
         /// \brief Constructor for an atomic test requires name and tags to be
         /// supplied at the same time as the function, to keep all information
         /// local to the implementation.
-        AtomicTest(std::string_view name,
-                const std::function<TestResult()>& func,
+        AtomicTest(std::string name, const std::function<TestResult()>& func,
                 std::vector<std::string> tags = {});
 
         /// \brief Run the test case and return the result directly.
@@ -47,13 +45,15 @@ class Test {
     public:
         /// \brief Constructor for a test unit requires name and tags to be
         /// supplied at the outset, to keep all information local.
-        Test(std::string_view name, std::vector<std::string> tags = {});
+        Test(std::string name, std::vector<std::string> tags = {});
 
         /// \brief Register a single atomic test to be run with this test unit.
-        void register_item(AtomicTest test);
+        void register_item(const AtomicTest& test);
+        /// \brief Register a single atomic test to be run with this test unit.
+        void register_item(AtomicTest&& test);
         /// \brief Register a collection of atomic tests to be run with this
         /// test unit.
-        void register_items(std::vector<AtomicTest> tests);
+        void register_items(const std::vector<AtomicTest>& tests);
         /// \brief Run registered tests, skipping any whose name or tags
         /// intersects with the supplied skip_tags list.
         auto run(const std::vector<std::string>& skip_tags = {}) const
@@ -81,23 +81,25 @@ class TestSuite {
     public:
         /// \brief Constructor for a test suite requires name to be supplied at
         /// the outset, to keep all information local.
-        TestSuite(std::string_view name, std::vector<std::string> tags = {});
+        TestSuite(std::string name, std::vector<std::string> tags = {});
         /// \brief Constructor for a test suite requires name to be supplied at
         /// the outset, to keep all information local. Deduce test suite level
         /// by passed argument.
-        TestSuite(std::string_view name, T test,
+        TestSuite(std::string name, const T& test,
                 std::vector<std::string> tags = {});
         /// \brief Constructor for a test suite requires name to be supplied at
         /// the outset, to keep all information local. Deduce test suite level
         /// by passed argument.
-        TestSuite(std::string_view name, std::vector<T> tests,
+        TestSuite(std::string name, std::vector<T> tests,
                 std::vector<std::string> tags = {});
 
         /// \brief Register a test unit to be run with this test suite.
-        void register_item(T test);
+        void register_item(const T& test);
+        /// \brief Register a test unit to be run with this test suite.
+        void register_item(T&& test);
         /// \brief Register a collection of test units to be run with this test
         /// suite.
-        void register_items(std::vector<T> tests);
+        void register_items(const std::vector<T>& tests);
         /// \brief Run registered tests, skipping any whose name or tags
         /// intersects with the supplied skip_tags list. Forward this list on
         /// when running a valid test so that subtests can be further filtered.
@@ -126,41 +128,45 @@ class TestSuite {
 // ========================================================================
 
 template <typename T>
-inline TestSuite<T>::TestSuite(std::string_view name,
+inline TestSuite<T>::TestSuite(std::string name,
         std::vector<std::string> tags) :
-    m_name{name},
+    m_name{std::move(name)},
     m_tags{std::move(tags)} {
     std::ranges::sort(m_tags);
 }
 
 template <typename T>
-inline TestSuite<T>::TestSuite(std::string_view name, T test,
+inline TestSuite<T>::TestSuite(std::string name, const T& test,
         std::vector<std::string> tags) :
-    m_name{name},
+    m_name{std::move(name)},
     m_tags{std::move(tags)} {
     std::ranges::sort(m_tags);
     register_item(test);
 }
 
 template <typename T>
-inline TestSuite<T>::TestSuite(std::string_view name, std::vector<T> tests,
+inline TestSuite<T>::TestSuite(std::string name, std::vector<T> tests,
         std::vector<std::string> tags) :
-    m_name{name},
+    m_name{std::move(name)},
     m_tags{std::move(tags)} {
     std::ranges::sort(m_tags);
     register_items(tests);
 }
 
 template <typename T>
-inline void TestSuite<T>::register_item(T test) {
+inline void TestSuite<T>::register_item(const T& test) {
+    m_tests.push_back(test);
+}
+
+template <typename T>
+inline void TestSuite<T>::register_item(T&& test) {
     m_tests.push_back(std::move(test));
 }
 
 template <typename T>
-inline void TestSuite<T>::register_items(std::vector<T> tests) {
-    for (auto& test : tests) {
-        register_item(std::move(test));
-    }
+inline void TestSuite<T>::register_items(const std::vector<T>& tests) {
+    // TODO: std::vector::insert_range
+    m_tests.insert(m_tests.end(), tests.begin(), tests.end());
 }
 
 template <typename T>

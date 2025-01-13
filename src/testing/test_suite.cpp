@@ -7,10 +7,10 @@
 #include <exception>
 
 namespace jump {
-AtomicTest::AtomicTest(std::string_view name,
+AtomicTest::AtomicTest(std::string name,
         const std::function<TestResult()>& func,
         std::vector<std::string> tags) :
-    m_name{name},
+    m_name{std::move(name)},
     m_tags{std::move(tags)},
     m_func{func} {
     std::ranges::sort(m_tags);
@@ -30,20 +30,23 @@ auto AtomicTest::tags() const -> const std::vector<std::string>& {
     return m_tags;
 }
 
-Test::Test(std::string_view name, std::vector<std::string> tags) :
-    m_name{name},
+Test::Test(std::string name, std::vector<std::string> tags) :
+    m_name{std::move(name)},
     m_tags{std::move(tags)} {
     std::ranges::sort(m_tags);
 }
 
-void Test::register_item(AtomicTest test) {
+void Test::register_item(const AtomicTest& test) {
+    m_atomic_tests.push_back(test);
+}
+
+void Test::register_item(AtomicTest&& test) {
     m_atomic_tests.push_back(std::move(test));
 }
 
-void Test::register_items(std::vector<AtomicTest> tests) {
-    for (auto& test: tests) {
-        register_item(std::move(test));
-    }
+void Test::register_items(const std::vector<AtomicTest>& tests) {
+    // TODO: std::vector::insert_range
+    m_atomic_tests.insert(m_atomic_tests.end(), tests.begin(), tests.end());
 }
 
 auto Test::run(const std::vector<std::string>& skip_tags) const
