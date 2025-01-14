@@ -292,7 +292,7 @@ inline void BandedMatrix<T>::assign(InputIt first, InputIt last) {
     }
 #endif  // NDEBUG
 
-    m_storage.assign(std::move(first), std::move(last));
+    m_storage.assign(first, last);
 }
 
 template <typename T>
