@@ -388,11 +388,12 @@ inline auto Dual<N, T>::operator+() const -> Dual {
 /// \f$-\h{x}=-x-\sum_{k=0}^{N-1}p'_k\epsilon_k\f$.
 template <std::size_t N, typename T>
 inline auto Dual<N, T>::operator-() const -> Dual {
-    std::array<T, N> temp{dual};
-    for (auto& x : temp) {
+    auto result{*this};
+    result.value *= T{-1};
+    for (auto& x : result.dual) {
         x *= T{-1};
     }
-    return {-value, temp};
+    return result;
 }
 
 /// Writing \f$\h{x}=x+\sum_{k=0}^{N-1}p'_k\epsilon_k\f$ and
