@@ -1,13 +1,14 @@
-set(all_test_sources
-    jump_tests.cpp
-)
+if (BUILD_TESTING)
+    set(all_test_sources
+        jump_tests.cpp
+    )
 
-add_custom_target(tests)
-foreach(test_source ${all_test_sources})
-    # Cut off the file extension and directory path
-    get_filename_component(test_name ${test_source} NAME_WE)
-    add_executable(${test_name} ${test_source})
-    target_link_libraries(${test_name} PUBLIC jump)
-    add_dependencies(tests ${test_name})
-endforeach(test_source ${all_test_sources})
+    foreach(test_source ${all_test_sources})
+        # Cut off the file extension and directory path
+        get_filename_component(test_name ${test_source} NAME_WE)
+        add_executable(${test_name} ${test_source})
+        target_link_libraries(${test_name} PUBLIC jump)
+    endforeach(test_source ${all_test_sources})
 
+    add_test(NAME ${test_name} COMMAND ${test_name})
+endif()
