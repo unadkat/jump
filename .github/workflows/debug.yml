@@ -22,8 +22,8 @@ jobs:
     steps:
     - name: Install dependencies
       run: |
-        sudo apt-get install -y libblas3
-        sudo apt-get install -y liblapacke
+        sudo apt-get install -y libblas-dev
+        sudo apt-get install -y liblapacke-dev
 
     - name: Checkout files
       uses: actions/checkout@v4
