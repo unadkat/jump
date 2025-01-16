@@ -7,7 +7,8 @@ if (BUILD_TESTING)
         # Cut off the file extension and directory path
         get_filename_component(test_name ${test_source} NAME_WE)
         add_executable(${test_name} ${test_source})
-        target_link_libraries(${test_name} PUBLIC jump)
+        target_compile_options(${test_name} PRIVATE -Wall -Wextra -Wpedantic)
+        target_link_libraries(${test_name} PRIVATE jump)
     endforeach(test_source ${all_test_sources})
 
     add_test(NAME ${test_name} COMMAND ${test_name})
