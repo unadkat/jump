@@ -3,9 +3,12 @@
 A C++ library with some basic utilities and some generally useful mathematical
 and numerical facilities/interfaces.
 
-## External libraries
+![Debug workflow](https://github.com/unadkat/jump/actions/workflows/debug.yml/badge.svg)
+![Release workflow](https://github.com/unadkat/jump/actions/workflows/release.yml/badge.svg)
 
-This software (optionally) uses the following external libraries:
+## Third-party libraries
+
+This software (optionally) uses the following third-party libraries:
 - CBLAS:  
     Copyright (c) 1992-2023 The University of Tennessee and The University of Tennessee Research Foundation.  All rights reserved.  
     Copyright (c) 2000-2023 The University of California Berkeley. All rights reserved.  

@@ -27,7 +27,7 @@ class BandedLinearSystem : public LinearSystemBase {
 
     private:
 #ifdef JUMP_HAS_LAPACKE
-        /// \brief Call the external solver for this linear system type.
+        /// \brief Call the third-party solver for this linear system type.
         void solve_lapacke();
 #endif  // JUMP_HAS_LAPACKE
 

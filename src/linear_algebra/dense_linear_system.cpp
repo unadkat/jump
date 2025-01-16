@@ -6,7 +6,7 @@
 
 #include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
-#include "jump/utility/external.hpp"
+#include "jump/utility/third_party.hpp"
 #include "jump/utility/types.hpp"
 
 #include <format>
@@ -25,8 +25,8 @@ DenseLinearSystem<T>::DenseLinearSystem(DenseMatrix<T>& A, Vector<T>& b) :
 #endif  // NDEBUG
 }
 
-/// We delegate the solution to the external linear algebra library, otherwise
-/// throw an error.
+/// We delegate the solution to the third-party linear algebra library,
+/// otherwise throw an error.
 template <typename T>
 void DenseLinearSystem<T>::solve() {
 #ifdef JUMP_HAS_LAPACKE
@@ -43,7 +43,7 @@ auto DenseLinearSystem<T>::order() const -> std::size_t {
 }
 
 #ifdef JUMP_HAS_LAPACKE
-/// Call the external solver for a real-valued problem.
+/// Call the third-party solver for a real-valued problem.
 template <>
 void DenseLinearSystem<Real>::solve_lapacke() {
 #ifndef NDEBUG
@@ -69,7 +69,7 @@ void DenseLinearSystem<Real>::solve_lapacke() {
     }
 }
 
-/// Call the external solver for a complex-valued problem.
+/// Call the third-party solver for a complex-valued problem.
 template <>
 void DenseLinearSystem<Complex>::solve_lapacke() {
 #ifndef NDEBUG

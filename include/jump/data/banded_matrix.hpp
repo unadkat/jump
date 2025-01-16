@@ -102,9 +102,11 @@ class BandedMatrix : public MatrixBase<T> {
         /// \brief Divide matrix by scalar in place.
         auto operator/=(const T& k) -> BandedMatrix&;
 
-        /// \brief Pointer to underlying data, for use with external libraries.
+        /// \brief Pointer to underlying data, for use with third-party
+        /// libraries.
         auto data() -> T*;
-        /// \brief Pointer to underlying data, for use with external libraries.
+        /// \brief Pointer to underlying data, for use with third-party
+        /// libraries.
         auto data() const -> const T*;
         /// \brief Const reference to underlying Vector (column-major).
         auto as_vector() const -> const Vector<T>&;

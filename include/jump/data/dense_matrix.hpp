@@ -10,7 +10,7 @@
 #include "jump/data/vector.hpp"
 #include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
-#include "jump/utility/external.hpp"
+#include "jump/utility/third_party.hpp"
 #include "jump/utility/types.hpp"
 
 #include <algorithm>
@@ -134,9 +134,11 @@ class DenseMatrix : public MatrixBase<T> {
         /// \brief Return maximum magnitude over all elements in a column.
         auto column_Linf_norm(std::size_t column) const -> Real;
 
-        /// \brief Pointer to underlying data, for use with external libraries.
+        /// \brief Pointer to underlying data, for use with third-party
+        /// libraries.
         auto data() -> T*;
-        /// \brief Pointer to underlying data, for use with external libraries.
+        /// \brief Pointer to underlying data, for use with third-party
+        /// libraries.
         auto data() const -> const T*;
         /// \brief Const reference to underlying Vector (column-major).
         auto as_vector() const -> const Vector<T>&;

@@ -32,7 +32,7 @@ class GeneralisedEigenvalueSystem : public LinearSystemBase {
 
     private:
 #ifdef JUMP_HAS_LAPACKE
-        /// \brief Call the external solver for this eigenvalue system type.
+        /// \brief Call the third-party solver for this eigenvalue system type.
         void solve_lapacke();
 #endif  // JUMP_HAS_LAPACKE
 

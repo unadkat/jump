@@ -21,13 +21,13 @@ struct Eigendatum {
     Vector<T> vector;
 };
 
-/// \brief Combine separate eigenvalue/eigenvector data from external solvers
+/// \brief Combine separate eigenvalue/eigenvector data from third-party solvers
 /// into a single vector. Data is copied so source is unaffected.
 template <typename T>
 auto copy_eigendata(const std::vector<T>& eigenvalues,
         const std::vector<Vector<T>>& eigenvectors)
         -> std::vector<Eigendatum<T>>;
-/// \brief Combine separate eigenvalue/eigenvector data from external solvers
+/// \brief Combine separate eigenvalue/eigenvector data from third-party solvers
 /// into a single vector. Data is moved from source which thus invalidated.
 template <typename T>
 auto move_eigendata(const std::vector<T>& eigenvalues,

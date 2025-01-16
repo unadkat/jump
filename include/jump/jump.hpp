@@ -24,7 +24,7 @@
 #include "jump/testing/testing.hpp"
 
 #include "jump/utility/command_line_args.hpp"
-#include "jump/utility/external.hpp"
+#include "jump/utility/third_party.hpp"
 #include "jump/utility/file_system.hpp"
 #include "jump/utility/io.hpp"
 #include "jump/utility/logging.hpp"

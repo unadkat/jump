@@ -6,7 +6,7 @@
 
 #include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
-#include "jump/utility/external.hpp"
+#include "jump/utility/third_party.hpp"
 #include "jump/utility/types.hpp"
 
 #include <format>
@@ -38,8 +38,8 @@ GeneralisedEigenvalueSystem<T>::GeneralisedEigenvalueSystem(DenseMatrix<T>& A,
 #endif  // NDEBUG
 }
 
-/// We delegate the solution to the external linear algebra library, otherwise
-/// throw an error.
+/// We delegate the solution to the third-party linear algebra library,
+/// otherwise throw an error.
 template <typename T>
 void GeneralisedEigenvalueSystem<T>::solve() {
 #ifdef JUMP_HAS_LAPACKE
@@ -56,7 +56,7 @@ auto GeneralisedEigenvalueSystem<T>::order() const -> std::size_t {
 }
 
 #ifdef JUMP_HAS_LAPACKE
-/// \brief Call the external solver for a complex-valued problem.
+/// \brief Call the third-party solver for a complex-valued problem.
 template <>
 void GeneralisedEigenvalueSystem<Complex>::solve_lapacke() {
 #ifndef NDEBUG
