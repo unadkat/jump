@@ -20,7 +20,7 @@ class TestReporter {
         void trace(const TestResult& results, std::string current = "") const;
         /// \brief Print summary of the total reported results in the tree, and
         /// give details of all failed and skipped tests.
-        void summarise(const TestResult& results) const;
+        auto summarise(const TestResult& results) const -> int;
 
     private:
         /// \brief Traverse result structure and collect all results in a

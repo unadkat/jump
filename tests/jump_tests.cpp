@@ -29,8 +29,6 @@ int main(int argc, char** argv) {
     if (do_trace) {
         report.trace(all_results);
     }
-    report.summarise(all_results);
-
-    return 0;
+    return report.summarise(all_results);
 }
 

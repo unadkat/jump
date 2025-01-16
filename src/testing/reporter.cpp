@@ -43,7 +43,7 @@ void TestReporter::trace(const TestResult& results, std::string current) const {
     }
 }
 
-void TestReporter::summarise(const TestResult& results) const {
+auto TestReporter::summarise(const TestResult& results) const -> int {
     auto flat{flatten(results)};
 
     auto passes{std::format("{}/{} tests passed", flat.passed,
@@ -80,6 +80,8 @@ void TestReporter::summarise(const TestResult& results) const {
                     skip);
         }
     }
+
+    return flat.failed > 0;
 }
 
 auto TestReporter::flatten(TestResult root) const -> TestResult {
