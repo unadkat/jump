@@ -46,11 +46,11 @@ int main() {
 
     auto test_suite{TestSuite{"vector", tests}};
 
-    auto all_results{test_suite.run()};
-    TestReporter report;
-    report.trace(all_results);
+    TestReporter report{test_suite.run()};
+    report.trace();
+    report.summarise();
 
-    return report.summarise(all_results);
+    return report.failed() > 0;
 }
 
 auto test_vector_arithmetic_basic() -> TestResult {

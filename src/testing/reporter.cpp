@@ -12,6 +12,64 @@
 #include <format>
 
 namespace jump {
+TestReporter::TestReporter(const TestResult& results) :
+    m_results{results},
+    m_flattened_results{flatten(results)} {
+}
+
+void TestReporter::trace() const {
+    trace(m_results);
+}
+
+void TestReporter::summarise() const {
+    auto passes{std::format("{}/{} tests passed", m_flattened_results.passed,
+            m_flattened_results.passed + m_flattened_results.failed)};
+    auto skips{std::format("{} skipped", m_flattened_results.skipped)};
+
+    std::clog << "Overall results for \"" << m_results.name << "\":\n";
+    if (m_flattened_results.failed > 0) {
+        std::clog << Log::red(passes);
+    } else if (m_flattened_results.passed > 0) {
+        std::clog << Log::green(passes);
+    } else {
+        std::clog << passes;
+    }
+    std::clog << ", ";
+    if (m_flattened_results.skipped > 0) {
+        std::clog << Log::yellow(skips);
+    } else {
+        std::clog << skips;
+    }
+    std::clog << '\n';
+
+    if (m_flattened_results.failed_tests.size() > 0) {
+        std::clog << "Failed tests:\n";
+        for (const auto& fail : m_flattened_results.failed_tests) {
+            std::clog << std::format("  \"{}{}{}\"\n", m_flattened_results.name, 
+                    delimiter, fail);
+        }
+    }
+    if (m_flattened_results.skipped_tests.size() > 0) {
+        std::clog << "Skipped tests:\n";
+        for (const auto& skip : m_flattened_results.skipped_tests) {
+            std::clog << std::format("  \"{}{}{}\"\n", m_flattened_results.name,
+                    delimiter, skip);
+        }
+    }
+}
+
+auto TestReporter::passed() const -> std::size_t {
+    return m_flattened_results.passed;
+}
+
+auto TestReporter::skipped() const -> std::size_t {
+    return m_flattened_results.skipped;
+}
+
+auto TestReporter::failed() const -> std::size_t {
+    return m_flattened_results.failed;
+}
+
 void TestReporter::trace(const TestResult& results, std::string current) const {
     if (current == "") {
         current = results.name;
@@ -43,47 +101,6 @@ void TestReporter::trace(const TestResult& results, std::string current) const {
     for (const auto& sub : results.sub_results) {
         trace(sub, current);
     }
-}
-
-auto TestReporter::summarise(const TestResult& results) const -> int {
-    auto flat{flatten(results)};
-
-    auto passes{std::format("{}/{} tests passed", flat.passed,
-            flat.passed + flat.failed)};
-    auto skips{std::format("{} skipped", flat.skipped)};
-
-    std::clog << "Overall results for \"" << results.name << "\":\n";
-    if (flat.failed > 0) {
-        std::clog << Log::red(passes);
-    } else if (flat.passed > 0) {
-        std::clog << Log::green(passes);
-    } else {
-        std::clog << passes;
-    }
-    std::clog << ", ";
-    if (flat.skipped > 0) {
-        std::clog << Log::yellow(skips);
-    } else {
-        std::clog << skips;
-    }
-    std::clog << '\n';
-
-    if (flat.failed_tests.size() > 0) {
-        std::clog << "Failed tests:\n";
-        for (const auto& fail : flat.failed_tests) {
-            std::clog << std::format("  \"{}{}{}\"\n", flat.name, delimiter,
-                    fail);
-        }
-    }
-    if (flat.skipped_tests.size() > 0) {
-        std::clog << "Skipped tests:\n";
-        for (const auto& skip : flat.skipped_tests) {
-            std::clog << std::format("  \"{}{}{}\"\n", flat.name, delimiter,
-                    skip);
-        }
-    }
-
-    return flat.failed > 0;
 }
 
 auto TestReporter::flatten(TestResult root) const -> TestResult {
