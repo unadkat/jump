@@ -1,5 +1,8 @@
-#ifndef JUMP_TESTS_VECTOR_HPP
-#define JUMP_TESTS_VECTOR_HPP
+// This file forms part of Jump (Jay's Utilities and Mathematical Primitives)
+// Copyright (C) Jay Unadkat 2024--2025. SPDX-Licence-Identifier: MPL-2.0
+// This Source Code Form is subject to the terms of the Mozilla Public Licence,
+// v. 2.0. If a copy of the MPL was not distributed with this file, you can
+// obtain one at https://mozilla.org/MPL/2.0/
 
 #include "jump/data/vector.hpp"
 #include "jump/debug/error_data.hpp"
@@ -19,7 +22,7 @@ auto test_vector_norms() -> TestResult;
 auto test_vector_access_in_range() -> TestResult;
 auto test_vector_access_fail() -> TestResult;
 
-inline auto vector_tests() {
+int main() {
     std::vector<Test> tests;
 
     tests.push_back({"arithmetic"});
@@ -41,10 +44,16 @@ inline auto vector_tests() {
     tests.back().register_item({"fail", &test_vector_access_fail});
 #endif  // NDEBUG
 
-    return TestSuite{"vector", tests};
+    auto test_suite{TestSuite{"vector", tests}};
+
+    auto all_results{test_suite.run()};
+    TestReporter report;
+    report.trace(all_results);
+
+    return report.summarise(all_results);
 }
 
-inline auto test_vector_arithmetic_basic() -> TestResult {
+auto test_vector_arithmetic_basic() -> TestResult {
     TestResult result;
     RandomReal rng(0., 10.);
 
@@ -103,7 +112,7 @@ inline auto test_vector_arithmetic_basic() -> TestResult {
     return result;
 }
 
-inline auto test_vector_arithmetic_compound() -> TestResult {
+auto test_vector_arithmetic_compound() -> TestResult {
     TestResult result;
     RandomReal rng_real(0., 10.);
     RandomInt rng_int(10, 15);
@@ -132,7 +141,7 @@ inline auto test_vector_arithmetic_compound() -> TestResult {
     return result;
 }
 
-inline auto test_vector_inner_prod() -> TestResult {
+auto test_vector_inner_prod() -> TestResult {
     TestResult result;
     RandomInt rng_int(10, 15);
 
@@ -160,7 +169,7 @@ inline auto test_vector_inner_prod() -> TestResult {
     return result;
 }
 
-inline auto test_vector_arithmetic_fail() -> TestResult {
+auto test_vector_arithmetic_fail() -> TestResult {
     TestResult result;
 
     Vector<Real> var(5), vbr(6);
@@ -224,7 +233,7 @@ inline auto test_vector_arithmetic_fail() -> TestResult {
     return result;
 }
 
-inline auto test_vector_norms() -> TestResult {
+auto test_vector_norms() -> TestResult {
     TestResult result;
     RandomInt rng_int(10, 15);
 
@@ -255,7 +264,7 @@ inline auto test_vector_norms() -> TestResult {
     return result;
 }
 
-inline auto test_vector_access_in_range() -> TestResult {
+auto test_vector_access_in_range() -> TestResult {
     TestResult result;
     RandomInt rng_int(10, 15);
 
@@ -273,7 +282,7 @@ inline auto test_vector_access_in_range() -> TestResult {
     return result;
 }
 
-inline auto test_vector_access_fail() -> TestResult {
+auto test_vector_access_fail() -> TestResult {
     TestResult result;
     bool exception_caught{false};
     Vector<Complex> b(10, {1., 2.});
@@ -288,6 +297,4 @@ inline auto test_vector_access_fail() -> TestResult {
 
     return result;
 }
-
-#endif  // JUMP_TESTS_VECTOR_HPP
 

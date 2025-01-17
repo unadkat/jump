@@ -1,6 +1,9 @@
 if (BUILD_TESTING)
     set(all_test_sources
-        jump_tests.cpp
+        dual.cpp
+        linear_algebra.cpp
+        matrix.cpp
+        vector.cpp
     )
 
     foreach(test_source ${all_test_sources})
@@ -9,7 +12,7 @@ if (BUILD_TESTING)
         add_executable(${test_name} ${test_source})
         target_compile_options(${test_name} PRIVATE -Wall -Wextra -Wpedantic)
         target_link_libraries(${test_name} PRIVATE jump)
-    endforeach(test_source ${all_test_sources})
 
-    add_test(NAME ${test_name} COMMAND ${test_name})
+        add_test(NAME ${test_name} COMMAND ${test_name})
+    endforeach(test_source ${all_test_sources})
 endif()

@@ -1,5 +1,8 @@
-#ifndef JUMP_TESTS_DUAL_HPP
-#define JUMP_TESTS_DUAL_HPP
+// This file forms part of Jump (Jay's Utilities and Mathematical Primitives)
+// Copyright (C) Jay Unadkat 2024--2025. SPDX-Licence-Identifier: MPL-2.0
+// This Source Code Form is subject to the terms of the Mozilla Public Licence,
+// v. 2.0. If a copy of the MPL was not distributed with this file, you can
+// obtain one at https://mozilla.org/MPL/2.0/
 
 #include "jump/autodiff/dual.hpp"
 #include "jump/data/vector.hpp"
@@ -11,7 +14,32 @@
 using namespace jump;
 
 template <std::size_t N, typename T>
-inline auto vector_compare(const Vector<Dual<N, T>>& dual_vector,
+auto vector_compare(const Vector<Dual<N, T>>& dual_vector,
+        const Vector<T>& values, const Vector<T>& derivatives) -> bool;
+auto populate_real(Real min, Real max, std::size_t N)
+        -> std::pair<Vector<d1f64>, Vector<Real>>;
+auto populate_complex(Complex begin, Complex end, std::size_t N)
+        -> std::pair<Vector<d1z64>, Vector<Complex>>;
+
+auto test_dual_arithmetic_basic() -> TestResult;
+
+int main() {
+    std::vector<Test> tests;
+
+    tests.push_back({"arithmetic"});
+    tests.back().register_item({"basic", &test_dual_arithmetic_basic});
+
+    auto test_suite{TestSuite{"dual", tests}};
+
+    auto all_results{test_suite.run()};
+    TestReporter report;
+    report.trace(all_results);
+
+    return report.summarise(all_results);
+}
+
+template <std::size_t N, typename T>
+auto vector_compare(const Vector<Dual<N, T>>& dual_vector,
         const Vector<T>& values, const Vector<T>& derivatives) -> bool {
     if (dual_vector.size() != values.size()
             || dual_vector.size() != derivatives.size()) {
@@ -26,7 +54,7 @@ inline auto vector_compare(const Vector<Dual<N, T>>& dual_vector,
     return true;
 }
 
-inline auto populate_real(Real min, Real max, std::size_t N)
+auto populate_real(Real min, Real max, std::size_t N)
         -> std::pair<Vector<d1f64>, Vector<Real>> {
     std::pair<Vector<d1f64>, Vector<Real>> result;
     result.first.storage.assign(N, {0., 0});
@@ -40,7 +68,7 @@ inline auto populate_real(Real min, Real max, std::size_t N)
     return result;
 }
 
-inline auto populate_complex(Complex begin, Complex end, std::size_t N)
+auto populate_complex(Complex begin, Complex end, std::size_t N)
         -> std::pair<Vector<d1z64>, Vector<Complex>> {
     std::pair<Vector<d1z64>, Vector<Complex>> result;
     result.first.storage.assign(N, {0., 0});
@@ -55,18 +83,7 @@ inline auto populate_complex(Complex begin, Complex end, std::size_t N)
     return result;
 }
 
-auto test_dual_arithmetic_basic() -> TestResult;
-
-inline auto dual_tests() {
-    std::vector<Test> tests;
-
-    tests.push_back({"arithmetic"});
-    tests.back().register_item({"basic", &test_dual_arithmetic_basic});
-
-    return TestSuite{"dual", tests};
-}
-
-inline auto test_dual_arithmetic_basic() -> TestResult {
+auto test_dual_arithmetic_basic() -> TestResult {
     TestResult result;
 
     RandomInt rng_int(91, 111);
@@ -168,6 +185,4 @@ inline auto test_dual_arithmetic_basic() -> TestResult {
 
     return result;
 }
-
-#endif  // JUMP_TESTS_DUAL_HPP
 

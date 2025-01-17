@@ -1,5 +1,8 @@
-#ifndef JUMP_TESTS_LINEAR_ALGEBRA_HPP
-#define JUMP_TESTS_LINEAR_ALGEBRA_HPP
+// This file forms part of Jump (Jay's Utilities and Mathematical Primitives)
+// Copyright (C) Jay Unadkat 2024--2025. SPDX-Licence-Identifier: MPL-2.0
+// This Source Code Form is subject to the terms of the Mozilla Public Licence,
+// v. 2.0. If a copy of the MPL was not distributed with this file, you can
+// obtain one at https://mozilla.org/MPL/2.0/
 
 #include "jump/data/banded_matrix.hpp"
 #include "jump/data/dense_matrix.hpp"
@@ -27,7 +30,7 @@ auto test_linalg_dense_mismatch() -> TestResult;
 auto test_linalg_gev_basic() -> TestResult;
 auto test_linalg_gev_mismatch() -> TestResult;
 
-inline auto linear_algebra_tests() {
+int main() {
     std::vector<Test> tests;
 
     tests.push_back({"banded"});
@@ -53,10 +56,16 @@ inline auto linear_algebra_tests() {
     tests.back().register_item({"mismatch", &test_linalg_gev_mismatch});
 #endif  // NDEBUG
 
-    return TestSuite{"linear systems", tests};
+    auto test_suite{TestSuite{"linear systems", tests}};
+
+    auto all_results{test_suite.run()};
+    TestReporter report;
+    report.trace(all_results);
+
+    return report.summarise(all_results);
 }
 
-inline auto test_linalg_banded_basic() -> TestResult {
+auto test_linalg_banded_basic() -> TestResult {
     TestResult result;
 
     // Test cases generated and verified externally using Python and numpy
@@ -154,7 +163,7 @@ inline auto test_linalg_banded_basic() -> TestResult {
     return result;
 }
 
-inline auto test_linalg_banded_fail() -> TestResult {
+auto test_linalg_banded_fail() -> TestResult {
     TestResult result;
     RandomReal rng_real(0., 10.);
     std::size_t N{12}, bands{3};
@@ -198,7 +207,7 @@ inline auto test_linalg_banded_fail() -> TestResult {
     return result;
 }
 
-inline auto test_linalg_banded_mismatch() -> TestResult {
+auto test_linalg_banded_mismatch() -> TestResult {
     TestResult result;
 
     RandomInt rng_int(10, 15);
@@ -255,7 +264,7 @@ inline auto test_linalg_banded_mismatch() -> TestResult {
     return result;
 }
 
-inline auto test_linalg_dense_basic() -> TestResult {
+auto test_linalg_dense_basic() -> TestResult {
     TestResult result;
 
     // Test cases generated and verified externally using Python and numpy
@@ -364,7 +373,7 @@ inline auto test_linalg_dense_basic() -> TestResult {
     return result;
 }
 
-inline auto test_linalg_dense_fail() -> TestResult {
+auto test_linalg_dense_fail() -> TestResult {
     TestResult result;
     RandomReal rng_real(0., 10.);
     std::size_t N{12};
@@ -409,7 +418,7 @@ inline auto test_linalg_dense_fail() -> TestResult {
     return result;
 }
 
-inline auto test_linalg_dense_mismatch() -> TestResult {
+auto test_linalg_dense_mismatch() -> TestResult {
     TestResult result;
 
     RandomInt rng_int(10, 15);
@@ -466,7 +475,7 @@ inline auto test_linalg_dense_mismatch() -> TestResult {
     return result;
 }
 
-inline auto test_linalg_gev_basic() -> TestResult {
+auto test_linalg_gev_basic() -> TestResult {
     TestResult result;
 
     // Test cases generated and verified externally using Python and numpy
@@ -553,7 +562,7 @@ inline auto test_linalg_gev_basic() -> TestResult {
     return result;
 }
 
-inline auto test_linalg_gev_mismatch() -> TestResult {
+auto test_linalg_gev_mismatch() -> TestResult {
     TestResult result;
 
     RandomInt rng_int(10, 15);
@@ -637,6 +646,4 @@ inline auto test_linalg_gev_mismatch() -> TestResult {
 
     return result;
 }
-
-#endif  // JUMP_TESTS_LINEAR_ALGEBRA_HPP
 
