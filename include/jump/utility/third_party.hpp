@@ -8,13 +8,6 @@
 #define JUMP_THIRD_PARTY_HPP
 
 #ifdef __has_include
-    #if defined(JUMP_USE_CBLAS) && __has_include(<cblas.h>)
-        #include <cblas.h>
-        #define JUMP_HAS_CBLAS
-    #endif  // __has_include(<cblas.h>)
-#endif  // __has_include
-
-#ifdef __has_include
     #if defined(JUMP_USE_LAPACKE) && __has_include(<lapacke.h>)
         #include <lapacke.h>
         #define JUMP_HAS_LAPACKE

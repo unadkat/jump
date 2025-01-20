@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 project(Jump VERSION 0.2.6 LANGUAGES CXX)
 
-option(USE_CBLAS "" OFF)
 option(USE_LAPACKE "" ON)
 option(BUILD_TESTING "" ON)
 
@@ -26,11 +25,6 @@ add_library(jump STATIC ${sources})
 target_include_directories(jump PUBLIC include)
 target_compile_options(jump PRIVATE -Wall -Wextra -Wpedantic)
 
-if(USE_CBLAS)
-    find_library(CBLAS blas REQUIRED)
-    target_compile_definitions(jump PRIVATE JUMP_USE_CBLAS)
-    target_link_libraries(jump PUBLIC ${CBLAS})
-endif()
 if(USE_LAPACKE)
     find_library(LAPACKE lapacke REQUIRED)
     target_compile_definitions(jump PRIVATE JUMP_USE_LAPACKE)
