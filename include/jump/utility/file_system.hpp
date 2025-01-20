@@ -24,7 +24,7 @@ class FileSystem {
         /// \brief Use current working directory as root folder for all input
         /// and output files opened by this object, optionally take a
         /// subdirectory location to be used.
-        explicit FileSystem(const std::string& path = "");
+        explicit FileSystem(const std::filesystem::path& path = ".");
         /// \brief Deleted copy constructor to protect data integrity.
         FileSystem(const FileSystem& source) = delete;
         /// \brief Default move constructor to allow moves (preserves data
@@ -40,24 +40,25 @@ class FileSystem {
         /// \brief Open file with a specified filename (relative to the root
         /// directory), with a given handle, and an explicit access specifier.
         void open(const std::string& key, const std::string& filename,
-                const std::ios_base::openmode& mode);
+                const FileMode& mode);
         /// \brief Close file with the given handle.
         void close(const std::string& key);
         /// \brief Close all open files.
         void close_all();
 
         /// \brief Open file with a specified filename (relative to the root
-        /// directory) for quick data output (in truncation mode), without
-        /// explicitly storing the file handle for later access.
-        auto quick_write(const std::string& filename) const -> std::fstream;
-        /// \brief Open file with a specified filename (relative to the root
-        /// directory) for quick data reading, without explicitly storing the
-        /// file handle for later access.
-        auto quick_read(const std::string& filename) const -> std::fstream;
+        /// directory) for quick data input or output, without explicitly
+        /// storing the file handle for later access.
+        auto file_stream(const std::string& filename,
+                const FileMode& mode) const -> std::fstream;
+        /// \brief Read all the content of a specified file (relative to the
+        /// root directory) as text.
+        auto read_file_as_text(const std::string& filename) const
+                -> std::string;
 
         /// \brief Return file stream corresponding to the supplied handle, if
         /// it exists, otherwise throw an exception.
-        auto operator()(const std::string& key) -> std::fstream&;
+        auto operator[](const std::string& key) -> std::fstream&;
 
         /// \brief File mode for input.
         static constexpr FileMode mode_in{std::ios_base::in};
@@ -73,6 +74,8 @@ class FileSystem {
         /// \brief File mode for input and output (append).
         static constexpr FileMode mode_random_app{std::ios_base::in
             | std::ios_base::out | std::ios_base::app};
+        /// \brief Binary file mode.
+        static constexpr FileMode mode_binary{std::ios_base::binary};
 
     private:
         /// \brief Stores file streams as shared pointers indexed by a

@@ -10,8 +10,8 @@
 #include "jump/debug/exception.hpp"
 
 namespace jump {
-FileSystem::FileSystem(const std::string& path) :
-    m_root{"./" + path} {
+FileSystem::FileSystem(const std::filesystem::path& path) :
+    m_root{path} {
 
     if (!std::filesystem::exists(m_root)) {
         if (!std::filesystem::create_directories(m_root)) {
@@ -62,9 +62,9 @@ void FileSystem::close_all() {
     m_files.clear();
 }
 
-auto FileSystem::quick_write(const std::string& filename) const
-        -> std::fstream {
-    std::fstream file{m_root/filename, mode_out_trunc};
+auto FileSystem::file_stream(const std::string& filename,
+        const FileMode& mode) const -> std::fstream {
+    std::fstream file{m_root/filename, mode};
     if (!(file.is_open() && file.good())) {
         throw RuntimeError{FileIOError{
             .resource = (m_root/filename).native()}};
@@ -72,16 +72,29 @@ auto FileSystem::quick_write(const std::string& filename) const
     return file;
 }
 
-auto FileSystem::quick_read(const std::string& filename) const -> std::fstream {
-    std::fstream file{m_root/filename, mode_in};
-    if (!(file.is_open() && file.good())) {
-        throw RuntimeError{FileIOError{
-            .resource = (m_root/filename).native()}};
+auto FileSystem::read_file_as_text(const std::string& filename) const
+        -> std::string {
+    auto in{file_stream(filename, mode_in)};
+    std::string contents;
+
+    // Find the size of the file by seeking to the end and then getting the
+    // position of the stream
+    in.seekg(0, std::ios::end);
+    const auto num_chars{in.tellg()};
+    contents.resize(num_chars);
+    // Return to the start of the file
+    in.seekg(0, std::ios::beg);
+    // Read the full contents of the file
+    in.read(&contents[0], num_chars);
+    // Check how many characters were read successfully
+    if (in.gcount() != num_chars) {
+        throw RuntimeError{FileIOError{.resource = "std::fstream"}};
     }
-    return file;
+
+    return contents;
 }
 
-auto FileSystem::operator()(const std::string& key) -> std::fstream& {
+auto FileSystem::operator[](const std::string& key) -> std::fstream& {
     if (auto it{m_files.find(key)}; it != m_files.end()) {
         return *(it->second);
     } else {
