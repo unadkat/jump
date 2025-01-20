@@ -98,17 +98,23 @@ struct Vector {
     /// \brief Negate `Vector`.
     auto operator-() const -> Vector;
     /// \brief Add two Vectors together in place.
-    auto operator+=(const Vector& rhs) -> Vector&;
+    template <std::convertible_to<T> U>
+    auto operator+=(const Vector<U>& rhs) -> Vector&;
     /// \brief Subtract one `Vector` from another in place.
-    auto operator-=(const Vector& rhs) -> Vector&;
+    template <std::convertible_to<T> U>
+    auto operator-=(const Vector<U>& rhs) -> Vector&;
     /// \brief Multiply by scalar in place.
-    auto operator*=(const T& rhs) -> Vector&;
+    template <std::convertible_to<T> U>
+    auto operator*=(const U& rhs) -> Vector&;
     /// \brief Elementwise product by another Vector.
-    auto operator*=(const Vector& rhs) -> Vector&;
+    template <std::convertible_to<T> U>
+    auto operator*=(const Vector<U>& rhs) -> Vector&;
     /// \brief Divide by scalar in place.
-    auto operator/=(const T& rhs) -> Vector&;
+    template <std::convertible_to<T> U>
+    auto operator/=(const U& rhs) -> Vector&;
     /// \brief Elementwise division by another Vector.
-    auto operator/=(const Vector& rhs) -> Vector&;
+    template <std::convertible_to<T> U>
+    auto operator/=(const Vector<U>& rhs) -> Vector&;
 
     /// \brief Return sum of element magnitudes.
     auto L1_norm() const -> Real;
@@ -446,7 +452,8 @@ inline auto Vector<T>::operator-() const -> Vector<T> {
 }
 
 template <typename T>
-inline auto Vector<T>::operator+=(const Vector<T>& rhs) -> Vector<T>& {
+template <std::convertible_to<T> U>
+inline auto Vector<T>::operator+=(const Vector<U>& rhs) -> Vector<T>& {
 #ifndef NDEBUG
     if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
@@ -461,7 +468,8 @@ inline auto Vector<T>::operator+=(const Vector<T>& rhs) -> Vector<T>& {
 }
 
 template <typename T>
-inline auto Vector<T>::operator-=(const Vector<T>& rhs) -> Vector<T>& {
+template <std::convertible_to<T> U>
+inline auto Vector<T>::operator-=(const Vector<U>& rhs) -> Vector<T>& {
 #ifndef NDEBUG
     if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
@@ -476,7 +484,8 @@ inline auto Vector<T>::operator-=(const Vector<T>& rhs) -> Vector<T>& {
 }
 
 template <typename T>
-inline auto Vector<T>::operator*=(const T& rhs) -> Vector<T>& {
+template <std::convertible_to<T> U>
+inline auto Vector<T>::operator*=(const U& rhs) -> Vector<T>& {
     for (auto& x : storage) {
         x *= rhs;
     }
@@ -484,7 +493,8 @@ inline auto Vector<T>::operator*=(const T& rhs) -> Vector<T>& {
 }
 
 template <typename T>
-inline auto Vector<T>::operator*=(const Vector<T>& rhs) -> Vector<T>& {
+template <std::convertible_to<T> U>
+inline auto Vector<T>::operator*=(const Vector<U>& rhs) -> Vector<T>& {
 #ifndef NDEBUG
     if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
@@ -499,12 +509,14 @@ inline auto Vector<T>::operator*=(const Vector<T>& rhs) -> Vector<T>& {
 }
 
 template <typename T>
-inline auto Vector<T>::operator/=(const T& rhs) -> Vector<T>& {
+template <std::convertible_to<T> U>
+inline auto Vector<T>::operator/=(const U& rhs) -> Vector<T>& {
     return *this *= (T{1}/rhs);
 }
 
 template <typename T>
-inline auto Vector<T>::operator/=(const Vector<T>& rhs) -> Vector<T>& {
+template <std::convertible_to<T> U>
+inline auto Vector<T>::operator/=(const Vector<U>& rhs) -> Vector<T>& {
 #ifndef NDEBUG
     if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
