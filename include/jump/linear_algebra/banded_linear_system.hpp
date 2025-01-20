@@ -10,6 +10,7 @@
 #include "jump/data/banded_matrix.hpp"
 #include "jump/data/vector.hpp"
 #include "jump/linear_algebra/linear_system_base.hpp"
+#include "jump/utility/third_party.hpp"
 
 namespace jump {
 /// \brief A linear system \f$A\vec{x}=\vec{b}\f$, where \f$A\f$ is a matrix and

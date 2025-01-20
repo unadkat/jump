@@ -10,6 +10,7 @@
 #include "jump/data/dense_matrix.hpp"
 #include "jump/data/eigendata.hpp"
 #include "jump/linear_algebra/linear_system_base.hpp"
+#include "jump/utility/third_party.hpp"
 
 #include <vector>
 
