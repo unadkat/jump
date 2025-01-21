@@ -143,9 +143,39 @@ template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator+(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
 
 /// \relates Vector
+/// \brief Addition of two Vectors.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator+(Vector<T>&& lhs, const Vector<U>& rhs) -> Vector<R>;
+
+/// \relates Vector
+/// \brief Addition of two Vectors.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator+(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R>;
+
+/// \relates Vector
+/// \brief Addition of two Vectors.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator+(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R>;
+
+/// \relates Vector
 /// \brief Difference of two Vectors.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator-(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
+
+/// \relates Vector
+/// \brief Difference of two Vectors.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator-(Vector<T>&& lhs, const Vector<U>& rhs) -> Vector<R>;
+
+/// \relates Vector
+/// \brief Difference of two Vectors.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator-(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R>;
+
+/// \relates Vector
+/// \brief Difference of two Vectors.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator-(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R>;
 
 /// \relates Vector
 /// \brief Left-hand multiplication by scalar.
@@ -176,26 +206,6 @@ auto operator/(const Vector<T>& lhs, const U& rhs) -> Vector<R>;
 /// \brief Elementwise division of two Vectors.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator/(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Addition of two Vectors.
-template <typename T>
-auto operator+(Vector<T> lhs, const Vector<T>& rhs) -> Vector<T>;
-
-/// \relates Vector
-/// \brief Addition of two Vectors.
-template <typename T>
-auto operator+(const Vector<T>& lhs, Vector<T>&& rhs) -> Vector<T>;
-
-/// \relates Vector
-/// \brief Difference of two Vectors.
-template <typename T>
-auto operator-(Vector<T> lhs, const Vector<T>& rhs) -> Vector<T>;
-
-/// \relates Vector
-/// \brief Difference of two Vectors.
-template <typename T>
-auto operator-(const Vector<T>& lhs, Vector<T>&& rhs) -> Vector<T>;
 
 /// \relates Vector
 /// \brief Left-hand multiplication by scalar.
@@ -594,9 +604,54 @@ inline auto operator<<(std::ostream& out, const Vector<T>& rhs)
 template <typename T, typename U, typename R>
 inline auto operator+(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R> {
     if constexpr (std::is_same_v<T, R>) {
+        Vector<R> result{lhs};
+        result += rhs;
+        return result;
+    } else {
         Vector<R> result{rhs};
         result += lhs;
         return result;
+    }
+}
+
+/// \relates Vector
+/// \brief Addition of two Vectors.
+template <typename T, typename U, typename R>
+inline auto operator+(Vector<T>&& lhs, const Vector<U>& rhs) -> Vector<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        lhs += rhs;
+        return lhs;
+    } else {
+        Vector<R> result{rhs};
+        result += lhs;
+        return result;
+    }
+}
+
+/// \relates Vector
+/// \brief Addition of two Vectors.
+template <typename T, typename U, typename R>
+inline auto operator+(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R> {
+    if constexpr (std::is_same_v<U, R>) {
+        rhs += lhs;
+        return rhs;
+    } else {
+        Vector<R> result{lhs};
+        result += rhs;
+        return result;
+    }
+}
+
+/// \relates Vector
+/// \brief Addition of two Vectors.
+template <typename T, typename U, typename R>
+inline auto operator+(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        lhs += rhs;
+        return lhs;
+    } else if constexpr (std::is_same_v<U, R>) {
+        rhs += lhs;
+        return rhs;
     } else {
         Vector<R> result{lhs};
         result += rhs;
@@ -608,11 +663,51 @@ inline auto operator+(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R> {
 /// \brief Difference of two Vectors.
 template <typename T, typename U, typename R>
 inline auto operator-(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R> {
+    Vector<R> result{lhs};
+    result -= rhs;
+    return result;
+}
+
+/// \relates Vector
+/// \brief Difference of two Vectors.
+template <typename T, typename U, typename R>
+inline auto operator-(Vector<T>&& lhs, const Vector<U>& rhs) -> Vector<R> {
     if constexpr (std::is_same_v<T, R>) {
-        Vector<R> result{rhs};
-        result *= R{-1};
-        result += lhs;
+        lhs -= rhs;
+        return lhs;
+    } else {
+        Vector<R> result{lhs};
+        result -= rhs;
         return result;
+    }
+}
+
+/// \relates Vector
+/// \brief Difference of two Vectors.
+template <typename T, typename U, typename R>
+inline auto operator-(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R> {
+    if constexpr (std::is_same_v<U, R>) {
+        rhs *= R{-1};
+        rhs += lhs;
+        return rhs;
+    } else {
+        Vector<R> result{lhs};
+        result -= rhs;
+        return result;
+    }
+}
+
+/// \relates Vector
+/// \brief Difference of two Vectors.
+template <typename T, typename U, typename R>
+inline auto operator-(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        lhs -= rhs;
+        return lhs;
+    } else if constexpr (std::is_same_v<U, R>) {
+        rhs *= R{-1};
+        rhs += lhs;
+        return rhs;
     } else {
         Vector<R> result{lhs};
         result -= rhs;
