@@ -183,14 +183,39 @@ template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator*(const T& lhs, const Vector<U>& rhs) -> Vector<R>;
 
 /// \relates Vector
+/// \brief Left-hand multiplication by scalar.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator*(const T& lhs, Vector<U>&& rhs) -> Vector<R>;
+
+/// \relates Vector
 /// \brief Right-hand multiplication by scalar.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator*(const Vector<T>& lhs, const U& rhs) -> Vector<R>;
 
 /// \relates Vector
+/// \brief Right-hand multiplication by scalar.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator*(Vector<T>&& lhs, const U& rhs) -> Vector<R>;
+
+/// \relates Vector
 /// \brief Elementwise product of two Vectors.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator*(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
+
+/// \relates Vector
+/// \brief Elementwise product of two Vectors.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator*(Vector<T>&& lhs, const Vector<U>& rhs) -> Vector<R>;
+
+/// \relates Vector
+/// \brief Elementwise product of two Vectors.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator*(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R>;
+
+/// \relates Vector
+/// \brief Elementwise product of two Vectors.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator*(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R>;
 
 /// \relates Vector
 /// \brief Inner product of two Vectors.
@@ -206,26 +231,6 @@ auto operator/(const Vector<T>& lhs, const U& rhs) -> Vector<R>;
 /// \brief Elementwise division of two Vectors.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator/(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Left-hand multiplication by scalar.
-template <typename T>
-auto operator*(const T& lhs, Vector<T> rhs) -> Vector<T>;
-
-/// \relates Vector
-/// \brief Right-hand multiplication by scalar.
-template <typename T>
-auto operator*(Vector<T> lhs, const T& rhs) -> Vector<T>;
-
-/// \relates Vector
-/// \brief Elementwise product of two Vectors.
-template <typename T>
-auto operator*(Vector<T> lhs, const Vector<T>& rhs) -> Vector<T>;
-
-/// \relates Vector
-/// \brief Elementwise product of two Vectors.
-template <typename T>
-auto operator*(const Vector<T>& lhs, Vector<T>&& rhs) -> Vector<T>;
 
 /// \relates Vector
 /// \brief Inner product of two Vectors.
@@ -725,6 +730,20 @@ inline auto operator*(const T& lhs, const Vector<U>& rhs) -> Vector<R> {
 }
 
 /// \relates Vector
+/// \brief Left-hand multiplication by scalar.
+template <typename T, typename U, typename R>
+inline auto operator*(const T& lhs, Vector<U>&& rhs) -> Vector<R> {
+    if constexpr (std::is_same_v<U, R>) {
+        rhs *= lhs;
+        return rhs;
+    } else {
+        Vector<T> result{rhs};
+        result *= lhs;
+        return result;
+    }
+}
+
+/// \relates Vector
 /// \brief Right-hand multiplication by scalar.
 template <typename T, typename U, typename R>
 inline auto operator*(const Vector<T>& lhs, const U& rhs) -> Vector<R> {
@@ -734,16 +753,75 @@ inline auto operator*(const Vector<T>& lhs, const U& rhs) -> Vector<R> {
 }
 
 /// \relates Vector
+/// \brief Right-hand multiplication by scalar.
+template <typename T, typename U, typename R>
+inline auto operator*(Vector<T>&& lhs, const U& rhs) -> Vector<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        lhs *= rhs;
+        return lhs;
+    } else {
+        Vector<R> result{lhs};
+        result *= rhs;
+        return result;
+    }
+}
+
+/// \relates Vector
 /// \brief Elementwise product of two Vectors.
 template <typename T, typename U, typename R>
 inline auto operator*(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R> {
     if constexpr (std::is_same_v<T, R>) {
+        Vector<R> result{lhs};
+        result *= rhs;
+        return result;
+    } else {
         Vector<R> result{rhs};
         result *= lhs;
         return result;
+    }
+}
+
+/// \relates Vector
+/// \brief Elementwise product of two Vectors.
+template <typename T, typename U, typename R>
+inline auto operator*(Vector<T>&& lhs, const Vector<U>& rhs) -> Vector<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        lhs *= rhs;
+        return lhs;
+    } else {
+        Vector<R> result{rhs};
+        result *= lhs;
+        return result;
+    }
+}
+
+/// \relates Vector
+/// \brief Elementwise product of two Vectors.
+template <typename T, typename U, typename R>
+inline auto operator*(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R> {
+    if constexpr (std::is_same_v<U, R>) {
+        rhs *= lhs;
+        return rhs;
     } else {
         Vector<R> result{lhs};
         result *= rhs;
+        return result;
+    }
+}
+
+/// \relates Vector
+/// \brief Elementwise product of two Vectors.
+template <typename T, typename U, typename R>
+inline auto operator*(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        lhs *= rhs;
+        return lhs;
+    } else if constexpr (std::is_same_v<U, R>) {
+        rhs *= lhs;
+        return rhs;
+    } else {
+        Vector<R> result{lhs};
+        lhs *= rhs;
         return result;
     }
 }
@@ -777,44 +855,6 @@ inline auto operator/(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R> {
     Vector<R> result{lhs};
     result /= rhs;
     return result;
-}
-
-/// \relates Vector
-/// \brief Left-hand multiplication by scalar.
-template <typename T>
-inline auto operator*(const T& lhs, Vector<T> rhs) -> Vector<T> {
-    rhs *= lhs;
-    return rhs;
-}
-
-/// \relates Vector
-/// \brief Right-hand multiplication by scalar.
-template <typename T>
-inline auto operator*(Vector<T> lhs, const T& rhs) -> Vector<T> {
-    lhs *= rhs;
-    return lhs;
-}
-
-/// \relates Vector
-/// \brief Elementwise product of two Vectors.
-///
-/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
-/// return. Also handles the case that lhs is given an rvalue (NRVO).
-template <typename T>
-inline auto operator*(Vector<T> lhs, const Vector<T>& rhs) -> Vector<T> {
-    lhs *= rhs;
-    return lhs;
-}
-
-/// \relates Vector
-/// \brief Elementwise product of two Vectors.
-///
-/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
-/// reference parameter (NRVO).
-template <typename T>
-inline auto operator*(const Vector<T>& lhs, Vector<T>&& rhs) -> Vector<T> {
-    rhs *= lhs;
-    return rhs;
 }
 
 /// \relates Vector
