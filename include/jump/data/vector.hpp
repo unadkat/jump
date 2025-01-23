@@ -780,51 +780,6 @@ inline auto operator/(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R> {
 }
 
 /// \relates Vector
-/// \brief Addition of two Vectors.
-///
-/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
-/// return. Also handles the case that lhs is given an rvalue (NRVO).
-template <typename T>
-inline auto operator+(Vector<T> lhs, const Vector<T>& rhs) -> Vector<T> {
-    lhs += rhs;
-    return lhs;
-}
-
-/// \relates Vector
-/// \brief Addition of two Vectors.
-///
-/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
-/// reference parameter (NRVO).
-template <typename T>
-inline auto operator+(const Vector<T>& lhs, Vector<T>&& rhs) -> Vector<T> {
-    rhs += lhs;
-    return rhs;
-}
-
-/// \relates Vector
-/// \brief Difference of two Vectors.
-///
-/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
-/// return. Also handles the case that lhs is given an rvalue (NRVO).
-template <typename T>
-inline auto operator-(Vector<T> lhs, const Vector<T>& rhs) -> Vector<T> {
-    lhs -= rhs;
-    return lhs;
-}
-
-/// \relates Vector
-/// \brief Difference of two Vectors.
-///
-/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
-/// reference parameter (NRVO).
-template <typename T>
-inline auto operator-(const Vector<T>& lhs, Vector<T>&& rhs) -> Vector<T> {
-    rhs *= T{-1};
-    rhs += lhs;
-    return rhs;
-}
-
-/// \relates Vector
 /// \brief Left-hand multiplication by scalar.
 template <typename T>
 inline auto operator*(const T& lhs, Vector<T> rhs) -> Vector<T> {
