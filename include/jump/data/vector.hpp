@@ -233,11 +233,6 @@ template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator/(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
 
 /// \relates Vector
-/// \brief Inner product of two Vectors.
-template <typename T>
-auto dot(const Vector<T>& lhs, const Vector<T>& rhs) -> T;
-
-/// \relates Vector
 /// \brief Right-hand division by scalar.
 template <typename T>
 auto operator/(Vector<T> lhs, const T& rhs) -> Vector<T>;
@@ -830,13 +825,14 @@ inline auto operator*(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R> {
 /// \brief Inner product of two Vectors.
 template <typename T, typename U, typename R>
 inline auto dot(const Vector<T>& lhs, const Vector<U>& rhs) -> R {
-    if constexpr (std::is_same_v<T, R>) {
-        return dot(lhs, Vector<R>{rhs});
-    } else if constexpr(std::is_same_v<U, R>) {
-        return dot(Vector<R>{lhs}, rhs);
-    } else {
-        return dot(Vector<R>{lhs}, Vector<R>{rhs});
+#ifndef NDEBUG
+    if (lhs.size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
     }
+#endif  // NDEBUG
+
+    return std::inner_product(lhs.begin(), lhs.end(), rhs.begin(), R{0});
 }
 
 /// \relates Vector
@@ -855,20 +851,6 @@ inline auto operator/(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R> {
     Vector<R> result{lhs};
     result /= rhs;
     return result;
-}
-
-/// \relates Vector
-/// \brief Inner product of two Vectors.
-template <typename T>
-inline auto dot(const Vector<T>& lhs, const Vector<T>& rhs) -> T {
-#ifndef NDEBUG
-    if (lhs.size() != rhs.size()) {
-        throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
-            .name2 = "rhs", .size2 = rhs.size()}};
-    }
-#endif  // NDEBUG
-
-    return std::inner_product(lhs.begin(), lhs.end(), rhs.begin(), T{0});
 }
 
 /// \relates Vector
