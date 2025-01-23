@@ -228,14 +228,24 @@ template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator/(const Vector<T>& lhs, const U& rhs) -> Vector<R>;
 
 /// \relates Vector
+/// \brief Right-hand division by scalar.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator/(Vector<T>&& lhs, const U& rhs) -> Vector<R>;
+
+/// \relates Vector
+/// \brief Quotient with scalar.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator/(const T& lhs, const Vector<U>& rhs) -> Vector<R>;
+
+/// \relates Vector
+/// \brief Quotient with scalar.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator/(const T& lhs, Vector<U>&& rhs) -> Vector<R>;
+
+/// \relates Vector
 /// \brief Elementwise division of two Vectors.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator/(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Right-hand division by scalar.
-template <typename T>
-auto operator/(Vector<T> lhs, const T& rhs) -> Vector<T>;
 
 /// \relates Vector
 /// \brief Elementwise division of two Vectors.
@@ -845,20 +855,57 @@ inline auto operator/(const Vector<T>& lhs, const U& rhs) -> Vector<R> {
 }
 
 /// \relates Vector
+/// \brief Right-hand division by scalar.
+template <typename T, typename U, typename R>
+auto operator/(Vector<T>&& lhs, const U& rhs) -> Vector<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        lhs /= rhs;
+        return rhs;
+    } else {
+        Vector<R> result{lhs};
+        result /= rhs;
+        return result;
+    }
+}
+
+/// \relates Vector
+/// \brief Quotient with scalar.
+template <typename T, typename U, typename R>
+auto operator/(const T& lhs, const Vector<U>& rhs) -> Vector<R> {
+    std::size_t N{rhs.size()};
+    Vector<R> result(N);
+    for (std::size_t i{0}; i < N; ++i) {
+        result[i] = lhs/rhs[i];
+    }
+    return result;
+}
+
+/// \relates Vector
+/// \brief Quotient with scalar.
+template <typename T, typename U, typename R>
+auto operator/(const T& lhs, Vector<U>&& rhs) -> Vector<R> {
+    std::size_t N{rhs.size()};
+    if constexpr (std::is_same_v<U, R>) {
+        for (std::size_t i{0}; i < N; ++i) {
+            rhs[i] = lhs/rhs[i];
+        }
+        return rhs;
+    } else {
+        Vector<R> result(N);
+        for (std::size_t i{0}; i < N; ++i) {
+            result[i] = lhs/rhs[i];
+        }
+        return result;
+    }
+}
+
+/// \relates Vector
 /// \brief Elementwise division of two Vectors.
 template <typename T, typename U, typename R>
 inline auto operator/(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R> {
     Vector<R> result{lhs};
     result /= rhs;
     return result;
-}
-
-/// \relates Vector
-/// \brief Right-hand division by scalar.
-template <typename T>
-inline auto operator/(Vector<T> lhs, const T& rhs) -> Vector<T> {
-    lhs /= rhs;
-    return lhs;
 }
 
 /// \relates Vector

@@ -108,6 +108,15 @@ auto test_vector_arithmetic_basic() -> TestResult {
                 "scale complex-real");
         result.add_check(approx(vans_z, vcz), "scale complex");
     }
+    {
+        // TODO: elementwise multiplication
+    }
+    {
+        // TODO: division/quotients
+    }
+    {
+        // TODO: elementwise division
+    }
 
     return result;
 }
