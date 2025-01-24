@@ -129,8 +129,32 @@ auto test_vector_arithmetic_basic() -> TestResult {
                 "elementwise multiplication complex");
     }
     {
-        // TODO: division/quotients
         randomise(rng_real, ar, az, var, vaz);
+        Vector<Real> vans_r(N);
+        Vector<Complex> vans_zr(N), vans_rz(N), vans_z(N);
+        for (std::size_t i{0}; i < N; ++i) {
+            vans_r[i] = var[i]/ar;
+            vans_zr[i] = vaz[i]/ar;
+            vans_rz[i] = var[i]/az;
+            vans_z[i] = vaz[i]/az;
+        }
+
+        result.add_check(approx(vans_r, (1.*var)/ar), "division real");
+        result.add_check(approx(vans_zr, (1.*vaz)/ar), "division complex-real");
+        result.add_check(approx(vans_rz, (1.*var)/az), "division real-complex");
+        result.add_check(approx(vans_z, (1.*vaz)/az), "division complex");
+
+        for (std::size_t i{0}; i < N; ++i) {
+            vans_r[i] = ar/var[i];
+            vans_zr[i] = az/var[i];
+            vans_rz[i] = ar/vaz[i];
+            vans_z[i] = az/vaz[i];
+        }
+
+        result.add_check(approx(vans_r, ar/(1.*var)), "inverse real");
+        result.add_check(approx(vans_zr, az/(1.*var)), "inverse complex-real");
+        result.add_check(approx(vans_rz, ar/(1.*vaz)), "inverse real-complex");
+        result.add_check(approx(vans_z, az/(1.*vaz)), "inverse complex");
     }
     {
         randomise(rng_real, var, vbr, vaz, vbz);

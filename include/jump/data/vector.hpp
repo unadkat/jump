@@ -870,7 +870,7 @@ template <typename T, typename U, typename R>
 auto operator/(Vector<T>&& lhs, const U& rhs) -> Vector<R> {
     if constexpr (std::is_same_v<T, R>) {
         lhs /= rhs;
-        return rhs;
+        return lhs;
     } else {
         Vector<R> result{lhs};
         result /= rhs;
