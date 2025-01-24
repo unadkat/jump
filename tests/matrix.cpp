@@ -1175,10 +1175,10 @@ auto test_matrix_dense_columns() -> TestResult {
     }
 
     for (std::size_t col{0}; col < size2; ++col) {
-        if (!vanishes(Ar.column_L2_norm(col) - (col + 1)*vr.L2_norm())) {
+        if (!approx(Ar.column_L2_norm(col), (col + 1)*vr.L2_norm())) {
             real_success = false;
         }
-        if (!vanishes(Az.column_L2_norm(col) - (col + 1)*vz.L2_norm())) {
+        if (!approx(Az.column_L2_norm(col), (col + 1)*vz.L2_norm())) {
             complex_success = false;
         }
     }

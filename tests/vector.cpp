@@ -55,23 +55,25 @@ int main() {
 
 auto test_vector_arithmetic_basic() -> TestResult {
     TestResult result;
-    RandomReal rng(0., 10.);
+    RandomReal rng_real(0.5, 10.);
+    RandomInt rng_int(5, 10);
 
+    auto N{static_cast<std::size_t>(rng_int.generate())};
     Real ar, br;
     Complex az, bz;
-    randomise(rng, ar, br, az, bz);
+    randomise(rng_real, ar, br, az, bz);
 
-    Vector<Real> var(5, ar), vbr(5, br);
+    Vector<Real> var(N, ar), vbr(N, br);
     Vector<Complex> varZ{var}, vbrZ{vbr};
-    Vector<Complex> vaz(5, az), vbz(5, bz);
+    Vector<Complex> vaz(N, az), vbz(N, bz);
 
     {
         Real ans_r{ar + br};
-        Vector<Real> vans_r(5, ans_r), vcr{var + vbr};
+        Vector<Real> vans_r(N, ans_r), vcr{var + vbr};
         Vector<Complex> vans_rZ{vans_r};
         Vector<Complex> vcrZ1{var + vbrZ}, vcrZ2{varZ + vbr};
         Complex ans_z{az + bz};
-        Vector<Complex> vans_z(5, ans_z), vcz{vaz + vbz};
+        Vector<Complex> vans_z(N, ans_z), vcz{vaz + vbz};
 
         result.add_check(approx(vans_r, vcr), "add real");
         result.add_check(approx(vans_rZ, vcrZ1), "add real-complex");
@@ -80,11 +82,11 @@ auto test_vector_arithmetic_basic() -> TestResult {
     }
     {
         Real ans_r{ar - br};
-        Vector<Real> vans_r(5, ans_r), vcr{var - vbr};
+        Vector<Real> vans_r(N, ans_r), vcr{var - vbr};
         Vector<Complex> vans_rZ{vans_r};
         Vector<Complex> vcrZ1{var - vbrZ}, vcrZ2{varZ - vbr};
         Complex ans_z{az - bz};
-        Vector<Complex> vans_z(5, ans_z), vcz{vaz - vbz};
+        Vector<Complex> vans_z(N, ans_z), vcz{vaz - vbz};
 
         result.add_check(approx(vans_r, vcr), "subtract real");
         result.add_check(approx(vans_rZ, vcrZ1), "subtract real-complex");
@@ -93,29 +95,62 @@ auto test_vector_arithmetic_basic() -> TestResult {
     }
     {
         Real ans_r{ar*br};
-        Vector<Real> vans_r(5, ans_r), vcr{var*br};
+        Vector<Real> vans_r(N, ans_r), vcr{var*br};
         Complex brZ{br};
         Vector<Complex> vans_rZ{vans_r};
         Vector<Complex> vcrZ1{var*brZ};
         Vector<Complex> vcrZ2{brZ*var};
         Complex ans_z{az*bz};
-        Vector<Complex> vans_z(5, ans_z), vcz{vaz*bz};
+        Vector<Complex> vans_z(N, ans_z), vcz{vaz*bz};
 
         result.add_check(approx(vans_r, vcr), "scale real");
-        result.add_check(vanishes((vans_rZ - vcrZ1).L2_norm()),
-                "scale real-complex");
-        result.add_check(vanishes((vans_rZ - vcrZ2).L2_norm()),
-                "scale complex-real");
+        result.add_check(approx(vans_rZ, vcrZ1), "scale real-complex");
+        result.add_check(approx(vans_rZ, vcrZ2), "scale complex-real");
         result.add_check(approx(vans_z, vcz), "scale complex");
     }
     {
-        // TODO: elementwise multiplication
+        randomise(rng_real, var, vbr, vaz, vbz);
+        Vector<Real> vans_r(N);
+        Vector<Complex> vans_zr(N), vans_rz(N), vans_z(N);
+        for (std::size_t i{0}; i < N; ++i) {
+            vans_r[i] = var[i]*vbr[i];
+            vans_zr[i] = vaz[i]*var[i];
+            vans_rz[i] = var[i]*vaz[i];
+            vans_z[i] = vaz[i]*vbz[i];
+        }
+
+        result.add_check(approx(vans_r, (1.*var)*vbr),
+                "elementwise multiplication real");
+        result.add_check(approx(vans_zr, vaz*(1.*var)),
+                "elementwise multiplication complex-real");
+        result.add_check(approx(vans_rz, (1.*var)*vaz),
+                "elementwise multiplication real-complex");
+        result.add_check(approx(vans_z, (1.*vaz)*vbz),
+                "elementwise multiplication complex");
     }
     {
         // TODO: division/quotients
+        randomise(rng_real, ar, az, var, vaz);
     }
     {
-        // TODO: elementwise division
+        randomise(rng_real, var, vbr, vaz, vbz);
+        Vector<Real> vans_r(N);
+        Vector<Complex> vans_zr(N), vans_rz(N), vans_z(N);
+        for (std::size_t i{0}; i < N; ++i) {
+            vans_r[i] = var[i]/vbr[i];
+            vans_zr[i] = vaz[i]/var[i];
+            vans_rz[i] = var[i]/vaz[i];
+            vans_z[i] = vaz[i]/vbz[i];
+        }
+
+        result.add_check(approx(vans_r, (1.*var)/vbr),
+                "elementwise division real");
+        result.add_check(approx(vans_zr, vaz/(1.*var)),
+                "elementwise division complex-real");
+        result.add_check(approx(vans_rz, (1.*var)/vaz),
+                "elementwise division real-complex");
+        result.add_check(approx(vans_z, (1.*vaz)/vbz),
+                "elementwise division complex");
     }
 
     return result;
@@ -126,9 +161,9 @@ auto test_vector_arithmetic_compound() -> TestResult {
     RandomReal rng_real(0., 10.);
     RandomInt rng_int(10, 15);
 
-    auto size{static_cast<std::size_t>(rng_int.generate())};
-    Vector<Real> ar(size), br(size), cr(size);
-    Vector<Complex> az(size), bz(size), cz(size);
+    auto N{static_cast<std::size_t>(rng_int.generate())};
+    Vector<Real> ar(N), br(N), cr(N);
+    Vector<Complex> az(N), bz(N), cz(N);
     Real kr1, kr2;
     Complex kz1, kz2;
     randomise(rng_real, ar, br, cr, az, bz, cz, kr1, kr2, kz1, kz2);
