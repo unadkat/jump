@@ -96,13 +96,17 @@ class BandedMatrix : public MatrixBase<T> {
         /// \brief Negate matrix.
         auto operator-() const -> BandedMatrix;
         /// \brief Add two matrices together in place.
-        auto operator+=(const BandedMatrix& rhs) -> BandedMatrix&;
+        template <std::convertible_to<T> U>
+        auto operator+=(const BandedMatrix<U>& rhs) -> BandedMatrix&;
         /// \brief Subtract a matrix from another in place.
-        auto operator-=(const BandedMatrix& rhs) -> BandedMatrix&;
+        template <std::convertible_to<T> U>
+        auto operator-=(const BandedMatrix<U>& rhs) -> BandedMatrix&;
         /// \brief Multiply matrix by scalar in place.
-        auto operator*=(const T& k) -> BandedMatrix&;
+        template <std::convertible_to<T> U>
+        auto operator*=(const U& k) -> BandedMatrix&;
         /// \brief Divide matrix by scalar in place.
-        auto operator/=(const T& k) -> BandedMatrix&;
+        template <std::convertible_to<T> U>
+        auto operator/=(const U& k) -> BandedMatrix&;
 
         /// \brief Pointer to underlying data, for use with third-party
         /// libraries.
@@ -428,13 +432,14 @@ inline auto BandedMatrix<T>::operator+() const -> const BandedMatrix& {
 
 template <typename T>
 inline auto BandedMatrix<T>::operator-() const -> BandedMatrix {
-    BandedMatrix<T> result(*this);
+    BandedMatrix<T> result{*this};
     result *= T{-1};
     return result;
 }
 
 template <typename T>
-inline auto BandedMatrix<T>::operator+=(const BandedMatrix<T>& rhs)
+template <std::convertible_to<T> U>
+inline auto BandedMatrix<T>::operator+=(const BandedMatrix<U>& rhs)
         -> BandedMatrix& {
 #ifndef NDEBUG
     if (this->size() != rhs.size()) {
@@ -453,7 +458,8 @@ inline auto BandedMatrix<T>::operator+=(const BandedMatrix<T>& rhs)
 }
 
 template <typename T>
-inline auto BandedMatrix<T>::operator-=(const BandedMatrix<T>& rhs)
+template <std::convertible_to<T> U>
+inline auto BandedMatrix<T>::operator-=(const BandedMatrix<U>& rhs)
         -> BandedMatrix& {
 #ifndef NDEBUG
     if (this->size() != rhs.size()) {
@@ -472,13 +478,15 @@ inline auto BandedMatrix<T>::operator-=(const BandedMatrix<T>& rhs)
 }
 
 template <typename T>
-inline auto BandedMatrix<T>::operator*=(const T& k) -> BandedMatrix& {
+template <std::convertible_to<T> U>
+inline auto BandedMatrix<T>::operator*=(const U& k) -> BandedMatrix& {
     m_storage *= k;
     return *this;
 }
 
 template <typename T>
-inline auto BandedMatrix<T>::operator/=(const T& k) -> BandedMatrix& {
+template <std::convertible_to<T> U>
+inline auto BandedMatrix<T>::operator/=(const U& k) -> BandedMatrix& {
     m_storage /= k;
     return *this;
 }

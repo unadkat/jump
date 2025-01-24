@@ -115,15 +115,20 @@ class DenseMatrix : public MatrixBase<T> {
         /// \brief Negate matrix.
         auto operator-() const -> DenseMatrix;
         /// \brief Add two matrices together in place.
-        auto operator+=(const DenseMatrix& rhs) -> DenseMatrix&;
+        template <std::convertible_to<T> U>
+        auto operator+=(const DenseMatrix<U>& rhs) -> DenseMatrix&;
         /// \brief Subtract a matrix from another in place.
-        auto operator-=(const DenseMatrix& rhs) -> DenseMatrix&;
+        template <std::convertible_to<T> U>
+        auto operator-=(const DenseMatrix<U>& rhs) -> DenseMatrix&;
         /// \brief Multiply matrix by scalar in place.
-        auto operator*=(const T& k) -> DenseMatrix&;
+        template <std::convertible_to<T> U>
+        auto operator*=(const U& k) -> DenseMatrix&;
         /// \brief Multiply matrix by another in place
-        auto operator*=(const DenseMatrix& rhs) -> DenseMatrix&;
+        template <std::convertible_to<T> U>
+        auto operator*=(const DenseMatrix<U>& rhs) -> DenseMatrix&;
         /// \brief Divide matrix by scalar in place.
-        auto operator/=(const T& k) -> DenseMatrix&;
+        template <std::convertible_to<T> U>
+        auto operator/=(const U& k) -> DenseMatrix&;
 
         /// \brief Return sum of element magnitudes in a column.
         auto column_L1_norm(std::size_t column) const -> Real;
@@ -454,7 +459,9 @@ inline auto DenseMatrix<T>::operator-() const -> DenseMatrix {
 }
 
 template <typename T>
-inline auto DenseMatrix<T>::operator+=(const DenseMatrix& rhs) -> DenseMatrix& {
+template <std::convertible_to<T> U>
+inline auto DenseMatrix<T>::operator+=(const DenseMatrix<U>& rhs)
+        -> DenseMatrix& {
 #ifndef NDEBUG
     if (this->size() != rhs.size()) {
         throw RuntimeError{Mismatch2DError{.size1 = this->size(),
@@ -467,7 +474,9 @@ inline auto DenseMatrix<T>::operator+=(const DenseMatrix& rhs) -> DenseMatrix& {
 }
 
 template <typename T>
-inline auto DenseMatrix<T>::operator-=(const DenseMatrix& rhs) -> DenseMatrix& {
+template <std::convertible_to<T> U>
+inline auto DenseMatrix<T>::operator-=(const DenseMatrix<U>& rhs)
+        -> DenseMatrix& {
 #ifndef NDEBUG
     if (this->size() != rhs.size()) {
         throw RuntimeError{Mismatch2DError{.size1 = this->size(),
@@ -480,13 +489,15 @@ inline auto DenseMatrix<T>::operator-=(const DenseMatrix& rhs) -> DenseMatrix& {
 }
 
 template <typename T>
-inline auto DenseMatrix<T>::operator*=(const T& k) -> DenseMatrix& {
+template <std::convertible_to<T> U>
+inline auto DenseMatrix<T>::operator*=(const U& k) -> DenseMatrix& {
     m_storage *= k;
     return *this;
 }
 
 template <typename T>
-inline auto DenseMatrix<T>::operator*=(const DenseMatrix<T>& rhs)
+template <std::convertible_to<T> U>
+inline auto DenseMatrix<T>::operator*=(const DenseMatrix<U>& rhs)
         -> DenseMatrix& {
 #ifndef NDEBUG
     if (this->num_columns() != rhs.num_rows()) {
@@ -511,7 +522,8 @@ inline auto DenseMatrix<T>::operator*=(const DenseMatrix<T>& rhs)
 }
 
 template <typename T>
-inline auto DenseMatrix<T>::operator/=(const T& k) -> DenseMatrix& {
+template <std::convertible_to<T> U>
+inline auto DenseMatrix<T>::operator/=(const U& k) -> DenseMatrix& {
     m_storage /= k;
     return *this;
 }
