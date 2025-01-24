@@ -249,8 +249,18 @@ auto operator/(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
 
 /// \relates Vector
 /// \brief Elementwise division of two Vectors.
-template <typename T>
-auto operator/(Vector<T> lhs, const Vector<T>& rhs) -> Vector<T>;
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator/(Vector<T>&& lhs, const Vector<U>& rhs) -> Vector<R>;
+
+/// \relates Vector
+/// \brief Elementwise division of two Vectors.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator/(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R>;
+
+/// \relates Vector
+/// \brief Elementwise division of two Vectors.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator/(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R>;
 
 // ========================================================================
 // Exponentiation
@@ -873,9 +883,9 @@ auto operator/(Vector<T>&& lhs, const U& rhs) -> Vector<R> {
 template <typename T, typename U, typename R>
 auto operator/(const T& lhs, const Vector<U>& rhs) -> Vector<R> {
     std::size_t N{rhs.size()};
-    Vector<R> result(N);
+    Vector<R> result(N, R{lhs});
     for (std::size_t i{0}; i < N; ++i) {
-        result[i] = lhs/rhs[i];
+        result[i] /= rhs[i];
     }
     return result;
 }
@@ -891,9 +901,9 @@ auto operator/(const T& lhs, Vector<U>&& rhs) -> Vector<R> {
         }
         return rhs;
     } else {
-        Vector<R> result(N);
+        Vector<R> result(N, R{lhs});
         for (std::size_t i{0}; i < N; ++i) {
-            result[i] = lhs/rhs[i];
+            result[i] /= rhs[i];
         }
         return result;
     }
@@ -910,13 +920,73 @@ inline auto operator/(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R> {
 
 /// \relates Vector
 /// \brief Elementwise division of two Vectors.
-///
-/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
-/// return. Also handles the case that lhs is given an rvalue (NRVO).
-template <typename T>
-inline auto operator/(Vector<T> lhs, const Vector<T>& rhs) -> Vector<T> {
-    lhs /= rhs;
-    return lhs;
+template <typename T, typename U, typename R>
+inline auto operator/(Vector<T>&& lhs, const Vector<U>& rhs) -> Vector<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        lhs /= rhs;
+        return lhs;
+    } else {
+        Vector<R> result{lhs};
+        result /= rhs;
+        return result;
+    }
+}
+
+/// \relates Vector
+/// \brief Elementwise division of two Vectors.
+template <typename T, typename U, typename R>
+inline auto operator/(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R> {
+#ifndef NDEBUG
+    if (lhs.size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    std::size_t N{lhs.size()};
+    if constexpr (std::is_same_v<U, R>) {
+        for (std::size_t i{0}; i < N; ++i) {
+            rhs[i] = lhs[i]/rhs[i];
+        }
+        return rhs;
+    } else {
+        Vector<R> result{lhs};
+        for (std::size_t i{0}; i < N; ++i) {
+            result[i] /= rhs[i];
+        }
+        return result;
+    }
+}
+
+/// \relates Vector
+/// \brief Elementwise division of two Vectors.
+template <typename T, typename U, typename R>
+inline auto operator/(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R> {
+#ifndef NDEBUG
+    if (lhs.size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    std::size_t N{lhs.size()};
+    if constexpr (std::is_same_v<T, R>) {
+        for (std::size_t i{0}; i < N; ++i) {
+            lhs[i] /= rhs[i];
+        }
+        return lhs;
+    } else if constexpr (std::is_same_v<U, R>) {
+        for (std::size_t i{0}; i < N; ++i) {
+            rhs[i] = lhs[i]/rhs[i];
+        }
+        return rhs;
+    } else {
+        Vector<R> result{lhs};
+        for (std::size_t i{0}; i < N; ++i) {
+            result[i] /= rhs[i];
+        }
+        return result;
+    }
 }
 
 // ========================================================================
