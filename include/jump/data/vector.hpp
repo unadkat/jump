@@ -130,6 +130,8 @@ struct Vector {
     /// \brief Populate with data in a `std::string`. Continue to read data
     /// until a `std::stringstream` fails to read a new value.
     void operator<<(std::string data);
+    /// \brief Vector serialisation to a string.
+    auto as_string() const -> std::string;
 };
 
 /// \relates Vector
@@ -607,6 +609,13 @@ inline void Vector<T>::operator<<(std::string data) {
 
     // Don't leave storage in an in-between state if anything happens
     storage = std::move(new_data);
+}
+
+template <typename T>
+inline auto Vector<T>::as_string() const -> std::string {
+    std::ostringstream oss;
+    oss << *this;
+    return oss.str();
 }
 
 /// \relates Vector
