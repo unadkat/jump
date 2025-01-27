@@ -24,7 +24,7 @@ class UnaryVectorOp {
 
     protected:
         typename std::conditional<Expr::is_vector_expression_leaf,
-                 const Expr&, const Expr>::type m_expression;
+                 const Expr&, const Expr>::type m_expr;
         Functor m_operator{};
 };
 
@@ -48,19 +48,19 @@ class BinaryVectorOp {
 
 template <typename Functor, VectorExpression Expr>
 inline constexpr UnaryVectorOp<Functor, Expr>::UnaryVectorOp(const Expr& expr) :
-    m_expression{expr} {
+    m_expr{expr} {
 }
 
 template <typename Functor, VectorExpression Expr>
 inline constexpr auto UnaryVectorOp<Functor, Expr>::operator[](
         std::size_t i) const {
-    return m_operator(m_expression[i]);
+    return m_operator(m_expr[i]);
 }
 
 template <typename Functor, VectorExpression Expr>
 inline constexpr auto UnaryVectorOp<Functor, Expr>::size() const
         -> std::size_t {
-    return m_expression.size();
+    return m_expr.size();
 }
 
 template <typename Functor, VectorExpression Left, VectorExpression Right>
