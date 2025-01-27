@@ -13,6 +13,10 @@
 #include "jump/utility/types.hpp"
 #include "jump/utility/utility.hpp"
 
+#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+#include "jump/experimental/expression_templates/vector_operators.hpp"
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+
 #include <algorithm>
 #include <cmath>
 #include <initializer_list>
@@ -29,6 +33,10 @@ namespace jump {
 /// operators enabled.
 template <typename T>
 struct Vector {
+#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+    static constexpr bool is_vector_expression_leaf{true};
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+
     /// \brief Internal contiguous storage.
     std::vector<T> storage;
 
@@ -52,6 +60,14 @@ struct Vector {
     Vector(const Vector<U>& other);
     /// \brief Default move constructor.
     Vector(Vector&& other) = default;
+#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+    template <VectorExpression Expr>
+    Vector(const Expr& expr) : storage(expr.size()) {
+        for (std::size_t i{0}, N{expr.size()}; i < N; ++i) {
+            storage[i] = expr[i];
+        }
+    }
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
     /// \brief Default copy assignment.
     auto operator=(const Vector& other) -> Vector& = default;
@@ -94,8 +110,10 @@ struct Vector {
 
     /// \brief No operation on `Vector`.
     auto operator+() const -> const Vector&;
+#ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
     /// \brief Negate `Vector`.
     auto operator-() const -> Vector;
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
     /// \brief Add two Vectors together in place.
     template <std::convertible_to<T> U>
     auto operator+=(const Vector<U>& rhs) -> Vector&;
@@ -139,6 +157,7 @@ struct Vector {
 template <typename T>
 auto operator<<(std::ostream& out, const Vector<T>& rhs) -> std::ostream&;
 
+#ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 /// \relates Vector
 /// \brief Addition of two Vectors.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
@@ -158,6 +177,7 @@ auto operator+(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R>;
 /// \brief Addition of two Vectors.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator+(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R>;
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 /// \relates Vector
 /// \brief Difference of two Vectors.
@@ -461,11 +481,13 @@ inline auto Vector<T>::operator+() const -> const Vector<T>& {
     return *this;
 }
 
+#ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 template <typename T>
 inline auto Vector<T>::operator-() const -> Vector<T> {
     Vector<T> temp{*this};
     return temp *= -1;
 }
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 template <typename T>
 template <std::convertible_to<T> U>
@@ -628,6 +650,7 @@ inline auto operator<<(std::ostream& out, const Vector<T>& rhs)
     return out;
 }
 
+#ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 /// \relates Vector
 /// \brief Addition of two Vectors.
 template <typename T, typename U, typename R>
@@ -687,6 +710,7 @@ inline auto operator+(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R> {
         return result;
     }
 }
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 /// \relates Vector
 /// \brief Difference of two Vectors.
