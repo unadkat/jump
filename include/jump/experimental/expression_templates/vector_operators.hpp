@@ -10,6 +10,7 @@
 #include "jump/experimental/expression_templates/concepts.hpp"
 #include "jump/experimental/expression_templates/vector_expressions.hpp"
 
+namespace jump {
 #ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 template <VectorExpression Left, VectorExpression Right>
 inline constexpr auto operator+(const Left& lhs, const Right& rhs) 
@@ -22,5 +23,7 @@ inline constexpr auto operator-(const Expr& expr) -> VectorNegate<Expr> {
     return VectorNegate<Expr>(expr);
 }
 #endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+}   // namespace jump
+
 #endif  // JUMP_EXPRESSION_TEMPLATE_VECTOR_OPERATORS_HPP
 

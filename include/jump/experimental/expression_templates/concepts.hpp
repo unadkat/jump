@@ -9,12 +9,14 @@
 
 #include <concepts>
 
+namespace jump {
 template <typename Expr>
 concept VectorExpression = requires (Expr expr, std::size_t i) {
     {expr.is_vector_expression_leaf} -> std::same_as<const bool&>;
     {expr[i]};
     {expr.size()} -> std::same_as<std::size_t>;
 };
+}   // namespace jump
 
 #endif  // JUMP_EXPRESSION_TEMPLATE_CONCEPTS_HPP
 

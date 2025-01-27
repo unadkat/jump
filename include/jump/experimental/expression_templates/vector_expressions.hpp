@@ -12,6 +12,7 @@
 #include <cassert>
 #include <functional>
 
+namespace jump {
 template <typename Functor, VectorExpression Expr>
 class UnaryVectorOp {
     public:
@@ -91,6 +92,7 @@ template <VectorExpression Left, VectorExpression Right>
 struct VectorAdd : BinaryVectorOp<std::plus<>, Left, Right> {
     using BinaryVectorOp<std::plus<>, Left, Right>::BinaryVectorOp;
 };
+}   // namespace jump
 
 #endif  // JUMP_EXPRESSION_TEMPLATE_VECTOR_EXPRESSIONS_HPP
 
