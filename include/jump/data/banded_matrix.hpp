@@ -184,14 +184,14 @@ template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator-(BandedMatrix<T>&& lhs, BandedMatrix<U>&& rhs) -> BandedMatrix<R>;
 
 /// \relates BandedMatrix
-/// \brief Right-hand-side multiplication by vector.
+/// \brief Left-hand multiplication by scalar.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator*(const BandedMatrix<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
+auto operator*(const T& lhs, const BandedMatrix<U>& rhs) -> BandedMatrix<R>;
 
 /// \relates BandedMatrix
 /// \brief Left-hand multiplication by scalar.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator*(const T& lhs, BandedMatrix<U>& rhs) -> BandedMatrix<R>;
+auto operator*(const T& lhs, BandedMatrix<U>&& rhs) -> BandedMatrix<R>;
 
 /// \relates BandedMatrix
 /// \brief Right-hand multiplication by scalar.
@@ -199,29 +199,24 @@ template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator*(const BandedMatrix<T>& lhs, const U& rhs) -> BandedMatrix<R>;
 
 /// \relates BandedMatrix
+/// \brief Right-hand multiplication by scalar.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator*(BandedMatrix<T>&& lhs, const U& rhs) -> BandedMatrix<R>;
+
+/// \relates BandedMatrix
+/// \brief Right-hand-side multiplication by vector.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator*(const BandedMatrix<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
+
+/// \relates BandedMatrix
 /// \brief Division by a scalar.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator/(const BandedMatrix<T>& lhs, const U& rhs) -> BandedMatrix<R>;
 
 /// \relates BandedMatrix
-/// \brief Right-hand-side multiplication by vector.
-template <typename T>
-auto operator*(const BandedMatrix<T>& lhs, const Vector<T>& rhs) -> Vector<T>;
-
-/// \relates BandedMatrix
-/// \brief Left-hand multiplication by scalar.
-template <typename T>
-auto operator*(const T& lhs, BandedMatrix<T> rhs) -> BandedMatrix<T>;
-
-/// \relates BandedMatrix
-/// \brief Right-hand multiplication by scalar.
-template <typename T>
-auto operator*(BandedMatrix<T> lhs, const T& rhs) -> BandedMatrix<T>;
-
-/// \relates BandedMatrix
 /// \brief Division by a scalar.
-template <typename T>
-auto operator/(BandedMatrix<T> lhs, const T& rhs) -> BandedMatrix<T>;
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator/(BandedMatrix<T>&& lhs, const U& rhs) -> BandedMatrix<R>;
 
 // ========================================================================
 // Implementation
@@ -689,24 +684,27 @@ inline auto operator-(BandedMatrix<T>&& lhs, BandedMatrix<U>&& rhs)
 }
 
 /// \relates BandedMatrix
-/// \brief Right-hand-side multiplication by vector.
+/// \brief Left-hand multiplication by scalar.
 template <typename T, typename U, typename R>
-inline auto operator*(const BandedMatrix<T>& lhs, const Vector<U>& rhs)
-        -> Vector<R> {
-    if constexpr (std::is_same_v<T, R>) {
-        return lhs*Vector<R>{rhs};
-    } else {
-        return BandedMatrix<R>{lhs}*rhs;
-    }
+inline auto operator*(const T& lhs, const BandedMatrix<U>& rhs)
+        -> BandedMatrix<R> {
+    BandedMatrix<R> result{rhs};
+    result *= lhs;
+    return result;
 }
 
 /// \relates BandedMatrix
 /// \brief Left-hand multiplication by scalar.
 template <typename T, typename U, typename R>
-inline auto operator*(const T& lhs, BandedMatrix<U>& rhs) -> BandedMatrix<R> {
-    BandedMatrix<R> result{rhs};
-    result *= lhs;
-    return result;
+inline auto operator*(const T& lhs, BandedMatrix<U>&& rhs) -> BandedMatrix<R> {
+    if constexpr (std::is_same_v<U, R>) {
+        rhs *= lhs;
+        return rhs;
+    } else {
+        BandedMatrix<R> result{rhs};
+        result *= lhs;
+        return result;
+    }
 }
 
 /// \relates BandedMatrix
@@ -716,6 +714,43 @@ inline auto operator*(const BandedMatrix<T>& lhs, const U& rhs)
         -> BandedMatrix<R> {
     BandedMatrix<R> result{lhs};
     result *= rhs;
+    return result;
+}
+
+/// \relates BandedMatrix
+/// \brief Right-hand multiplication by scalar.
+template <typename T, typename U, typename R>
+inline auto operator*(BandedMatrix<T>&& lhs, const U& rhs) -> BandedMatrix<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        lhs *= rhs;
+        return lhs;
+    } else {
+        BandedMatrix<R> result{lhs};
+        result *= rhs;
+        return result;
+    }
+}
+
+/// \relates BandedMatrix
+/// \brief Right-hand-side multiplication by vector.
+template <typename T, typename U, typename R>
+inline auto operator*(const BandedMatrix<T>& lhs, const Vector<U>& rhs)
+        -> Vector<R> {
+#ifndef NDEBUG
+    if (lhs.num_columns() != rhs.size()) {
+        throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = {rhs.size(), 1}}};
+    }
+#endif  // NDEBUG
+
+    std::size_t N{lhs.num_rows()}, X{lhs.num_columns()};
+    Vector<R> result(N);
+    for (std::size_t i{0}; i < X; ++i) {
+        for (std::size_t row{0}; row < N; ++row) {
+            result[row] += lhs[row, i]*rhs[i];
+        }
+    }
+
     return result;
 }
 
@@ -730,50 +765,17 @@ inline auto operator/(const BandedMatrix<T>& lhs, const U& rhs)
 }
 
 /// \relates BandedMatrix
-/// \brief Right-hand-side multiplication by vector.
-template <typename T>
-inline auto operator*(const BandedMatrix<T>& lhs, const Vector<T>& rhs)
-        -> Vector<T> {
-#ifndef NDEBUG
-    if (lhs.num_columns() != rhs.size()) {
-        throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
-            .name2 = "rhs", .size2 = {rhs.size(), 1}}};
-    }
-#endif  // NDEBUG
-
-    std::size_t N{lhs.num_rows()}, X{lhs.num_columns()};
-    Vector<T> result(N);
-    for (std::size_t i{0}; i < X; ++i) {
-        for (std::size_t row{0}; row < N; ++row) {
-            result[row] += lhs[row, i]*rhs[i];
-        }
-    }
-
-    return result;
-}
-
-/// \relates BandedMatrix
-/// \brief Left-hand multiplication by scalar.
-template <typename T>
-inline auto operator*(const T& lhs, BandedMatrix<T> rhs) -> BandedMatrix<T> {
-    rhs *= lhs;
-    return rhs;
-}
-
-/// \relates BandedMatrix
-/// \brief Right-hand multiplication by scalar.
-template <typename T>
-inline auto operator*(BandedMatrix<T> lhs, const T& rhs) -> BandedMatrix<T> {
-    lhs *= rhs;
-    return lhs;
-}
-
-/// \relates BandedMatrix
 /// \brief Division by a scalar.
-template <typename T>
-inline auto operator/(BandedMatrix<T> lhs, const T& rhs) -> BandedMatrix<T> {
-    lhs /= rhs;
-    return lhs;
+template <typename T, typename U, typename R>
+inline auto operator/(BandedMatrix<T>&& lhs, const U& rhs) -> BandedMatrix<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        lhs /= rhs;
+        return lhs;
+    } else {
+        BandedMatrix<R> result{lhs};
+        result /= rhs;
+        return result;
+    }
 }
 }   // namespace jump
 
