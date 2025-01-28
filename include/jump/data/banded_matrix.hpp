@@ -144,10 +144,44 @@ auto operator+(const BandedMatrix<T>& lhs, const BandedMatrix<U>& rhs)
         -> BandedMatrix<R>;
 
 /// \relates BandedMatrix
+/// \brief Addition of two BandedMatrices.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator+(BandedMatrix<T>&& lhs, const BandedMatrix<U>& rhs)
+        -> BandedMatrix<R>;
+
+/// \relates BandedMatrix
+/// \brief Addition of two BandedMatrices.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator+(const BandedMatrix<T>& lhs, BandedMatrix<U>&& rhs)
+        -> BandedMatrix<R>;
+
+/// \relates BandedMatrix
+/// \brief Addition of two BandedMatrices.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator+(BandedMatrix<T>&& lhs, BandedMatrix<U>&& rhs) -> BandedMatrix<R>;
+
+/// \relates BandedMatrix
 /// \brief Difference of two BandedMatrices.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator-(const BandedMatrix<T>& lhs, const BandedMatrix<U>& rhs)
         -> BandedMatrix<R>;
+
+/// \relates BandedMatrix
+/// \brief Difference of two BandedMatrices.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator-(BandedMatrix<T>&& lhs, const BandedMatrix<U>& rhs)
+        -> BandedMatrix<R>;
+
+/// \relates BandedMatrix
+/// \brief Difference of two BandedMatrices.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator-(const BandedMatrix<T>& lhs, BandedMatrix<U>&& rhs)
+        -> BandedMatrix<R>;
+
+/// \relates BandedMatrix
+/// \brief Difference of two BandedMatrices.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator-(BandedMatrix<T>&& lhs, BandedMatrix<U>&& rhs) -> BandedMatrix<R>;
 
 /// \relates BandedMatrix
 /// \brief Right-hand-side multiplication by vector.
@@ -168,30 +202,6 @@ auto operator*(const BandedMatrix<T>& lhs, const U& rhs) -> BandedMatrix<R>;
 /// \brief Division by a scalar.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator/(const BandedMatrix<T>& lhs, const U& rhs) -> BandedMatrix<R>;
-
-/// \relates BandedMatrix
-/// \brief Addition of two BandedMatrices.
-template <typename T>
-auto operator+(BandedMatrix<T> lhs, const BandedMatrix<T>& rhs)
-        -> BandedMatrix<T>;
-
-/// \relates BandedMatrix
-/// \brief Addition of two BandedMatrices.
-template <typename T>
-auto operator+(const BandedMatrix<T>& lhs, BandedMatrix<T>&& rhs)
-        -> BandedMatrix<T>;
-
-/// \relates BandedMatrix
-/// \brief Difference of two BandedMatrices.
-template <typename T>
-auto operator-(BandedMatrix<T> lhs, const BandedMatrix<T>& rhs)
-        -> BandedMatrix<T>;
-
-/// \relates BandedMatrix
-/// \brief Difference of two BandedMatrices.
-template <typename T>
-auto operator-(const BandedMatrix<T>& lhs, BandedMatrix<T>&& rhs)
-        -> BandedMatrix<T>;
 
 /// \relates BandedMatrix
 /// \brief Right-hand-side multiplication by vector.
@@ -453,7 +463,7 @@ inline auto BandedMatrix<T>::operator+=(const BandedMatrix<U>& rhs)
     }
 #endif  // NDEBUG
 
-    m_storage += rhs.m_storage;
+    m_storage += rhs.as_vector();
     return *this;
 }
 
@@ -473,7 +483,7 @@ inline auto BandedMatrix<T>::operator-=(const BandedMatrix<U>& rhs)
     }
 #endif  // NDEBUG
 
-    m_storage -= rhs.m_storage;
+    m_storage -= rhs.as_vector();
     return *this;
 }
 
@@ -560,9 +570,57 @@ template <typename T, typename U, typename R>
 inline auto operator+(const BandedMatrix<T>& lhs, const BandedMatrix<U>& rhs)
         -> BandedMatrix<R> {
     if constexpr (std::is_same_v<T, R>) {
+        BandedMatrix<R> result{lhs};
+        result += rhs;
+        return result;
+    } else {
         BandedMatrix<R> result{rhs};
         result += lhs;
         return result;
+    }
+}
+
+/// \relates BandedMatrix
+/// \brief Addition of two BandedMatrices.
+template <typename T, typename U, typename R>
+inline auto operator+(BandedMatrix<T>&& lhs, const BandedMatrix<U>& rhs)
+        -> BandedMatrix<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        lhs += rhs;
+        return lhs;
+    } else {
+        BandedMatrix<R> result{rhs};
+        result += lhs;
+        return result;
+    }
+}
+
+/// \relates BandedMatrix
+/// \brief Addition of two BandedMatrices.
+template <typename T, typename U, typename R>
+inline auto operator+(const BandedMatrix<T>& lhs, BandedMatrix<U>&& rhs)
+        -> BandedMatrix<R> {
+    if constexpr (std::is_same_v<U, R>) {
+        rhs += lhs;
+        return rhs;
+    } else {
+        BandedMatrix<R> result{lhs};
+        result += rhs;
+        return result;
+    }
+}
+
+/// \relates BandedMatrix
+/// \brief Addition of two BandedMatrices.
+template <typename T, typename U, typename R>
+inline auto operator+(BandedMatrix<T>&& lhs, BandedMatrix<U>&& rhs)
+        -> BandedMatrix<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        lhs += rhs;
+        return lhs;
+    } else if constexpr (std::is_same_v<U, R>) {
+        rhs += lhs;
+        return rhs;
     } else {
         BandedMatrix<R> result{lhs};
         result += rhs;
@@ -575,11 +633,54 @@ inline auto operator+(const BandedMatrix<T>& lhs, const BandedMatrix<U>& rhs)
 template <typename T, typename U, typename R>
 inline auto operator-(const BandedMatrix<T>& lhs, const BandedMatrix<U>& rhs)
         -> BandedMatrix<R> {
+    BandedMatrix<R> result{lhs};
+    result -= rhs;
+    return result;
+}
+
+/// \relates BandedMatrix
+/// \brief Difference of two BandedMatrices.
+template <typename T, typename U, typename R>
+inline auto operator-(BandedMatrix<T>&& lhs, const BandedMatrix<U>& rhs)
+        -> BandedMatrix<R> {
     if constexpr (std::is_same_v<T, R>) {
-        BandedMatrix<R> result{rhs};
-        result *= R{-1};
-        result += lhs;
+        lhs -= rhs;
+        return lhs;
+    } else {
+        BandedMatrix<R> result{lhs};
+        result -= rhs;
         return result;
+    }
+}
+
+/// \relates BandedMatrix
+/// \brief Difference of two BandedMatrices.
+template <typename T, typename U, typename R>
+inline auto operator-(const BandedMatrix<T>& lhs, BandedMatrix<U>&& rhs)
+        -> BandedMatrix<R> {
+    if constexpr (std::is_same_v<U, R>) {
+        rhs *= R{-1};
+        rhs += lhs;
+        return rhs;
+    } else {
+        BandedMatrix<R> result{lhs};
+        result -= rhs;
+        return result;
+    }
+}
+
+/// \relates BandedMatrix
+/// \brief Difference of two BandedMatrices.
+template <typename T, typename U, typename R>
+inline auto operator-(BandedMatrix<T>&& lhs, BandedMatrix<U>&& rhs)
+        -> BandedMatrix<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        lhs -= rhs;
+        return lhs;
+    } else if constexpr (std::is_same_v<U, R>) {
+        rhs *= R{-1};
+        rhs += lhs;
+        return rhs;
     } else {
         BandedMatrix<R> result{lhs};
         result -= rhs;
@@ -626,55 +727,6 @@ inline auto operator/(const BandedMatrix<T>& lhs, const U& rhs)
     BandedMatrix<R> result{lhs};
     result /= rhs;
     return result;
-}
-
-/// \relates BandedMatrix
-/// \brief Addition of two BandedMatrices.
-///
-/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
-/// return. Also handles the case that lhs is given an rvalue (NRVO).
-template <typename T>
-inline auto operator+(BandedMatrix<T> lhs, const BandedMatrix<T>& rhs)
-        -> BandedMatrix<T> {
-    lhs += rhs;
-    return lhs;
-}
-
-/// \relates BandedMatrix
-/// \brief Addition of two BandedMatrices.
-///
-/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
-/// reference parameter (NRVO).
-template <typename T>
-inline auto operator+(const BandedMatrix<T>& lhs, BandedMatrix<T>&& rhs)
-        -> BandedMatrix<T> {
-    rhs += lhs;
-    return rhs;
-}
-
-/// \relates BandedMatrix
-/// \brief Difference of two BandedMatrices.
-///
-/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
-/// return. Also handles the case that lhs is given an rvalue (NRVO).
-template <typename T>
-inline auto operator-(BandedMatrix<T> lhs, const BandedMatrix<T>& rhs)
-        -> BandedMatrix<T> {
-    lhs -= rhs;
-    return lhs;
-}
-
-/// \relates BandedMatrix
-/// \brief Difference of two BandedMatrices.
-///
-/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
-/// reference parameter (NRVO).
-template <typename T>
-inline auto operator-(const BandedMatrix<T>& lhs, BandedMatrix<T>&& rhs)
-        -> BandedMatrix<T> {
-    rhs *= T{-1};
-    rhs += lhs;
-    return rhs;
 }
 
 /// \relates BandedMatrix
