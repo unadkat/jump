@@ -485,7 +485,7 @@ inline auto Vector<T>::operator+() const -> const Vector<T>& {
 template <typename T>
 inline auto Vector<T>::operator-() const -> Vector<T> {
     Vector<T> temp{*this};
-    return temp *= -1;
+    return temp *= T{-1};
 }
 #endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
@@ -740,8 +740,16 @@ inline auto operator-(Vector<T>&& lhs, const Vector<U>& rhs) -> Vector<R> {
 template <typename T, typename U, typename R>
 inline auto operator-(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R> {
     if constexpr (std::is_same_v<U, R>) {
-        rhs *= R{-1};
-        rhs += lhs;
+#ifndef NDEBUG
+        if (lhs.size() != rhs.size()) {
+            throw RuntimeError{Mismatch1DError{.name1 = "lhs",
+                .size1 = lhs.size(), .name2 = "rhs", .size2 = rhs.size()}};
+        }
+#endif  // NDEBUG
+
+        for (std::size_t i{0}, N{lhs.size()}; i < N; ++i) {
+            rhs.storage[i] = lhs.storage[i] - rhs.storage[i];
+        }
         return rhs;
     } else {
         Vector<R> result{lhs};
@@ -758,8 +766,16 @@ inline auto operator-(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R> {
         lhs -= rhs;
         return lhs;
     } else if constexpr (std::is_same_v<U, R>) {
-        rhs *= R{-1};
-        rhs += lhs;
+#ifndef NDEBUG
+        if (lhs.size() != rhs.size()) {
+            throw RuntimeError{Mismatch1DError{.name1 = "lhs",
+                .size1 = lhs.size(), .name2 = "rhs", .size2 = rhs.size()}};
+        }
+#endif  // NDEBUG
+
+        for (std::size_t i{0}, N{lhs.size()}; i < N; ++i) {
+            rhs.storage[i] = lhs.storage[i] - rhs.storage[i];
+        }
         return rhs;
     } else {
         Vector<R> result{lhs};
