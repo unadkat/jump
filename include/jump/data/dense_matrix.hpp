@@ -214,19 +214,29 @@ template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator-(DenseMatrix<T>&& lhs, DenseMatrix<U>&& rhs) -> DenseMatrix<R>;
 
 /// \relates DenseMatrix
-/// \brief Right-hand-side multiplication by vector.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator*(const DenseMatrix<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
-
-/// \relates DenseMatrix
 /// \brief Left-hand multiplication by scalar.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator*(const T& lhs, const DenseMatrix<U>& rhs) -> DenseMatrix<R>;
 
 /// \relates DenseMatrix
+/// \brief Left-hand multiplication by scalar.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator*(const T& lhs, DenseMatrix<U>&& rhs) -> DenseMatrix<R>;
+
+/// \relates DenseMatrix
 /// \brief Right-hand multiplication by scalar.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator*(const DenseMatrix<T>& lhs, const U& rhs) -> DenseMatrix<R>;
+
+/// \relates DenseMatrix
+/// \brief Right-hand multiplication by scalar.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator*(DenseMatrix<T>&& lhs, const U& rhs) -> DenseMatrix<R>;
+
+/// \relates DenseMatrix
+/// \brief Right-hand-side multiplication by vector.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator*(const DenseMatrix<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
 
 /// \relates DenseMatrix
 /// \brief Multiplication of two DenseMatrices.
@@ -240,29 +250,9 @@ template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator/(const DenseMatrix<T>& lhs, const U& rhs) -> DenseMatrix<R>;
 
 /// \relates DenseMatrix
-/// \brief Right-hand-side multiplication by vector.
-template <typename T>
-auto operator*(const DenseMatrix<T>& lhs, const Vector<T>& rhs) -> Vector<T>;
-
-/// \relates DenseMatrix
-/// \brief Left-hand multiplication by scalar.
-template <typename T>
-auto operator*(const T& lhs, DenseMatrix<T> rhs) -> DenseMatrix<T>;
-
-/// \relates DenseMatrix
-/// \brief Right-hand multiplication by scalar.
-template <typename T>
-auto operator*(DenseMatrix<T> lhs, const T& rhs) -> DenseMatrix<T>;
-
-/// \relates DenseMatrix
-/// \brief Multiplication of two DenseMatrices.
-template <typename T>
-auto operator*(DenseMatrix<T> lhs, const DenseMatrix<T>& rhs) -> DenseMatrix<T>;
-
-/// \relates DenseMatrix
 /// \brief Division by a scalar.
-template <typename T>
-auto operator/(DenseMatrix<T> lhs, const T& rhs) -> DenseMatrix<T>;
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator/(DenseMatrix<T>&& lhs, const U& rhs) -> DenseMatrix<R>;
 
 // ========================================================================
 // Implementation
@@ -781,18 +771,6 @@ inline auto operator-(DenseMatrix<T>&& lhs, DenseMatrix<U>&& rhs)
 }
 
 /// \relates DenseMatrix
-/// \brief Right-hand-side multiplication by vector.
-template <typename T, typename U, typename R>
-inline auto operator*(const DenseMatrix<T>& lhs, const Vector<U>& rhs)
-        -> Vector<R> {
-    if constexpr (std::is_same_v<T, R>) {
-        return lhs*Vector<R>{rhs};
-    } else {
-        return DenseMatrix<R>{lhs}*rhs;
-    }
-}
-
-/// \relates DenseMatrix
 /// \brief Left-hand multiplication by scalar.
 template <typename T, typename U, typename R>
 inline auto operator*(const T& lhs, const DenseMatrix<U>& rhs)
@@ -803,12 +781,63 @@ inline auto operator*(const T& lhs, const DenseMatrix<U>& rhs)
 }
 
 /// \relates DenseMatrix
+/// \brief Left-hand multiplication by scalar.
+template <typename T, typename U, typename R>
+inline auto operator*(const T& lhs, DenseMatrix<U>&& rhs) -> DenseMatrix<R> {
+    if constexpr (std::is_same_v<U, R>) {
+        rhs *= lhs;
+        return rhs;
+    } else {
+        DenseMatrix<R> result{rhs};
+        result *= lhs;
+        return result;
+    }
+}
+
+/// \relates DenseMatrix
 /// \brief Right-hand multiplication by scalar.
 template <typename T, typename U, typename R>
 inline auto operator*(const DenseMatrix<T>& lhs, const U& rhs)
         -> DenseMatrix<R> {
     DenseMatrix<R> result{lhs};
     result *= rhs;
+    return result;
+}
+
+/// \relates DenseMatrix
+/// \brief Right-hand multiplication by scalar.
+template <typename T, typename U, typename R>
+inline auto operator*(DenseMatrix<T>&& lhs, const U& rhs) -> DenseMatrix<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        lhs *= rhs;
+        return lhs;
+    } else {
+        DenseMatrix<R> result{lhs};
+        result *= rhs;
+        return result;
+    }
+}
+
+/// \relates DenseMatrix
+/// \brief Right-hand-side multiplication by vector.
+template <typename T, typename U, typename R>
+inline auto operator*(const DenseMatrix<T>& lhs, const Vector<U>& rhs)
+        -> Vector<R> {
+#ifndef NDEBUG
+    if (lhs.num_columns() != rhs.size()) {
+        throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = {rhs.size(), 1}}};
+    }
+#endif  // NDEBUG
+
+    std::size_t N{lhs.num_rows()}, X{lhs.num_columns()};
+    Vector<R> result(N);
+    for (std::size_t i{0}; i < X; ++i) {
+        for (std::size_t row{0}; row < N; ++row) {
+            result[row] += lhs[row, i]*rhs[i];
+        }
+    }
+
     return result;
 }
 
@@ -850,59 +879,17 @@ inline auto operator/(const DenseMatrix<T>& lhs, const U& rhs)
 }
 
 /// \relates DenseMatrix
-/// \brief Right-hand-side multiplication by vector.
-template <typename T>
-inline auto operator*(const DenseMatrix<T>& lhs, const Vector<T>& rhs)
-        -> Vector<T> {
-#ifndef NDEBUG
-    if (lhs.num_columns() != rhs.size()) {
-        throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
-            .name2 = "rhs", .size2 = {rhs.size(), 1}}};
-    }
-#endif  // NDEBUG
-
-    std::size_t N{lhs.num_rows()}, X{lhs.num_columns()};
-    Vector<T> result(N);
-    for (std::size_t i{0}; i < X; ++i) {
-        for (std::size_t row{0}; row < N; ++row) {
-            result[row] += lhs[row, i]*rhs[i];
-        }
-    }
-
-    return result;
-}
-
-/// \relates DenseMatrix
-/// \brief Left-hand multiplication by scalar.
-template <typename T>
-inline auto operator*(const T& lhs, DenseMatrix<T> rhs) -> DenseMatrix<T> {
-    rhs *= lhs;
-    return rhs;
-}
-
-/// \relates DenseMatrix
-/// \brief Right-hand multiplication by scalar.
-template <typename T>
-inline auto operator*(DenseMatrix<T> lhs, const T& rhs) -> DenseMatrix<T> {
-    lhs *= rhs;
-    return lhs;
-}
-
-/// \relates DenseMatrix
-/// \brief Multiplication of two DenseMatrices.
-template <typename T>
-inline auto operator*(DenseMatrix<T> lhs, const DenseMatrix<T>& rhs)
-        -> DenseMatrix<T> {
-    lhs *= rhs;
-    return lhs;
-}
-
-/// \relates DenseMatrix
 /// \brief Division by a scalar.
-template <typename T>
-inline auto operator/(DenseMatrix<T> lhs, const T& rhs) -> DenseMatrix<T> {
-    lhs /= rhs;
-    return lhs;
+template <typename T, typename U, typename R>
+inline auto operator/(DenseMatrix<T>&& lhs, const U& rhs) -> DenseMatrix<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        lhs /= rhs;
+        return lhs;
+    } else {
+        DenseMatrix<R> result{lhs};
+        result /= rhs;
+        return result;
+    }
 }
 }   // namespace jump
 
