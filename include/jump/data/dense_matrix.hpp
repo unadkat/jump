@@ -174,10 +174,44 @@ auto operator+(const DenseMatrix<T>& lhs, const DenseMatrix<U>& rhs)
         -> DenseMatrix<R>;
 
 /// \relates DenseMatrix
+/// \brief Addition of two DenseMatrices.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator+(DenseMatrix<T>&& lhs, const DenseMatrix<U>& rhs)
+        -> DenseMatrix<R>;
+
+/// \relates DenseMatrix
+/// \brief Addition of two DenseMatrices.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator+(const DenseMatrix<T>& lhs, DenseMatrix<U>&& rhs)
+        -> DenseMatrix<R>;
+
+/// \relates DenseMatrix
+/// \brief Addition of two DenseMatrices.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator+(DenseMatrix<T>&& lhs, DenseMatrix<U>&& rhs) -> DenseMatrix<R>;
+
+/// \relates DenseMatrix
 /// \brief Difference of two DenseMatrices.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator-(const DenseMatrix<T>& lhs, const DenseMatrix<U>& rhs)
         -> DenseMatrix<R>;
+
+/// \relates DenseMatrix
+/// \brief Difference of two DenseMatrices.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator-(DenseMatrix<T>&& lhs, const DenseMatrix<U>& rhs)
+        -> DenseMatrix<R>;
+
+/// \relates DenseMatrix
+/// \brief Difference of two DenseMatrices.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator-(const DenseMatrix<T>& lhs, DenseMatrix<U>&& rhs)
+        -> DenseMatrix<R>;
+
+/// \relates DenseMatrix
+/// \brief Difference of two DenseMatrices.
+template <typename T, typename U, typename R = std::common_type_t<T, U>>
+auto operator-(DenseMatrix<T>&& lhs, DenseMatrix<U>&& rhs) -> DenseMatrix<R>;
 
 /// \relates DenseMatrix
 /// \brief Right-hand-side multiplication by vector.
@@ -204,28 +238,6 @@ auto operator*(const DenseMatrix<T>& lhs, const DenseMatrix<U>& rhs)
 /// \brief Division by a scalar.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator/(const DenseMatrix<T>& lhs, const U& rhs) -> DenseMatrix<R>;
-
-/// \relates DenseMatrix
-/// \brief Addition of two DenseMatrices.
-template <typename T>
-auto operator+(DenseMatrix<T> lhs, const DenseMatrix<T>& rhs) -> DenseMatrix<T>;
-
-/// \relates DenseMatrix
-/// \brief Addition of two DenseMatrices.
-template <typename T>
-auto operator+(const DenseMatrix<T>& lhs, DenseMatrix<T>&& rhs)
-        -> DenseMatrix<T>;
-
-/// \relates DenseMatrix
-/// \brief Difference of two DenseMatrices.
-template <typename T>
-auto operator-(DenseMatrix<T> lhs, const DenseMatrix<T>& rhs) -> DenseMatrix<T>;
-
-/// \relates DenseMatrix
-/// \brief Difference of two DenseMatrices.
-template <typename T>
-auto operator-(const DenseMatrix<T>& lhs, DenseMatrix<T>&& rhs)
-        -> DenseMatrix<T>;
 
 /// \relates DenseMatrix
 /// \brief Right-hand-side multiplication by vector.
@@ -469,7 +481,7 @@ inline auto DenseMatrix<T>::operator+=(const DenseMatrix<U>& rhs)
     }
 #endif  // NDEBUG
 
-    m_storage += rhs.m_storage;
+    m_storage += rhs.as_vector();
     return *this;
 }
 
@@ -484,7 +496,7 @@ inline auto DenseMatrix<T>::operator-=(const DenseMatrix<U>& rhs)
     }
 #endif  // NDEBUG
 
-    m_storage -= rhs.m_storage;
+    m_storage -= rhs.as_vector();
     return *this;
 }
 
@@ -655,10 +667,52 @@ inline auto DenseMatrix<T>::identity(std::size_t size) -> DenseMatrix {
 template <typename T, typename U, typename R>
 inline auto operator+(const DenseMatrix<T>& lhs, const DenseMatrix<U>& rhs)
         -> DenseMatrix<R> {
+    DenseMatrix<R> result{lhs};
+    result += rhs;
+    return result;
+}
+
+/// \relates DenseMatrix
+/// \brief Addition of two DenseMatrices.
+template <typename T, typename U, typename R>
+inline auto operator+(DenseMatrix<T>&& lhs, const DenseMatrix<U>& rhs)
+        -> DenseMatrix<R> {
     if constexpr (std::is_same_v<T, R>) {
+        lhs += rhs;
+        return lhs;
+    } else {
         DenseMatrix<R> result{rhs};
         result += lhs;
         return result;
+    }
+}
+
+/// \relates DenseMatrix
+/// \brief Addition of two DenseMatrices.
+template <typename T, typename U, typename R>
+inline auto operator+(const DenseMatrix<T>& lhs, DenseMatrix<U>&& rhs)
+        -> DenseMatrix<R> {
+    if constexpr (std::is_same_v<U, R>) {
+        rhs += lhs;
+        return rhs;
+    } else {
+        DenseMatrix<R> result{lhs};
+        result += rhs;
+        return result;
+    }
+}
+
+/// \relates DenseMatrix
+/// \brief Addition of two DenseMatrices.
+template <typename T, typename U, typename R>
+inline auto operator+(DenseMatrix<T>&& lhs, DenseMatrix<U>&& rhs)
+        -> DenseMatrix<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        lhs += rhs;
+        return lhs;
+    } else if constexpr (std::is_same_v<U, R>) {
+        rhs += lhs;
+        return rhs;
     } else {
         DenseMatrix<R> result{lhs};
         result += rhs;
@@ -671,11 +725,54 @@ inline auto operator+(const DenseMatrix<T>& lhs, const DenseMatrix<U>& rhs)
 template <typename T, typename U, typename R>
 inline auto operator-(const DenseMatrix<T>& lhs, const DenseMatrix<U>& rhs)
         -> DenseMatrix<R> {
+    DenseMatrix<R> result{lhs};
+    result -= rhs;
+    return result;
+}
+
+/// \relates DenseMatrix
+/// \brief Difference of two DenseMatrices.
+template <typename T, typename U, typename R>
+inline auto operator-(DenseMatrix<T>&& lhs, const DenseMatrix<U>& rhs)
+        -> DenseMatrix<R> {
     if constexpr (std::is_same_v<T, R>) {
-        DenseMatrix<R> result{rhs};
-        result *= R{-1};
-        result += lhs;
+        lhs -= rhs;
+        return lhs;
+    } else {
+        DenseMatrix<R> result{lhs};
+        result -= rhs;
         return result;
+    }
+}
+
+/// \relates DenseMatrix
+/// \brief Difference of two DenseMatrices.
+template <typename T, typename U, typename R>
+inline auto operator-(const DenseMatrix<T>& lhs, DenseMatrix<U>&& rhs)
+        -> DenseMatrix<R> {
+    if constexpr (std::is_same_v<U, R>) {
+        rhs *= R{-1};
+        rhs += lhs;
+        return rhs;
+    } else {
+        DenseMatrix<R> result{lhs};
+        result -= rhs;
+        return result;
+    }
+}
+
+/// \relates DenseMatrix
+/// \brief Difference of two DenseMatrices.
+template <typename T, typename U, typename R>
+inline auto operator-(DenseMatrix<T>&& lhs, DenseMatrix<U>&& rhs)
+        -> DenseMatrix<R> {
+    if constexpr (std::is_same_v<T, R>) {
+        lhs -= rhs;
+        return lhs;
+    } else if constexpr (std::is_same_v<U, R>) {
+        rhs *= R{-1};
+        rhs += lhs;
+        return rhs;
     } else {
         DenseMatrix<R> result{lhs};
         result -= rhs;
@@ -750,55 +847,6 @@ inline auto operator/(const DenseMatrix<T>& lhs, const U& rhs)
     DenseMatrix<R> result{lhs};
     result /= rhs;
     return result;
-}
-
-/// \relates DenseMatrix
-/// \brief Addition of two DenseMatrices.
-///
-/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
-/// return. Also handles the case that lhs is given an rvalue (NRVO).
-template <typename T>
-inline auto operator+(DenseMatrix<T> lhs, const DenseMatrix<T>& rhs)
-        -> DenseMatrix<T> {
-    lhs += rhs;
-    return lhs;
-}
-
-/// \relates DenseMatrix
-/// \brief Addition of two DenseMatrices.
-///
-/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
-/// reference parameter (NRVO).
-template <typename T>
-inline auto operator+(const DenseMatrix<T>& lhs, DenseMatrix<T>&& rhs)
-        -> DenseMatrix<T> {
-    rhs += lhs;
-    return rhs;
-}
-
-/// \relates DenseMatrix
-/// \brief Difference of two DenseMatrices.
-///
-/// If both lhs and rhs are given lvalues, take copy of lhs and elide copy on
-/// return. Also handles the case that lhs is given an rvalue (NRVO).
-template <typename T>
-inline auto operator-(DenseMatrix<T> lhs, const DenseMatrix<T>& rhs)
-        -> DenseMatrix<T> {
-    lhs -= rhs;
-    return lhs;
-}
-
-/// \relates DenseMatrix
-/// \brief Difference of two DenseMatrices.
-///
-/// Handles the case of rhs being given an rvalue, no ambiguity due to rvalue
-/// reference parameter (NRVO).
-template <typename T>
-inline auto operator-(const DenseMatrix<T>& lhs, DenseMatrix<T>&& rhs)
-        -> DenseMatrix<T> {
-    rhs *= T{-1};
-    rhs += lhs;
-    return rhs;
 }
 
 /// \relates DenseMatrix
