@@ -13,10 +13,6 @@
 #include "jump/utility/types.hpp"
 #include "jump/utility/utility.hpp"
 
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-#include "jump/experimental/expression_templates/vector_operators.hpp"
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-
 #include <algorithm>
 #include <cmath>
 #include <initializer_list>
@@ -27,6 +23,12 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+#include "jump/experimental/expression_templates/vector_operators.hpp"
+
+#include <concepts>
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 namespace jump {
 /// \brief Permissive encapulation of `std::vector` with arithmetic
@@ -64,11 +66,8 @@ struct Vector {
     Vector(Vector&& other) = default;
 #ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
     template <VectorExpression Expr>
-    Vector(const Expr& expr) : storage(expr.size()) {
-        for (std::size_t i{0}, N{expr.size()}; i < N; ++i) {
-            storage[i] = expr[i];
-        }
-    }
+    requires std::convertible_to <typename Expr::value_type, T>
+    Vector(const Expr& expr);
 #endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
     /// \brief Default copy assignment.
@@ -399,6 +398,17 @@ template <class InputIt>
 inline Vector<T>::Vector(InputIt first, InputIt last) :
     storage(first, last) {
 }
+
+#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+template <typename T>
+template <VectorExpression Expr>
+requires std::convertible_to <typename Expr::value_type, T>
+inline Vector<T>::Vector(const Expr& expr) : storage(expr.size()) {
+    for (std::size_t i{0}, N{expr.size()}; i < N; ++i) {
+        storage[i] = expr[i];
+    }
+}
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 template <typename T>
 inline void Vector<T>::assign(std::size_t size, const T& value) {
