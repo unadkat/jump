@@ -7,9 +7,10 @@
 #ifndef JUMP_EXPRESSION_TEMPLATE_VECTOR_EXPRESSIONS_HPP
 #define JUMP_EXPRESSION_TEMPLATE_VECTOR_EXPRESSIONS_HPP
 
+#include "jump/debug/error_data.hpp"
+#include "jump/debug/exception.hpp"
 #include "jump/experimental/expression_templates/concepts.hpp"
 
-#include <cassert>
 #include <type_traits>
 
 namespace jump {
@@ -74,7 +75,13 @@ template <typename Functor, VectorExpression Left, VectorExpression Right>
 inline constexpr BinaryVectorOp<Functor, Left, Right>::BinaryVectorOp(
         const Left& lhs, const Right& rhs) :
     m_lhs{lhs}, m_rhs{rhs} {
-    assert(m_lhs.size() == m_rhs.size());
+#ifndef NDEBUG
+    if (lhs.size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
 }
 
 template <typename Functor, VectorExpression Left, VectorExpression Right>
