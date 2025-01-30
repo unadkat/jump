@@ -10,17 +10,20 @@
 #include "jump/experimental/expression_templates/concepts.hpp"
 
 #include <cassert>
-#include <functional>
+#include <type_traits>
 
 namespace jump {
 template <typename Functor, VectorExpression Expr>
 class UnaryVectorOp {
     public:
+        using value_type = std::invoke_result_t<Functor,
+              typename Expr::value_type>;
+
         static constexpr bool is_vector_expression_leaf{false};
 
         constexpr UnaryVectorOp(const Expr& expr);
 
-        constexpr auto operator[](std::size_t i) const;
+        constexpr auto operator[](std::size_t i) const -> value_type;
         constexpr auto size() const -> std::size_t;
 
     protected:
@@ -32,11 +35,14 @@ class UnaryVectorOp {
 template <typename Functor, VectorExpression Left, VectorExpression Right>
 class BinaryVectorOp {
     public:
+        using value_type = std::invoke_result_t<Functor,
+              typename Left::value_type, typename Right::value_type>;
+
         static constexpr bool is_vector_expression_leaf{false};
 
         constexpr BinaryVectorOp(const Left& lhs, const Right& rhs);
 
-        constexpr auto operator[](std::size_t i) const;
+        constexpr auto operator[](std::size_t i) const -> value_type;
         constexpr auto size() const -> std::size_t;
 
     protected:
@@ -54,7 +60,7 @@ inline constexpr UnaryVectorOp<Functor, Expr>::UnaryVectorOp(const Expr& expr) :
 
 template <typename Functor, VectorExpression Expr>
 inline constexpr auto UnaryVectorOp<Functor, Expr>::operator[](
-        std::size_t i) const {
+        std::size_t i) const -> value_type {
     return m_operator(m_expr[i]);
 }
 
@@ -73,7 +79,7 @@ inline constexpr BinaryVectorOp<Functor, Left, Right>::BinaryVectorOp(
 
 template <typename Functor, VectorExpression Left, VectorExpression Right>
 inline constexpr auto BinaryVectorOp<Functor, Left, Right>::operator[](
-        std::size_t i) const {
+        std::size_t i) const -> value_type {
     return m_operator(m_lhs[i], m_rhs[i]);
 }
 
@@ -82,16 +88,6 @@ inline constexpr auto BinaryVectorOp<Functor, Left, Right>::size() const
         -> std::size_t {
     return m_lhs.size();
 }
-
-template <VectorExpression Expr>
-struct VectorNegate : UnaryVectorOp<std::negate<>, Expr> {
-    using UnaryVectorOp<std::negate<>, Expr>::UnaryVectorOp;
-};
-
-template <VectorExpression Left, VectorExpression Right>
-struct VectorAdd : BinaryVectorOp<std::plus<>, Left, Right> {
-    using BinaryVectorOp<std::plus<>, Left, Right>::BinaryVectorOp;
-};
 }   // namespace jump
 
 #endif  // JUMP_EXPRESSION_TEMPLATE_VECTOR_EXPRESSIONS_HPP

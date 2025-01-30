@@ -8,6 +8,7 @@
 #define JUMP_EXPRESSION_TEMPLATE_VECTOR_OPERATORS_HPP
 
 #include "jump/experimental/expression_templates/concepts.hpp"
+#include "jump/experimental/expression_templates/functors.hpp"
 #include "jump/experimental/expression_templates/vector_expressions.hpp"
 
 namespace jump {
