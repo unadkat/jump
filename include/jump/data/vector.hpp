@@ -34,6 +34,8 @@ namespace jump {
 template <typename T>
 struct Vector {
 #ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+    using value_type = T;
+
     static constexpr bool is_vector_expression_leaf{true};
 #endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
