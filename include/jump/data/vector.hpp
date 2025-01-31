@@ -35,19 +35,21 @@ namespace jump {
 /// operators enabled.
 template <typename T>
 struct Vector {
+    /// \brief Iterator for algorithms.
+    using Iterator = typename std::vector<T>::iterator;
+    /// \brief Iterator for algorithms.
+    using ConstIterator = typename std::vector<T>::const_iterator;
 #ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-    using value_type = T;
+    /// \brief To satisfy VectorExpression concept
+    using ValueType = T;
 
+    /// \brief To satisfy VectorExpression concept (and signal that this data
+    /// structure can be referenced in evaluations).
     static constexpr bool is_vector_expression_leaf{true};
 #endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
     /// \brief Internal contiguous storage.
     std::vector<T> storage;
-
-    /// \brief Iterator for algorithms.
-    using Iterator = typename std::vector<T>::iterator;
-    /// \brief Iterator for algorithms.
-    using ConstIterator = typename std::vector<T>::const_iterator;
 
     /// \brief Construct a `Vector` with a given size (empty by default) filled
     /// with the given item (`T{0}` by default).

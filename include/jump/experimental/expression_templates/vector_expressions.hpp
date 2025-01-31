@@ -17,14 +17,14 @@ namespace jump {
 template <typename Functor, VectorExpression Expr>
 class UnaryVectorOp {
     public:
-        using value_type = std::invoke_result_t<Functor,
-              typename Expr::value_type>;
+        using ValueType = std::invoke_result_t<Functor,
+              typename Expr::ValueType>;
 
         static constexpr bool is_vector_expression_leaf{false};
 
         constexpr UnaryVectorOp(const Expr& expr);
 
-        constexpr auto operator[](std::size_t i) const -> value_type;
+        constexpr auto operator[](std::size_t i) const -> ValueType;
         constexpr auto size() const -> std::size_t;
 
     protected:
@@ -36,14 +36,14 @@ class UnaryVectorOp {
 template <typename Functor, VectorExpression Left, VectorExpression Right>
 class BinaryVectorOp {
     public:
-        using value_type = std::invoke_result_t<Functor,
-              typename Left::value_type, typename Right::value_type>;
+        using ValueType = std::invoke_result_t<Functor,
+              typename Left::ValueType, typename Right::ValueType>;
 
         static constexpr bool is_vector_expression_leaf{false};
 
         constexpr BinaryVectorOp(const Left& lhs, const Right& rhs);
 
-        constexpr auto operator[](std::size_t i) const -> value_type;
+        constexpr auto operator[](std::size_t i) const -> ValueType;
         constexpr auto size() const -> std::size_t;
 
     protected:
@@ -61,7 +61,7 @@ inline constexpr UnaryVectorOp<Functor, Expr>::UnaryVectorOp(const Expr& expr) :
 
 template <typename Functor, VectorExpression Expr>
 inline constexpr auto UnaryVectorOp<Functor, Expr>::operator[](
-        std::size_t i) const -> value_type {
+        std::size_t i) const -> ValueType {
     return m_operator(m_expr[i]);
 }
 
@@ -86,7 +86,7 @@ inline constexpr BinaryVectorOp<Functor, Left, Right>::BinaryVectorOp(
 
 template <typename Functor, VectorExpression Left, VectorExpression Right>
 inline constexpr auto BinaryVectorOp<Functor, Left, Right>::operator[](
-        std::size_t i) const -> value_type {
+        std::size_t i) const -> ValueType {
     return m_operator(m_lhs[i], m_rhs[i]);
 }
 
