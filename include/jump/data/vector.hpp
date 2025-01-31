@@ -65,8 +65,7 @@ struct Vector {
     /// \brief Default move constructor.
     Vector(Vector&& other) = default;
 #ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-    template <VectorExpression Expr>
-    requires std::convertible_to <typename Expr::value_type, T>
+    template <VectorExpressionConvertibleTo<T> Expr>
     Vector(const Expr& expr);
 #endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
@@ -401,8 +400,7 @@ inline Vector<T>::Vector(InputIt first, InputIt last) :
 
 #ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 template <typename T>
-template <VectorExpression Expr>
-requires std::convertible_to <typename Expr::value_type, T>
+template <VectorExpressionConvertibleTo<T> Expr>
 inline Vector<T>::Vector(const Expr& expr) : storage(expr.size()) {
     for (std::size_t i{0}, N{expr.size()}; i < N; ++i) {
         storage[i] = expr[i];

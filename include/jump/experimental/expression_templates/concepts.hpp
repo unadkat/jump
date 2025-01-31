@@ -8,15 +8,22 @@
 #define JUMP_EXPRESSION_TEMPLATE_CONCEPTS_HPP
 
 #include <concepts>
+#include <type_traits>
 
 namespace jump {
 template <typename Expr>
 concept VectorExpression = requires (Expr expr, std::size_t i) {
     typename Expr::value_type;
     {expr.is_vector_expression_leaf} -> std::same_as<const bool&>;
-    {expr[i]};
     {expr.size()} -> std::same_as<std::size_t>;
+    expr[i];
+    requires std::same_as<std::remove_cvref_t<decltype(expr[i])>,
+             std::remove_cvref_t<typename Expr::value_type>>;
 };
+
+template <typename Expr, typename T>
+concept VectorExpressionConvertibleTo = VectorExpression<Expr>
+        && std::convertible_to<typename Expr::value_type, T>;
 }   // namespace jump
 
 #endif  // JUMP_EXPRESSION_TEMPLATE_CONCEPTS_HPP
