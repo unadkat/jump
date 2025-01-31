@@ -7,6 +7,8 @@
 #ifndef JUMP_EXPRESSION_TEMPLATE_VECTOR_OPERATORS_HPP
 #define JUMP_EXPRESSION_TEMPLATE_VECTOR_OPERATORS_HPP
 
+#include "jump/debug/error_data.hpp"
+#include "jump/debug/exception.hpp"
 #include "jump/experimental/expression_templates/concepts.hpp"
 #include "jump/experimental/expression_templates/functors.hpp"
 #include "jump/experimental/expression_templates/vector_expressions.hpp"
@@ -22,6 +24,24 @@ inline constexpr auto operator+(const Left& lhs, const Right& rhs)
 template <VectorExpression Expr>
 inline constexpr auto operator-(const Expr& expr) -> VectorNegate<Expr> {
     return VectorNegate<Expr>(expr);
+}
+
+template <VectorExpression Left, VectorExpression Right,
+         typename R = std::common_type_t<
+         typename Left::ValueType, typename Right::ValueType>>
+inline constexpr auto dot(const Left& lhs, const Right& rhs) -> R  {
+#ifndef NDEBUG
+    if (lhs.size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    R result{0};
+    for (std::size_t i{0}, N{lhs.size()}; i < N; ++i) {
+        result += lhs[i]*rhs[i];
+    }
+    return result;
 }
 #endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 }   // namespace jump
