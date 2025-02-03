@@ -15,19 +15,17 @@
 
 #include <algorithm>
 #include <cmath>
+#include <concepts>
 #include <initializer_list>
 #include <numeric>
 #include <ostream>
 #include <sstream>
 #include <string>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
 #ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 #include "jump/experimental/expression_templates/vector_operators.hpp"
-
-#include <concepts>
 #endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 namespace jump {
@@ -51,9 +49,11 @@ struct Vector {
     /// \brief Internal contiguous storage.
     std::vector<T> storage;
 
-    /// \brief Construct a `Vector` with a given size (empty by default) filled
-    /// with the given item (`T{0}` by default).
-    explicit Vector(std::size_t size = 0, const T& value = T{0});
+    /// \brief Construct a `Vector` with a given size (empty by default).
+    explicit Vector(std::size_t size = 0);
+    /// \brief Construct a `Vector` with a given size filled with copies of the
+    /// given item.
+    Vector(std::size_t size, const T& value);
     /// \brief Construct a `Vector` from a brace-enclosed list.
     Vector(std::initializer_list<T> list);
     /// \brief Construct a `Vector` via a pair of iterators.
@@ -67,6 +67,7 @@ struct Vector {
     /// \brief Default move constructor.
     Vector(Vector&& other) = default;
 #ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+    /// \brief Construct from a VectorExpression.
     template <VectorExpressionConvertibleTo<T> Expr>
     Vector(const Expr& expr);
 #endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
@@ -75,6 +76,11 @@ struct Vector {
     auto operator=(const Vector& other) -> Vector& = default;
     /// \brief Default move assignment.
     auto operator=(Vector&& other) -> Vector& = default;
+#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+    /// \brief Assignment from a VectorExpression.
+    template <VectorExpressionConvertibleTo<T> Expr>
+    auto operator=(const Expr& expr) -> Vector&;
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
     /// \brief Set size and fill with a given value.
     void assign(std::size_t size, const T& value = T{0});
@@ -375,6 +381,11 @@ auto sgn(Vector<T> v) -> Vector<T>;
 // ========================================================================
 
 template <typename T>
+inline Vector<T>::Vector(std::size_t size) :
+    storage(size) {
+}
+
+template <typename T>
 inline Vector<T>::Vector(std::size_t size, const T& value) :
     storage(size, value) {
 }
@@ -407,6 +418,18 @@ inline Vector<T>::Vector(const Expr& expr) : storage(expr.size()) {
     for (std::size_t i{0}, N{expr.size()}; i < N; ++i) {
         storage[i] = expr[i];
     }
+}
+
+/// \brief Assignment from a VectorExpression.
+template <typename T>
+template <VectorExpressionConvertibleTo<T> Expr>
+inline auto Vector<T>::operator=(const Expr& expr) -> Vector& {
+    std::size_t N{expr.size()};
+    storage.resize(N);
+    for (std::size_t i{0}; i < N; ++i) {
+        storage[i] = expr[i];
+    }
+    return *this;
 }
 #endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
