@@ -14,8 +14,16 @@ namespace jump {
 template <typename Expr>
 concept VectorExpression = requires (Expr expr, std::size_t i) {
     typename Expr::ValueType;
-    {expr.is_vector_expression_leaf} -> std::same_as<const bool&>;
+    // Vector expressions should define a bool member that determines if it is a
+    // leaf of a compound expression or not
+    expr.is_vector_expression_leaf;
+    requires std::same_as<
+        std::remove_cvref_t<decltype(expr.is_vector_expression_leaf)>, bool>;
+    // For use in evaluating the whole vector in a single loop
     {expr.size()} -> std::same_as<std::size_t>;
+    // Expression should evaluate, and to a value of appropriate type. They may
+    // return results by value or by const reference (in the case of leaves of
+    // an expression)
     expr[i];
     requires std::same_as<std::remove_cvref_t<decltype(expr[i])>,
              std::remove_cvref_t<typename Expr::ValueType>>;
