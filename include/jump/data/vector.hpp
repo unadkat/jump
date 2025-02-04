@@ -116,9 +116,9 @@ struct Vector {
     /// \brief Fill vector with zeroes.
     void zero();
 
+#ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
     /// \brief No operation on `Vector`.
     auto operator+() const -> const Vector&;
-#ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
     /// \brief Negate `Vector`.
     auto operator-() const -> Vector;
 #endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
@@ -511,12 +511,12 @@ inline void Vector<T>::zero() {
     fill(T{0});
 }
 
+#ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 template <typename T>
 inline auto Vector<T>::operator+() const -> const Vector<T>& {
     return *this;
 }
 
-#ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 template <typename T>
 inline auto Vector<T>::operator-() const -> Vector<T> {
     Vector<T> temp{*this};

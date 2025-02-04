@@ -13,6 +13,11 @@
 
 namespace jump {
 template <VectorExpression Expr>
+struct VectorIdentity : UnaryVectorOp<std::identity, Expr> {
+    using UnaryVectorOp<std::identity, Expr>::UnaryVectorOp;
+};
+
+template <VectorExpression Expr>
 struct VectorNegate : UnaryVectorOp<std::negate<>, Expr> {
     using UnaryVectorOp<std::negate<>, Expr>::UnaryVectorOp;
 };

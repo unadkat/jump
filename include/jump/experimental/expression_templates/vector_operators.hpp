@@ -15,10 +15,28 @@
 
 namespace jump {
 #ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+template <VectorExpression Expr>
+constexpr auto operator+(const Expr& expr) -> VectorIdentity<Expr>;
+
+template <VectorExpression Expr>
+constexpr auto operator-(const Expr& expr) -> VectorNegate<Expr>;
+
 template <VectorExpression Left, VectorExpression Right>
-inline constexpr auto operator+(const Left& lhs, const Right& rhs) 
-        -> VectorAdd<Left, Right>  {
-    return VectorAdd<Left, Right>(lhs, rhs);
+constexpr auto operator+(const Left& lhs, const Right& rhs)
+        -> VectorAdd<Left, Right>;
+
+template <VectorExpression Left, VectorExpression Right,
+         typename R = std::common_type_t<
+         typename Left::ValueType, typename Right::ValueType>>
+constexpr auto dot(const Left& lhs, const Right& rhs) -> R;
+
+// ========================================================================
+// Implementation
+// ========================================================================
+
+template <VectorExpression Expr>
+inline constexpr auto operator+(const Expr& expr) -> VectorIdentity<Expr> {
+    return VectorIdentity<Expr>(expr);
 }
 
 template <VectorExpression Expr>
@@ -26,10 +44,14 @@ inline constexpr auto operator-(const Expr& expr) -> VectorNegate<Expr> {
     return VectorNegate<Expr>(expr);
 }
 
-template <VectorExpression Left, VectorExpression Right,
-         typename R = std::common_type_t<
-         typename Left::ValueType, typename Right::ValueType>>
-inline constexpr auto dot(const Left& lhs, const Right& rhs) -> R  {
+template <VectorExpression Left, VectorExpression Right>
+inline constexpr auto operator+(const Left& lhs, const Right& rhs)
+        -> VectorAdd<Left, Right> {
+    return VectorAdd<Left, Right>(lhs, rhs);
+}
+
+template <VectorExpression Left, VectorExpression Right, typename R>
+inline constexpr auto dot(const Left& lhs, const Right& rhs) -> R {
 #ifndef NDEBUG
     if (lhs.size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
