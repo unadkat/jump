@@ -24,7 +24,7 @@ class UnaryVectorOp {
 
         constexpr UnaryVectorOp(const Expr& expr);
 
-        constexpr auto operator[](std::size_t i) const -> ValueType;
+        constexpr auto operator[](std::size_t index) const -> ValueType;
         constexpr auto size() const -> std::size_t;
 
     protected:
@@ -43,7 +43,7 @@ class BinaryVectorOp {
 
         constexpr BinaryVectorOp(const Left& lhs, const Right& rhs);
 
-        constexpr auto operator[](std::size_t i) const -> ValueType;
+        constexpr auto operator[](std::size_t index) const -> ValueType;
         constexpr auto size() const -> std::size_t;
 
     protected:
@@ -61,8 +61,14 @@ inline constexpr UnaryVectorOp<Functor, Expr>::UnaryVectorOp(const Expr& expr) :
 
 template <typename Functor, VectorExpression Expr>
 inline constexpr auto UnaryVectorOp<Functor, Expr>::operator[](
-        std::size_t i) const -> ValueType {
-    return m_operator(m_expr[i]);
+        std::size_t index) const -> ValueType {
+#ifndef NDEBUG
+    if (index >= size()) {
+        throw RuntimeError{Range1DError{.index = index, .size = size()}};
+    }
+#endif  // NDEBUG
+
+    return m_operator(m_expr[index]);
 }
 
 template <typename Functor, VectorExpression Expr>
@@ -81,13 +87,18 @@ inline constexpr BinaryVectorOp<Functor, Left, Right>::BinaryVectorOp(
             .name2 = "rhs", .size2 = rhs.size()}};
     }
 #endif  // NDEBUG
-
 }
 
 template <typename Functor, VectorExpression Left, VectorExpression Right>
 inline constexpr auto BinaryVectorOp<Functor, Left, Right>::operator[](
-        std::size_t i) const -> ValueType {
-    return m_operator(m_lhs[i], m_rhs[i]);
+        std::size_t index) const -> ValueType {
+#ifndef NDEBUG
+    if (index >= size()) {
+        throw RuntimeError{Range1DError{.index = index, .size = size()}};
+    }
+#endif  // NDEBUG
+
+    return m_operator(m_lhs[index], m_rhs[index]);
 }
 
 template <typename Functor, VectorExpression Left, VectorExpression Right>
