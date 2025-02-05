@@ -13,6 +13,10 @@
 #include "jump/utility/types.hpp"
 #include "jump/utility/utility.hpp"
 
+#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+#include "jump/experimental/expression_templates/vector_operators.hpp"
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+
 #include <algorithm>
 #include <cmath>
 #include <concepts>
@@ -23,10 +27,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-#include "jump/experimental/expression_templates/vector_operators.hpp"
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 namespace jump {
 /// \brief Permissive encapulation of `std::vector` with arithmetic
@@ -198,7 +198,6 @@ auto operator+(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R>;
 /// \brief Addition of two Vectors.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator+(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R>;
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 /// \relates Vector
 /// \brief Difference of two Vectors.
@@ -219,6 +218,7 @@ auto operator-(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R>;
 /// \brief Difference of two Vectors.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator-(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R>;
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 /// \relates Vector
 /// \brief Left-hand multiplication by scalar.
@@ -826,7 +826,6 @@ inline auto operator+(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R> {
         return result;
     }
 }
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 /// \relates Vector
 /// \brief Difference of two Vectors.
@@ -899,6 +898,7 @@ inline auto operator-(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R> {
         return result;
     }
 }
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 /// \relates Vector
 /// \brief Left-hand multiplication by scalar.

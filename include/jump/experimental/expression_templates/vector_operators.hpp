@@ -23,7 +23,11 @@ constexpr auto operator-(const Expr& expr) -> VectorNegate<Expr>;
 
 template <VectorExpression Left, VectorExpression Right>
 constexpr auto operator+(const Left& lhs, const Right& rhs)
-        -> VectorAdd<Left, Right>;
+        -> VectorPlus<Left, Right>;
+
+template <VectorExpression Left, VectorExpression Right>
+constexpr auto operator-(const Left& lhs, const Right& rhs)
+        -> VectorMinus<Left, Right>;
 
 template <VectorExpression Left, VectorExpression Right,
          typename R = std::common_type_t<
@@ -46,8 +50,14 @@ inline constexpr auto operator-(const Expr& expr) -> VectorNegate<Expr> {
 
 template <VectorExpression Left, VectorExpression Right>
 inline constexpr auto operator+(const Left& lhs, const Right& rhs)
-        -> VectorAdd<Left, Right> {
-    return VectorAdd<Left, Right>(lhs, rhs);
+        -> VectorPlus<Left, Right> {
+    return VectorPlus<Left, Right>(lhs, rhs);
+}
+
+template <VectorExpression Left, VectorExpression Right>
+inline constexpr auto operator-(const Left& lhs, const Right& rhs)
+        -> VectorMinus<Left, Right> {
+    return VectorMinus<Left, Right>(lhs, rhs);
 }
 
 template <VectorExpression Left, VectorExpression Right, typename R>

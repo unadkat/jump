@@ -23,8 +23,13 @@ struct VectorNegate : UnaryVectorOp<std::negate<>, Expr> {
 };
 
 template <VectorExpression Left, VectorExpression Right>
-struct VectorAdd : BinaryVectorOp<std::plus<>, Left, Right> {
+struct VectorPlus : BinaryVectorOp<std::plus<>, Left, Right> {
     using BinaryVectorOp<std::plus<>, Left, Right>::BinaryVectorOp;
+};
+
+template <VectorExpression Left, VectorExpression Right>
+struct VectorMinus : BinaryVectorOp<std::minus<>, Left, Right> {
+    using BinaryVectorOp<std::minus<>, Left, Right>::BinaryVectorOp;
 };
 }   // namespace jump
 
