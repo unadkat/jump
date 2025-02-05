@@ -121,25 +121,38 @@ struct Vector {
     auto operator+() const -> const Vector&;
     /// \brief Negate `Vector`.
     auto operator-() const -> Vector;
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
     /// \brief Add two Vectors together in place.
     template <std::convertible_to<T> U>
     auto operator+=(const Vector<U>& rhs) -> Vector&;
     /// \brief Subtract one `Vector` from another in place.
     template <std::convertible_to<T> U>
     auto operator-=(const Vector<U>& rhs) -> Vector&;
-    /// \brief Multiply by scalar in place.
-    template <std::convertible_to<T> U>
-    auto operator*=(const U& rhs) -> Vector&;
     /// \brief Elementwise product by another Vector.
     template <std::convertible_to<T> U>
     auto operator*=(const Vector<U>& rhs) -> Vector&;
-    /// \brief Divide by scalar in place.
-    template <std::convertible_to<T> U>
-    auto operator/=(const U& rhs) -> Vector&;
     /// \brief Elementwise division by another Vector.
     template <std::convertible_to<T> U>
     auto operator/=(const Vector<U>& rhs) -> Vector&;
+#else
+    /// \brief Add VectorExpression to Vector in place.
+    template <VectorExpressionConvertibleTo<T> Expr>
+    auto operator+=(const Expr& expr) -> Vector&;
+    /// \brief Subtract a VectorExpression from a Vector in place.
+    template <VectorExpressionConvertibleTo<T> Expr>
+    auto operator-=(const Expr& expr) -> Vector&;
+    /// \brief Elementwise product by VectorExpression.
+    template <VectorExpressionConvertibleTo<T> Expr>
+    auto operator*=(const Expr& expr) -> Vector&;
+    /// \brief Elementwise division by a VectorExpression.
+    template <VectorExpressionConvertibleTo<T> Expr>
+    auto operator/=(const Expr& expr) -> Vector&;
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+    /// \brief Multiply by scalar in place.
+    template <std::convertible_to<T> U>
+    auto operator*=(const U& rhs) -> Vector&;
+    /// \brief Divide by scalar in place.
+    template <std::convertible_to<T> U>
+    auto operator/=(const U& rhs) -> Vector&;
 
     /// \brief Return sum of element magnitudes.
     auto L1_norm() const -> Real;
@@ -522,7 +535,6 @@ inline auto Vector<T>::operator-() const -> Vector<T> {
     Vector<T> temp{*this};
     return temp *= T{-1};
 }
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 template <typename T>
 template <std::convertible_to<T> U>
@@ -558,15 +570,6 @@ inline auto Vector<T>::operator-=(const Vector<U>& rhs) -> Vector<T>& {
 
 template <typename T>
 template <std::convertible_to<T> U>
-inline auto Vector<T>::operator*=(const U& rhs) -> Vector<T>& {
-    for (auto& x : storage) {
-        x *= rhs;
-    }
-    return *this;
-}
-
-template <typename T>
-template <std::convertible_to<T> U>
 inline auto Vector<T>::operator*=(const Vector<U>& rhs) -> Vector<T>& {
 #ifndef NDEBUG
     if (size() != rhs.size()) {
@@ -583,12 +586,6 @@ inline auto Vector<T>::operator*=(const Vector<U>& rhs) -> Vector<T>& {
 
 template <typename T>
 template <std::convertible_to<T> U>
-inline auto Vector<T>::operator/=(const U& rhs) -> Vector<T>& {
-    return *this *= (T{1}/rhs);
-}
-
-template <typename T>
-template <std::convertible_to<T> U>
 inline auto Vector<T>::operator/=(const Vector<U>& rhs) -> Vector<T>& {
 #ifndef NDEBUG
     if (size() != rhs.size()) {
@@ -601,6 +598,90 @@ inline auto Vector<T>::operator/=(const Vector<U>& rhs) -> Vector<T>& {
         storage[i] /= rhs[i];
     }
     return *this;
+}
+#else
+/// \brief Add VectorExpression to Vector in place.
+template <typename T>
+template <VectorExpressionConvertibleTo<T> Expr>
+inline auto Vector<T>::operator+=(const Expr& expr) -> Vector& {
+#ifndef NDEBUG
+    if (size() != expr.size()) {
+        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "expr",
+            .size2 = expr.size()}};
+    }
+#endif  // NDEBUG
+
+    for (std::size_t i{0}, N{size()}; i < N; ++i) {
+        storage[i] += expr[i];
+    }
+    return *this;
+}
+
+/// \brief Subtract a VectorExpression from a Vector in place.
+template <typename T>
+template <VectorExpressionConvertibleTo<T> Expr>
+inline auto Vector<T>::operator-=(const Expr& expr) -> Vector& {
+#ifndef NDEBUG
+    if (size() != expr.size()) {
+        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "expr",
+            .size2 = expr.size()}};
+    }
+#endif  // NDEBUG
+
+    for (std::size_t i{0}, N{size()}; i < N; ++i) {
+        storage[i] -= expr[i];
+    }
+    return *this;
+}
+
+/// \brief Elementwise product by VectorExpression.
+template <typename T>
+template <VectorExpressionConvertibleTo<T> Expr>
+inline auto Vector<T>::operator*=(const Expr& expr) -> Vector& {
+#ifndef NDEBUG
+    if (size() != expr.size()) {
+        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "expr",
+            .size2 = expr.size()}};
+    }
+#endif  // NDEBUG
+
+    for (std::size_t i{0}, N{size()}; i < N; ++i) {
+        storage[i] *= expr[i];
+    }
+    return *this;
+}
+
+/// \brief Elementwise division by a VectorExpression.
+template <typename T>
+template <VectorExpressionConvertibleTo<T> Expr>
+inline auto Vector<T>::operator/=(const Expr& expr) -> Vector& {
+#ifndef NDEBUG
+    if (size() != expr.size()) {
+        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "expr",
+            .size2 = expr.size()}};
+    }
+#endif  // NDEBUG
+
+    for (std::size_t i{0}, N{size()}; i < N; ++i) {
+        storage[i] /= expr[i];
+    }
+    return *this;
+}
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+
+template <typename T>
+template <std::convertible_to<T> U>
+inline auto Vector<T>::operator*=(const U& rhs) -> Vector<T>& {
+    for (auto& x : storage) {
+        x *= rhs;
+    }
+    return *this;
+}
+
+template <typename T>
+template <std::convertible_to<T> U>
+inline auto Vector<T>::operator/=(const U& rhs) -> Vector<T>& {
+    return *this *= (T{1}/rhs);
 }
 
 template <typename T>
