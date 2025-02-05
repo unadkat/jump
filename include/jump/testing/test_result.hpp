@@ -15,6 +15,10 @@
 #include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
 
+#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+#include "jump/experimental/expression_templates/concepts.hpp"
+#endif //   JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+
 #include <cmath>
 #include <complex>
 #include <limits>
@@ -66,6 +70,14 @@ auto approx(const T& lhs, const T& rhs) -> bool;
 
 template <typename T>
 auto vanishes(const T& x) -> bool;
+
+#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+template <VectorExpression Left, VectorExpression Right>
+constexpr auto approx(const Left& lhs, const Right& rhs) -> bool;
+
+template <VectorExpression Expr>
+constexpr auto vanishes(const Expr& expr) -> bool;
+#endif //   JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 // ========================================================================
 // Implementation
@@ -156,6 +168,35 @@ template <typename T>
 inline auto vanishes(const DenseMatrix<T>& M) -> bool {
     return vanishes(M.as_vector());
 }
+
+#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+template <VectorExpression Left, VectorExpression Right>
+inline constexpr auto approx(const Left& lhs, const Right& rhs) -> bool {
+#ifndef NDEBUG
+    if (lhs.size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    for (std::size_t i{0}, N{lhs.size()}; i < N; ++i) {
+        if (!approx(lhs[i], rhs[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <VectorExpression Expr>
+inline constexpr auto vanishes(const Expr& expr) -> bool {
+    for (std::size_t i{0}, N{expr.size()}; i < N; ++i) {
+        if (!vanishes(expr[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+#endif //   JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 }   // namespace jump
 
 #endif  // JUMP_TEST_RESULT_HPP
