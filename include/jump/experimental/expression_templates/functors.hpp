@@ -31,6 +31,16 @@ template <VectorExpression Left, VectorExpression Right>
 struct VectorMinus : BinaryVectorOp<std::minus<>, Left, Right> {
     using BinaryVectorOp<std::minus<>, Left, Right>::BinaryVectorOp;
 };
+
+template <VectorExpression Left, VectorExpression Right>
+struct VectorMultiply : BinaryVectorOp<std::multiplies<>, Left, Right> {
+    using BinaryVectorOp<std::multiplies<>, Left, Right>::BinaryVectorOp;
+};
+
+template <VectorExpression Left, VectorExpression Right>
+struct VectorDivide : BinaryVectorOp<std::divides<>, Left, Right> {
+    using BinaryVectorOp<std::divides<>, Left, Right>::BinaryVectorOp;
+};
 }   // namespace jump
 
 #endif  // JUMP_EXPRESSION_TEMPLATE_FUNCTORS_HPP

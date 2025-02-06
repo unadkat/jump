@@ -29,6 +29,14 @@ template <VectorExpression Left, VectorExpression Right>
 constexpr auto operator-(const Left& lhs, const Right& rhs)
         -> VectorMinus<Left, Right>;
 
+template <VectorExpression Left, VectorExpression Right>
+constexpr auto operator*(const Left& lhs, const Right& rhs)
+        -> VectorMultiply<Left, Right>;
+
+template <VectorExpression Left, VectorExpression Right>
+constexpr auto operator/(const Left& lhs, const Right& rhs)
+        -> VectorDivide<Left, Right>;
+
 template <VectorExpression Left, VectorExpression Right,
          typename R = std::common_type_t<
          typename Left::ValueType, typename Right::ValueType>>
@@ -58,6 +66,18 @@ template <VectorExpression Left, VectorExpression Right>
 inline constexpr auto operator-(const Left& lhs, const Right& rhs)
         -> VectorMinus<Left, Right> {
     return VectorMinus<Left, Right>(lhs, rhs);
+}
+
+template <VectorExpression Left, VectorExpression Right>
+inline constexpr auto operator*(const Left& lhs, const Right& rhs)
+        -> VectorMultiply<Left, Right> {
+    return VectorMultiply<Left, Right>(lhs, rhs);
+}
+
+template <VectorExpression Left, VectorExpression Right>
+inline constexpr auto operator/(const Left& lhs, const Right& rhs)
+        -> VectorDivide<Left, Right> {
+    return VectorDivide<Left, Right>(lhs, rhs);
 }
 
 template <VectorExpression Left, VectorExpression Right, typename R>
