@@ -3,6 +3,7 @@ if (BUILD_TESTING)
         dual.cpp
         linear_algebra.cpp
         matrix.cpp
+        sandbox.cpp
         vector.cpp
     )
 
