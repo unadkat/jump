@@ -33,9 +33,29 @@ template <VectorExpression Left, VectorExpression Right>
 constexpr auto operator*(const Left& lhs, const Right& rhs)
         -> VectorMultiply<Left, Right>;
 
+template <typename T, VectorExpression Expr>
+requires (!VectorExpression<T>)
+inline constexpr auto operator*(const T& lhs, const Expr& rhs)
+        -> VectorMultiply<ConstantVectorExpression<T>, Expr>;
+
+template <typename T, VectorExpression Expr>
+requires (!VectorExpression<T>)
+inline constexpr auto operator*(const Expr& lhs, const T& rhs)
+        -> VectorMultiply<Expr, ConstantVectorExpression<T>>;
+
 template <VectorExpression Left, VectorExpression Right>
 constexpr auto operator/(const Left& lhs, const Right& rhs)
         -> VectorDivide<Left, Right>;
+
+template <typename T, VectorExpression Expr>
+requires (!VectorExpression<T>)
+inline constexpr auto operator/(const T& lhs, const Expr& rhs)
+        -> VectorDivide<ConstantVectorExpression<T>, Expr>;
+
+template <typename T, VectorExpression Expr>
+requires (!VectorExpression<T>)
+inline constexpr auto operator/(const Expr& lhs, const T& rhs)
+        -> VectorDivide<Expr, ConstantVectorExpression<T>>;
 
 template <VectorExpression Left, VectorExpression Right,
          typename R = std::common_type_t<
@@ -74,10 +94,38 @@ inline constexpr auto operator*(const Left& lhs, const Right& rhs)
     return VectorMultiply<Left, Right>(lhs, rhs);
 }
 
+template <typename T, VectorExpression Expr>
+requires (!VectorExpression<T>)
+inline constexpr auto operator*(const T& lhs, const Expr& rhs)
+        -> VectorMultiply<ConstantVectorExpression<T>, Expr> {
+    return VectorMultiply<ConstantVectorExpression<T>, Expr>(lhs, rhs);
+}
+
+template <typename T, VectorExpression Expr>
+requires (!VectorExpression<T>)
+inline constexpr auto operator*(const Expr& lhs, const T& rhs)
+        -> VectorMultiply<Expr, ConstantVectorExpression<T>> {
+    return VectorMultiply<Expr, ConstantVectorExpression<T>>(lhs, rhs);
+}
+
 template <VectorExpression Left, VectorExpression Right>
 inline constexpr auto operator/(const Left& lhs, const Right& rhs)
         -> VectorDivide<Left, Right> {
     return VectorDivide<Left, Right>(lhs, rhs);
+}
+
+template <typename T, VectorExpression Expr>
+requires (!VectorExpression<T>)
+inline constexpr auto operator/(const T& lhs, const Expr& rhs)
+        -> VectorDivide<ConstantVectorExpression<T>, Expr> {
+    return VectorDivide<ConstantVectorExpression<T>, Expr>(lhs, rhs);
+}
+
+template <typename T, VectorExpression Expr>
+requires (!VectorExpression<T>)
+inline constexpr auto operator/(const Expr& lhs, const T& rhs)
+        -> VectorDivide<Expr, ConstantVectorExpression<T>> {
+    return VectorDivide<Expr, ConstantVectorExpression<T>>(lhs, rhs);
 }
 
 template <VectorExpression Left, VectorExpression Right, typename R>

@@ -14,6 +14,27 @@
 #include <type_traits>
 
 namespace jump {
+template <typename T>
+class ConstantVectorExpression {
+    public:
+        using ValueType = T;
+
+        // Even though this is logically a "leaf" of the expression, we need to
+        // store this by value in an expression so we can update the size,
+        // proper leaves are stored by const reference which is insufficient
+        static constexpr bool is_vector_expression_leaf{false};
+
+        constexpr ConstantVectorExpression(const T& value);
+
+        constexpr auto operator[](std::size_t index) const -> ValueType;
+        constexpr auto size() const -> std::size_t;
+        constexpr void set_size(std::size_t N);
+
+    private:
+        T m_value{};
+        std::size_t m_size{};
+};
+
 template <typename Functor, VectorExpression Expr>
 class UnaryVectorOp {
     public:
@@ -29,7 +50,7 @@ class UnaryVectorOp {
 
     protected:
         typename std::conditional<Expr::is_vector_expression_leaf,
-                 const Expr&, const Expr>::type m_expr;
+                 const Expr&, Expr>::type m_expr;
         Functor m_operator{};
 };
 
@@ -48,11 +69,54 @@ class BinaryVectorOp {
 
     protected:
         typename std::conditional<Left::is_vector_expression_leaf,
-                 const Left&, const Left>::type m_lhs;
+                 const Left&, Left>::type m_lhs;
         typename std::conditional<Right::is_vector_expression_leaf,
-                 const Right&, const Right>::type m_rhs;
+                 const Right&, Right>::type m_rhs;
         Functor m_operator{};
 };
+
+// ========================================================================
+// Type traits
+// ========================================================================
+
+template <typename>
+struct IsConstantVectorExpression : public std::false_type {
+};
+
+template <typename T>
+struct IsConstantVectorExpression<ConstantVectorExpression<T>>
+        : public std::true_type {
+};
+
+template <typename T>
+inline constexpr bool IsConstantVectorExpression_v
+        = IsConstantVectorExpression<T>::value;
+
+// ========================================================================
+// Implementation
+// ========================================================================
+
+template <typename T>
+inline constexpr ConstantVectorExpression<T>::ConstantVectorExpression(
+        const T& value) :
+    m_value{value} {
+}
+
+template <typename T>
+inline constexpr auto ConstantVectorExpression<T>::operator[](
+        [[maybe_unused]] std::size_t index) const -> ValueType {
+    return m_value;
+}
+
+template <typename T>
+inline constexpr auto ConstantVectorExpression<T>::size() const -> std::size_t {
+    return m_size;
+}
+
+template <typename T>
+inline constexpr void ConstantVectorExpression<T>::set_size(std::size_t N) {
+    m_size = N;
+}
 
 template <typename Functor, VectorExpression Expr>
 inline constexpr UnaryVectorOp<Functor, Expr>::UnaryVectorOp(const Expr& expr) :
@@ -81,6 +145,18 @@ template <typename Functor, VectorExpression Left, VectorExpression Right>
 inline constexpr BinaryVectorOp<Functor, Left, Right>::BinaryVectorOp(
         const Left& lhs, const Right& rhs) :
     m_lhs{lhs}, m_rhs{rhs} {
+    if constexpr (IsConstantVectorExpression_v<Left>
+            && IsConstantVectorExpression_v<Right>) {
+        throw RuntimeError{InvalidArgumentError{
+            .argument = "IsConstantVectorExpression_v<Left> "
+                "&& IsConstantVectorExpression_v<Right>",
+            .value = "true",
+            .expected = "only one of the arguments being constant"}};
+    } else if constexpr (IsConstantVectorExpression_v<Left>) {
+        m_lhs.set_size(rhs.size());
+    } else if constexpr (IsConstantVectorExpression_v<Right>) {
+        m_rhs.set_size(lhs.size());
+    }
 #ifndef NDEBUG
     if (lhs.size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),

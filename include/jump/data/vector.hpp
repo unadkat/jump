@@ -218,7 +218,6 @@ auto operator-(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R>;
 /// \brief Difference of two Vectors.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator-(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R>;
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 /// \relates Vector
 /// \brief Left-hand multiplication by scalar.
@@ -240,7 +239,6 @@ auto operator*(const Vector<T>& lhs, const U& rhs) -> Vector<R>;
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator*(Vector<T>&& lhs, const U& rhs) -> Vector<R>;
 
-#ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 /// \relates Vector
 /// \brief Elementwise product of two Vectors.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
@@ -265,7 +263,6 @@ auto operator*(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R>;
 /// \brief Inner product of two Vectors.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto dot(const Vector<T>& lhs, const Vector<U>& rhs) -> R;
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 /// \relates Vector
 /// \brief Right-hand division by scalar.
@@ -287,7 +284,6 @@ auto operator/(const T& lhs, const Vector<U>& rhs) -> Vector<R>;
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator/(const T& lhs, Vector<U>&& rhs) -> Vector<R>;
 
-#ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 /// \relates Vector
 /// \brief Elementwise division of two Vectors.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
@@ -902,7 +898,6 @@ inline auto operator-(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R> {
         return result;
     }
 }
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 /// \relates Vector
 /// \brief Left-hand multiplication by scalar.
@@ -950,7 +945,6 @@ inline auto operator*(Vector<T>&& lhs, const U& rhs) -> Vector<R> {
     }
 }
 
-#ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 /// \relates Vector
 /// \brief Elementwise product of two Vectors.
 template <typename T, typename U, typename R>
@@ -1024,7 +1018,6 @@ inline auto dot(const Vector<T>& lhs, const Vector<U>& rhs) -> R {
 
     return std::inner_product(lhs.begin(), lhs.end(), rhs.begin(), R{0});
 }
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 /// \relates Vector
 /// \brief Right-hand division by scalar.
@@ -1080,7 +1073,6 @@ auto operator/(const T& lhs, Vector<U>&& rhs) -> Vector<R> {
     }
 }
 
-#ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 /// \relates Vector
 /// \brief Elementwise division of two Vectors.
 template <typename T, typename U, typename R>
