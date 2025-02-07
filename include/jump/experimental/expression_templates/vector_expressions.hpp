@@ -158,9 +158,9 @@ inline constexpr BinaryVectorOp<Functor, Left, Right>::BinaryVectorOp(
         m_rhs.set_size(lhs.size());
     }
 #ifndef NDEBUG
-    if (lhs.size() != rhs.size()) {
-        throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
-            .name2 = "rhs", .size2 = rhs.size()}};
+    if (m_lhs.size() != m_rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.name1 = "m_lhs",
+            .size1 = m_lhs.size(), .name2 = "m_rhs", .size2 = m_rhs.size()}};
     }
 #endif  // NDEBUG
 }
