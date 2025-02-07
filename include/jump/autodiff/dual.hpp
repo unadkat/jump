@@ -14,6 +14,7 @@
 
 #include <array>
 #include <cmath>
+#include <concepts>
 #include <ostream>
 
 namespace jump {
@@ -41,7 +42,7 @@ struct Dual {
     /// \brief Default copy constructor
     Dual(const Dual& other) = default;
     /// \brief Templated copy constructor
-    template <typename U>
+    template <std::convertible_to<T> U>
     Dual(const Dual<N, U>& other);
     /// \brief Default move constructor
     Dual(Dual&& other) = default;
@@ -92,6 +93,14 @@ auto operator-(Dual<N, T> lhs, const Dual<N, T>& rhs) -> Dual<N, T>;
 template <std::size_t N, typename T>
 auto operator-(const Dual<N, T>& lhs, Dual<N, T>&& rhs) -> Dual<N, T>;
 
+// \relates Dual
+template <std::size_t N, typename T, std::convertible_to<T> U>
+auto operator*(Dual<N, T> lhs, const U& rhs) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T, std::convertible_to<T> U>
+auto operator*(const U& lhs, Dual<N, T> rhs) -> Dual<N, T>;
+
 /// \relates Dual
 template <std::size_t N, typename T>
 auto operator*(Dual<N, T> lhs, const Dual<N, T>& rhs) -> Dual<N, T>;
@@ -99,6 +108,14 @@ auto operator*(Dual<N, T> lhs, const Dual<N, T>& rhs) -> Dual<N, T>;
 /// \relates Dual
 template <std::size_t N, typename T>
 auto operator*(const Dual<N, T>& lhs, Dual<N, T>&& rhs) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T, std::convertible_to<T> U>
+auto operator/(Dual<N, T> lhs, const U& rhs) -> Dual<N, T>;
+
+/// \relates Dual
+template <std::size_t N, typename T, std::convertible_to<T> U>
+auto operator/(const U& lhs, const Dual<N, T>& rhs) -> Dual<N, T>;
 
 /// \relates Dual
 template <std::size_t N, typename T>
@@ -375,7 +392,7 @@ inline Dual<N, T>::Dual(const T& x, std::size_t index, const T& d) :
 }
 
 template <std::size_t N, typename T>
-template <typename U>
+template <std::convertible_to<T> U>
 inline Dual<N, T>::Dual(const Dual<N, U>& other) :
     value{other.value},
     dual{other.dual} {
@@ -508,6 +525,20 @@ inline auto operator-(const Dual<N, T>& lhs, Dual<N, T>&& rhs) -> Dual<N, T> {
 }
 
 /// \relates Dual
+template <std::size_t N, typename T, std::convertible_to<T> U>
+inline auto operator*(Dual<N, T> lhs, const U& rhs) -> Dual<N, T> {
+    lhs *= rhs;
+    return lhs;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T, std::convertible_to<T> U>
+inline auto operator*(const U& lhs, Dual<N, T> rhs) -> Dual<N, T> {
+    rhs *= lhs;
+    return rhs;
+}
+
+/// \relates Dual
 template <std::size_t N, typename T>
 inline auto operator*(Dual<N, T> lhs, const Dual<N, T>& rhs) -> Dual<N, T> {
     lhs *= rhs;
@@ -519,6 +550,21 @@ template <std::size_t N, typename T>
 inline auto operator*(const Dual<N, T>& lhs, Dual<N, T>&& rhs) -> Dual<N, T> {
     rhs *= lhs;
     return rhs;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T, std::convertible_to<T> U>
+inline auto operator/(Dual<N, T> lhs, const U& rhs) -> Dual<N, T> {
+    lhs /= rhs;
+    return lhs;
+}
+
+/// \relates Dual
+template <std::size_t N, typename T, std::convertible_to<T> U>
+inline auto operator/(const U& lhs, const Dual<N, T>& rhs) -> Dual<N, T> {
+    Dual<N, T> result{T{lhs}};
+    result /= rhs;
+    return result;
 }
 
 /// \relates Dual
