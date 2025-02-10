@@ -65,10 +65,16 @@ struct TestResult {
 inline Real epsilon_relative{1e-6};
 inline Real epsilon_absolute{1e-12};
 
-template <typename T>
-auto approx(const T& lhs, const T& rhs) -> bool;
+template <typename T, typename U>
+#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+requires (!VectorExpression<T> && !VectorExpression<U>)
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+auto approx(const T& lhs, const U& rhs) -> bool;
 
 template <typename T>
+#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+requires (!VectorExpression<T>)
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 auto vanishes(const T& x) -> bool;
 
 #ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
@@ -83,8 +89,11 @@ constexpr auto vanishes(const Expr& expr) -> bool;
 // Implementation
 // ========================================================================
 
-template <typename T>
-inline auto approx(const T& lhs, const T& rhs) -> bool {
+template <typename T, typename U>
+#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+requires (!VectorExpression<T> && !VectorExpression<U>)
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+inline auto approx(const T& lhs, const U& rhs) -> bool {
     if (lhs == rhs) {
         return true;
     }
@@ -145,6 +154,9 @@ inline auto approx(const DenseMatrix<T>& lhs, const DenseMatrix<T>& rhs)
 }
 
 template <typename T>
+#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+requires (!VectorExpression<T>)
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 inline auto vanishes(const T& x) -> bool {
     return approx(x, T{0});
 }
