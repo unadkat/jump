@@ -303,7 +303,6 @@ auto operator/(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R>;
 /// \brief Elementwise division of two Vectors.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator/(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R>;
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 // ========================================================================
 // Exponentiation
@@ -316,6 +315,7 @@ auto exp(Vector<T> v) -> Vector<T>;
 /// \relates Vector
 template <typename T>
 auto log(Vector<T> v) -> Vector<T>;
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 /// \relates Vector
 template <typename T>
@@ -1152,7 +1152,6 @@ inline auto operator/(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R> {
         return result;
     }
 }
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 // ========================================================================
 // Exponentiation
@@ -1175,6 +1174,7 @@ inline auto log(Vector<T> v) -> Vector<T> {
             [&](const T& x) { return log(x); });
     return v;
 }
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 /// \relates Vector
 template <typename T>

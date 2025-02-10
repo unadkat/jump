@@ -7,6 +7,7 @@
 #ifndef JUMP_EXPRESSION_TEMPLATE_FUNCTORS_HPP
 #define JUMP_EXPRESSION_TEMPLATE_FUNCTORS_HPP
 
+#include "jump/experimental/expression_templates/functional.hpp"
 #include "jump/experimental/expression_templates/vector_expressions.hpp"
 
 #include <functional>
@@ -40,6 +41,20 @@ struct VectorMultiply : BinaryVectorOp<std::multiplies<>, Left, Right> {
 template <VectorExpression Left, VectorExpression Right>
 struct VectorDivide : BinaryVectorOp<std::divides<>, Left, Right> {
     using BinaryVectorOp<std::divides<>, Left, Right>::BinaryVectorOp;
+};
+
+// ========================================================================
+// Exponentiation
+// ========================================================================
+
+template <VectorExpression Expr>
+struct VectorExp : UnaryVectorOp<functional::Exp, Expr> {
+    using UnaryVectorOp<functional::Exp, Expr>::UnaryVectorOp;
+};
+
+template <VectorExpression Expr>
+struct VectorLog : UnaryVectorOp<functional::Log, Expr> {
+    using UnaryVectorOp<functional::Log, Expr>::UnaryVectorOp;
 };
 }   // namespace jump
 

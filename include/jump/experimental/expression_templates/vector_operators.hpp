@@ -63,6 +63,16 @@ template <VectorExpression Left, VectorExpression Right,
 constexpr auto dot(const Left& lhs, const Right& rhs) -> R;
 
 // ========================================================================
+// Exponentiation
+// ========================================================================
+
+template <VectorExpression Expr>
+constexpr auto exp(const Expr& expr) -> VectorExp<Expr>;
+
+template <VectorExpression Expr>
+constexpr auto log(const Expr& expr) -> VectorLog<Expr>;
+
+// ========================================================================
 // Implementation
 // ========================================================================
 
@@ -142,6 +152,16 @@ inline constexpr auto dot(const Left& lhs, const Right& rhs) -> R {
         result += lhs[i]*rhs[i];
     }
     return result;
+}
+
+template <VectorExpression Expr>
+inline constexpr auto exp(const Expr& expr) -> VectorExp<Expr> {
+    return {expr};
+}
+
+template <VectorExpression Expr>
+inline constexpr auto log(const Expr& expr) -> VectorLog<Expr> {
+    return {expr};
 }
 #endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 }   // namespace jump
