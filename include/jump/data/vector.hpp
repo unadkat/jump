@@ -325,6 +325,7 @@ auto pow(Vector<T> v, T p) -> Vector<T>;
 // Trigonometry
 // ========================================================================
 
+#ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 /// \relates Vector
 template <typename T>
 auto sin(Vector<T> v) -> Vector<T>;
@@ -376,6 +377,7 @@ auto acosh(Vector<T> v) -> Vector<T>;
 /// \relates Vector
 template <typename T>
 auto atanh(Vector<T> v) -> Vector<T>;
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 // ========================================================================
 // Miscellaneous
@@ -1189,6 +1191,7 @@ inline auto pow(Vector<T> v, T p) -> Vector<T> {
 // Trigonometry
 // ========================================================================
 
+#ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 /// \relates Vector
 template <typename T>
 inline auto sin(Vector<T> v) -> Vector<T> {
@@ -1300,6 +1303,7 @@ inline auto atanh(Vector<T> v) -> Vector<T> {
             [&](const T& x) { return atanh(x); });
     return v;
 }
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 // ========================================================================
 // Miscellaneous

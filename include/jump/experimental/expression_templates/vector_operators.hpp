@@ -72,6 +72,42 @@ constexpr auto exp(const Expr& expr) -> VectorExp<Expr>;
 template <VectorExpression Expr>
 constexpr auto log(const Expr& expr) -> VectorLog<Expr>;
 
+template <VectorExpression Expr>
+constexpr auto sin(const Expr& expr) -> VectorSin<Expr>;
+
+template <VectorExpression Expr>
+constexpr auto cos(const Expr& expr) -> VectorCos<Expr>;
+
+template <VectorExpression Expr>
+constexpr auto tan(const Expr& expr) -> VectorTan<Expr>;
+
+template <VectorExpression Expr>
+constexpr auto asin(const Expr& expr) -> VectorAsin<Expr>;
+
+template <VectorExpression Expr>
+constexpr auto acos(const Expr& expr) -> VectorAcos<Expr>;
+
+template <VectorExpression Expr>
+constexpr auto atan(const Expr& expr) -> VectorAtan<Expr>;
+
+template <VectorExpression Expr>
+constexpr auto sinh(const Expr& expr) -> VectorSinh<Expr>;
+
+template <VectorExpression Expr>
+constexpr auto cosh(const Expr& expr) -> VectorCosh<Expr>;
+
+template <VectorExpression Expr>
+constexpr auto tanh(const Expr& expr) -> VectorTanh<Expr>;
+
+template <VectorExpression Expr>
+constexpr auto asinh(const Expr& expr) -> VectorAsinh<Expr>;
+
+template <VectorExpression Expr>
+constexpr auto acosh(const Expr& expr) -> VectorAcosh<Expr>;
+
+template <VectorExpression Expr>
+constexpr auto atanh(const Expr& expr) -> VectorAtanh<Expr>;
+
 // ========================================================================
 // Implementation
 // ========================================================================
@@ -161,6 +197,66 @@ inline constexpr auto exp(const Expr& expr) -> VectorExp<Expr> {
 
 template <VectorExpression Expr>
 inline constexpr auto log(const Expr& expr) -> VectorLog<Expr> {
+    return {expr};
+}
+
+template <VectorExpression Expr>
+inline constexpr auto sin(const Expr& expr) -> VectorSin<Expr> {
+    return {expr};
+}
+
+template <VectorExpression Expr>
+inline constexpr auto cos(const Expr& expr) -> VectorCos<Expr> {
+    return {expr};
+}
+
+template <VectorExpression Expr>
+inline constexpr auto tan(const Expr& expr) -> VectorTan<Expr> {
+    return {expr};
+}
+
+template <VectorExpression Expr>
+inline constexpr auto asin(const Expr& expr) -> VectorAsin<Expr> {
+    return {expr};
+}
+
+template <VectorExpression Expr>
+inline constexpr auto acos(const Expr& expr) -> VectorAcos<Expr> {
+    return {expr};
+}
+
+template <VectorExpression Expr>
+inline constexpr auto atan(const Expr& expr) -> VectorAtan<Expr> {
+    return {expr};
+}
+
+template <VectorExpression Expr>
+inline constexpr auto sinh(const Expr& expr) -> VectorSinh<Expr> {
+    return {expr};
+}
+
+template <VectorExpression Expr>
+inline constexpr auto cosh(const Expr& expr) -> VectorCosh<Expr> {
+    return {expr};
+}
+
+template <VectorExpression Expr>
+inline constexpr auto tanh(const Expr& expr) -> VectorTanh<Expr> {
+    return {expr};
+}
+
+template <VectorExpression Expr>
+inline constexpr auto asinh(const Expr& expr) -> VectorAsinh<Expr> {
+    return {expr};
+}
+
+template <VectorExpression Expr>
+inline constexpr auto acosh(const Expr& expr) -> VectorAcosh<Expr> {
+    return {expr};
+}
+
+template <VectorExpression Expr>
+inline constexpr auto atanh(const Expr& expr) -> VectorAtanh<Expr> {
     return {expr};
 }
 #endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
