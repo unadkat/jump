@@ -124,6 +124,20 @@ template <VectorExpression Expr>
 struct VectorAtanh : UnaryVectorOp<functional::Atanh, Expr> {
     using UnaryVectorOp<functional::Atanh, Expr>::UnaryVectorOp;
 };
+
+// ========================================================================
+// Miscellaneous
+// ========================================================================
+
+template <VectorExpression Expr>
+struct VectorAbs : UnaryVectorOp<functional::Abs, Expr> {
+    using UnaryVectorOp<functional::Abs, Expr>::UnaryVectorOp;
+};
+
+template <VectorExpression Expr>
+struct VectorSgn : UnaryVectorOp<functional::Sgn, Expr> {
+    using UnaryVectorOp<functional::Sgn, Expr>::UnaryVectorOp;
+};
 }   // namespace jump
 
 #endif  // JUMP_EXPRESSION_TEMPLATE_FUNCTORS_HPP

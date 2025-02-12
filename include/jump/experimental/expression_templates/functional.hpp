@@ -8,6 +8,7 @@
 #define JUMP_EXPRESSION_TEMPLATE_FUNCTIONAL_HPP
 
 #include "jump/autodiff/dual.hpp"
+#include "jump/utility/utility.hpp"
 
 #include <cmath>
 
@@ -129,6 +130,25 @@ struct Atanh {
     constexpr auto operator()(T&& arg) const {
         using std::atanh;
         return atanh(std::forward<T>(arg));
+    }
+};
+
+// ========================================================================
+// Miscellaneous
+// ========================================================================
+
+struct Abs {
+    template <typename T>
+    constexpr auto operator()(T&& arg) const {
+        using std::abs;
+        return abs(std::forward<T>(arg));
+    }
+};
+
+struct Sgn {
+    template <typename T>
+    constexpr auto operator()(T&& arg) const {
+        return sgn(std::forward<T>(arg));
     }
 };
 }   // namespace jump::functional

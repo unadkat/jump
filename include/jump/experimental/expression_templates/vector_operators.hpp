@@ -108,6 +108,12 @@ constexpr auto acosh(const Expr& expr) -> VectorAcosh<Expr>;
 template <VectorExpression Expr>
 constexpr auto atanh(const Expr& expr) -> VectorAtanh<Expr>;
 
+template <VectorExpression Expr>
+constexpr auto abs(const Expr& expr) -> VectorAbs<Expr>;
+
+template <VectorExpression Expr>
+constexpr auto sgn(const Expr& expr) -> VectorSgn<Expr>;
+
 // ========================================================================
 // Implementation
 // ========================================================================
@@ -257,6 +263,16 @@ inline constexpr auto acosh(const Expr& expr) -> VectorAcosh<Expr> {
 
 template <VectorExpression Expr>
 inline constexpr auto atanh(const Expr& expr) -> VectorAtanh<Expr> {
+    return {expr};
+}
+
+template <VectorExpression Expr>
+inline constexpr auto abs(const Expr& expr) -> VectorAbs<Expr> {
+    return {expr};
+}
+
+template <VectorExpression Expr>
+inline constexpr auto sgn(const Expr& expr) -> VectorSgn<Expr> {
     return {expr};
 }
 #endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES

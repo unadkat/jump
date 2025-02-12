@@ -9,6 +9,7 @@
 
 #include <concepts>
 #include <limits>
+#include <type_traits>
 #include <vector>
 
 namespace jump {
@@ -19,6 +20,7 @@ auto has_intersection(const std::vector<T>& A, const std::vector<T>& B) -> bool;
 
 /// \brief Signum function.
 template <typename T>
+requires (std::is_arithmetic_v<T>)
 auto sgn(T val) -> int;
 
 // ========================================================================
@@ -51,6 +53,7 @@ inline auto has_intersection(const std::vector<T>& A, const std::vector<T>& B)
 }
 
 template <typename T>
+requires (std::is_arithmetic_v<T>)
 inline auto sgn(T val) -> int {
     if constexpr (std::totally_ordered<T>) {
         return (T{0} < val) - (val < T{0});

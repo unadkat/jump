@@ -377,7 +377,6 @@ auto acosh(Vector<T> v) -> Vector<T>;
 /// \relates Vector
 template <typename T>
 auto atanh(Vector<T> v) -> Vector<T>;
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 // ========================================================================
 // Miscellaneous
@@ -390,6 +389,7 @@ auto abs(Vector<T> v) -> Vector<T>;
 /// \relates Vector
 template <typename T>
 auto sgn(Vector<T> v) -> Vector<T>;
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 // ========================================================================
 // Implementation
@@ -1303,7 +1303,6 @@ inline auto atanh(Vector<T> v) -> Vector<T> {
             [&](const T& x) { return atanh(x); });
     return v;
 }
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 // ========================================================================
 // Miscellaneous
@@ -1325,6 +1324,7 @@ inline auto sgn(Vector<T> v) -> Vector<T> {
             [&](const T& x) { return sgn(x); });
     return v;
 }
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 }   // namespace jump
 
 #endif  // JUMP_VECTOR_HPP
