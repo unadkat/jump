@@ -353,10 +353,11 @@ auto test_vector_access_in_range() -> TestResult {
 auto test_vector_access_fail() -> TestResult {
     TestResult result;
     bool exception_caught{false};
-    Vector<Complex> b(10, {1., 2.});
+    volatile std::size_t N{10};
+    Vector<Complex> b(N, {1., 2.});
 
     try {
-        b[10] = {1., 0.};
+        b[N] = {1., 0.};
     } catch (RuntimeError<Range1DError>& e) {
         exception_caught = true;
     }
