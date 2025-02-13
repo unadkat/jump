@@ -89,7 +89,7 @@ struct IsConstantVectorExpression<ConstantVectorExpression<T>>
 };
 
 template <typename T>
-inline constexpr bool IsConstantVectorExpression_v
+inline constexpr bool is_constant_vector_expression_v
         = IsConstantVectorExpression<T>::value;
 
 // ========================================================================
@@ -145,16 +145,16 @@ template <typename Functor, VectorExpression Left, VectorExpression Right>
 inline constexpr BinaryVectorOp<Functor, Left, Right>::BinaryVectorOp(
         const Left& lhs, const Right& rhs) :
     m_lhs{lhs}, m_rhs{rhs} {
-    if constexpr (IsConstantVectorExpression_v<Left>
-            && IsConstantVectorExpression_v<Right>) {
+    if constexpr (is_constant_vector_expression_v<Left>
+            && is_constant_vector_expression_v<Right>) {
         throw RuntimeError{InvalidArgumentError{
-            .argument = "IsConstantVectorExpression_v<Left> "
-                "&& IsConstantVectorExpression_v<Right>",
+            .argument = "is_constant_vector_expression_v<Left> "
+                "&& is_constant_vector_expression_v<Right>",
             .value = "true",
             .expected = "only one of the arguments being constant"}};
-    } else if constexpr (IsConstantVectorExpression_v<Left>) {
+    } else if constexpr (is_constant_vector_expression_v<Left>) {
         m_lhs.set_size(rhs.size());
-    } else if constexpr (IsConstantVectorExpression_v<Right>) {
+    } else if constexpr (is_constant_vector_expression_v<Right>) {
         m_rhs.set_size(lhs.size());
     }
 #ifndef NDEBUG

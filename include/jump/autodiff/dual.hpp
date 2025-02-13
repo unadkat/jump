@@ -210,15 +210,15 @@ auto sgn(Dual<N, T> x) -> Dual<N, T>;
 // ========================================================================
 
 template <typename>
-struct is_dual : public std::false_type {
+struct IsDual : public std::false_type {
 };
 
 template <std::size_t N, typename T>
-struct is_dual<Dual<N, T>> : public std::true_type {
+struct IsDual<Dual<N, T>> : public std::true_type {
 };
 
 template <typename T>
-inline constexpr bool is_dual_v = is_dual<T>::value;
+inline constexpr bool is_dual_v = IsDual<T>::value;
 
 using d1f64 = Dual<1, Real>;
 using d2f64 = Dual<2, Real>;
