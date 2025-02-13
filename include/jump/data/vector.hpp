@@ -315,7 +315,6 @@ auto exp(Vector<T> v) -> Vector<T>;
 /// \relates Vector
 template <typename T>
 auto log(Vector<T> v) -> Vector<T>;
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 /// \relates Vector
 template <typename T>
@@ -325,7 +324,6 @@ auto pow(Vector<T> v, T p) -> Vector<T>;
 // Trigonometry
 // ========================================================================
 
-#ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 /// \relates Vector
 template <typename T>
 auto sin(Vector<T> v) -> Vector<T>;
@@ -1176,7 +1174,6 @@ inline auto log(Vector<T> v) -> Vector<T> {
             [&](const T& x) { return log(x); });
     return v;
 }
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 /// \relates Vector
 template <typename T>
@@ -1191,7 +1188,6 @@ inline auto pow(Vector<T> v, T p) -> Vector<T> {
 // Trigonometry
 // ========================================================================
 
-#ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 /// \relates Vector
 template <typename T>
 inline auto sin(Vector<T> v) -> Vector<T> {

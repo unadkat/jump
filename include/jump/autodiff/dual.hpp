@@ -135,7 +135,7 @@ auto log(Dual<N, T> x) -> Dual<N, T>;
 
 /// \relates Dual
 template <std::size_t N, typename T>
-auto pow(Dual<N, T> x, Dual<N, T> p) -> Dual<N, T>;
+auto pow(const Dual<N, T>& x, const Dual<N, T>& p) -> Dual<N, T>;
 
 // ========================================================================
 // Trigonometry
@@ -600,7 +600,7 @@ inline auto log(Dual<N, T> x) -> Dual<N, T> {
 
 /// \relates Dual
 template <std::size_t N, typename T>
-inline auto pow(Dual<N, T> x, Dual<N, T> p) -> Dual<N, T> {
+inline auto pow(const Dual<N, T>& x, const Dual<N, T>& p) -> Dual<N, T> {
     return exp(log(x)*p);
 }
 

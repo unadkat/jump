@@ -73,6 +73,10 @@ template <VectorExpression Expr>
 constexpr auto log(const Expr& expr) -> VectorLog<Expr>;
 
 template <VectorExpression Expr>
+inline constexpr auto pow(const Expr& expr, const typename Expr::ValueType& p)
+        -> VectorPow<Expr>;
+
+template <VectorExpression Expr>
 constexpr auto sin(const Expr& expr) -> VectorSin<Expr>;
 
 template <VectorExpression Expr>
@@ -204,6 +208,12 @@ inline constexpr auto exp(const Expr& expr) -> VectorExp<Expr> {
 template <VectorExpression Expr>
 inline constexpr auto log(const Expr& expr) -> VectorLog<Expr> {
     return {expr};
+}
+
+template <VectorExpression Expr>
+inline constexpr auto pow(const Expr& expr, const typename Expr::ValueType& p)
+        -> VectorPow<Expr> {
+    return {expr, p};
 }
 
 template <VectorExpression Expr>

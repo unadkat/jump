@@ -29,6 +29,16 @@ struct Log {
     }
 };
 
+template <typename T>
+struct Pow {
+    T p{1};
+
+    constexpr auto operator()(const T& arg) const {
+        using std::pow;
+        return pow(arg, p);
+    }
+};
+
 // ========================================================================
 // Trigonometry
 // ========================================================================

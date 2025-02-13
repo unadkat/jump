@@ -57,6 +57,15 @@ struct VectorLog : UnaryVectorOp<functional::Log, Expr> {
     using UnaryVectorOp<functional::Log, Expr>::UnaryVectorOp;
 };
 
+template <VectorExpression Expr>
+struct VectorPow : UnaryVectorOp<functional::Pow<typename Expr::ValueType>,
+        Expr> {
+    VectorPow(const Expr& expr, const typename Expr::ValueType& p) :
+        UnaryVectorOp<functional::Pow<typename Expr::ValueType>, Expr>{expr} {
+        this->m_operator.p = p;
+    }
+};
+
 // ========================================================================
 // Trigonometry
 // ========================================================================
