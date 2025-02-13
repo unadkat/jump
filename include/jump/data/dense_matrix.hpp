@@ -80,7 +80,7 @@ class DenseMatrix : public MatrixBase<T> {
         template <class InputIt>
         void assign(InputIt first, InputIt last);
         /// \brief Return size of internal storage.
-        auto num_elements() const -> std::size_t override;
+        virtual auto num_elements() const -> std::size_t override;
 
         /// \brief Defaulted spaceship operator.
         auto operator<=>(const DenseMatrix&) const = default;
