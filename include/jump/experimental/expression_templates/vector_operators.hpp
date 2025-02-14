@@ -10,11 +10,15 @@
 #include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
 #include "jump/experimental/expression_templates/concepts.hpp"
-#include "jump/experimental/expression_templates/functors.hpp"
+#include "jump/experimental/expression_templates/vector_functors.hpp"
 #include "jump/experimental/expression_templates/vector_expressions.hpp"
 
 namespace jump {
 #ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+// ========================================================================
+// Arithmetic
+// ========================================================================
+
 template <VectorExpression Expr>
 constexpr auto operator+(const Expr& expr) -> VectorIdentity<Expr>;
 

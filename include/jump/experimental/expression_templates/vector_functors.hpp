@@ -4,8 +4,8 @@
 // v. 2.0. If a copy of the MPL was not distributed with this file, you can
 // obtain one at https://mozilla.org/MPL/2.0/
 
-#ifndef JUMP_EXPRESSION_TEMPLATE_FUNCTORS_HPP
-#define JUMP_EXPRESSION_TEMPLATE_FUNCTORS_HPP
+#ifndef JUMP_EXPRESSION_TEMPLATE_VECTOR_FUNCTORS_HPP
+#define JUMP_EXPRESSION_TEMPLATE_VECTOR_FUNCTORS_HPP
 
 #include "jump/experimental/expression_templates/functional.hpp"
 #include "jump/experimental/expression_templates/vector_expressions.hpp"
@@ -13,6 +13,10 @@
 #include <functional>
 
 namespace jump {
+// ========================================================================
+// Arithmetic
+// ========================================================================
+
 template <VectorExpression Expr>
 struct VectorIdentity : UnaryVectorOp<std::identity, Expr> {
     using UnaryVectorOp<std::identity, Expr>::UnaryVectorOp;
@@ -149,5 +153,5 @@ struct VectorSgn : UnaryVectorOp<functional::Sgn, Expr> {
 };
 }   // namespace jump
 
-#endif  // JUMP_EXPRESSION_TEMPLATE_FUNCTORS_HPP
+#endif  // JUMP_EXPRESSION_TEMPLATE_VECTOR_FUNCTORS_HPP
 
