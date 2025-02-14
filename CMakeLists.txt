@@ -3,7 +3,7 @@ project(Jump VERSION 0.2.6 LANGUAGES CXX)
 
 option(USE_LAPACKE "" ON)
 option(BUILD_TESTING "" ON)
-option(ENABLE_VECTOR_EXPRESSION_TEMPLATES "" OFF)
+option(ENABLE_EXPRESSION_TEMPLATES "" OFF)
 
 include(CTest)
 
@@ -31,8 +31,9 @@ if(USE_LAPACKE)
     target_compile_definitions(jump PRIVATE JUMP_USE_LAPACKE)
     target_link_libraries(jump PUBLIC ${LAPACKE})
 endif()
-if (ENABLE_VECTOR_EXPRESSION_TEMPLATES)
+if (ENABLE_EXPRESSION_TEMPLATES)
     target_compile_definitions(jump PUBLIC JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES)
+    target_compile_definitions(jump PUBLIC JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES)
 endif()
 
 add_subdirectory(./tests)

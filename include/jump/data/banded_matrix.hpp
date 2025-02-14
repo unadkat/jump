@@ -27,6 +27,14 @@ class BandedMatrix : public MatrixBase<T> {
         using Iterator = typename Vector<T>::Iterator;
         /// \brief Iterator for algorithms.
         using ConstIterator = typename Vector<T>::ConstIterator;
+#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+        /// \brief To satisfy BandedMatrixExpression concept
+        using ValueType = T;
+
+        /// \brief To satisfy BandedMatrixExpression concept (and signal that
+        /// this data structure can be referenced in evaluations).
+        static constexpr bool is_banded_matrix_expression_leaf{true};
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
         /// \brief Construct a square matrix with the given number of diagonals
         /// on each side of the leading diagonal.
