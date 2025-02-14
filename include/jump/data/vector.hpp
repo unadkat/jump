@@ -538,7 +538,7 @@ inline auto Vector<T>::operator-() const -> Vector<T> {
 
 template <typename T>
 template <std::convertible_to<T> U>
-inline auto Vector<T>::operator+=(const Vector<U>& rhs) -> Vector<T>& {
+inline auto Vector<T>::operator+=(const Vector<U>& rhs) -> Vector& {
 #ifndef NDEBUG
     if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
@@ -554,7 +554,7 @@ inline auto Vector<T>::operator+=(const Vector<U>& rhs) -> Vector<T>& {
 
 template <typename T>
 template <std::convertible_to<T> U>
-inline auto Vector<T>::operator-=(const Vector<U>& rhs) -> Vector<T>& {
+inline auto Vector<T>::operator-=(const Vector<U>& rhs) -> Vector& {
 #ifndef NDEBUG
     if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
@@ -570,7 +570,7 @@ inline auto Vector<T>::operator-=(const Vector<U>& rhs) -> Vector<T>& {
 
 template <typename T>
 template <std::convertible_to<T> U>
-inline auto Vector<T>::operator*=(const Vector<U>& rhs) -> Vector<T>& {
+inline auto Vector<T>::operator*=(const Vector<U>& rhs) -> Vector& {
 #ifndef NDEBUG
     if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
@@ -586,7 +586,7 @@ inline auto Vector<T>::operator*=(const Vector<U>& rhs) -> Vector<T>& {
 
 template <typename T>
 template <std::convertible_to<T> U>
-inline auto Vector<T>::operator/=(const Vector<U>& rhs) -> Vector<T>& {
+inline auto Vector<T>::operator/=(const Vector<U>& rhs) -> Vector& {
 #ifndef NDEBUG
     if (size() != rhs.size()) {
         throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",

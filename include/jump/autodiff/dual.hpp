@@ -60,13 +60,23 @@ struct Dual {
     /// \brief Negate `Dual`.
     auto operator-() const -> Dual;
     /// \brief Add one `Dual` to another in place.
-    auto operator+=(const Dual& rhs) -> Dual&;
+    template <std::convertible_to<T> U>
+    auto operator+=(const Dual<N, U>& rhs) -> Dual&;
     /// \brief Subtract one `Dual` from another in place.
-    auto operator-=(const Dual& rhs) -> Dual&;
+    template <std::convertible_to<T> U>
+    auto operator-=(const Dual<N, U>& rhs) -> Dual&;
+    /// \brief Multiply by scalar in place.
+    template <std::convertible_to<T> U>
+    auto operator*=(const U& rhs) -> Dual&;
     /// \brief Multiply one `Dual` by another in place.
-    auto operator*=(const Dual& rhs) -> Dual&;
+    template <std::convertible_to<T> U>
+    auto operator*=(const Dual<N, U>& rhs) -> Dual&;
+    /// \brief Divide by scalar in place.
+    template <std::convertible_to<T> U>
+    auto operator/=(const U& rhs) -> Dual&;
     /// \brief Divide one `Dual` by another in place.
-    auto operator/=(const Dual& rhs) -> Dual&;
+    template <std::convertible_to<T> U>
+    auto operator/=(const Dual<N, U>& rhs) -> Dual&;
 };
 
 /// \relates Jump::Dual
@@ -419,9 +429,10 @@ inline auto Dual<N, T>::operator-() const -> Dual {
 /// \f$\h{y}=y+\sum_{k=0}^{N-1}q'_k\epsilon_k\f$, we have
 /// \f$\h{x}+\h{y}=(x+y)+\sum_{k=0}^{N-1}(p'_k+q'_k)\epsilon_k\f$.
 template <std::size_t N, typename T>
-inline auto Dual<N, T>::operator+=(const Dual<N, T>& rhs) -> Dual& {
+template <std::convertible_to<T> U>
+inline auto Dual<N, T>::operator+=(const Dual<N, U>& rhs) -> Dual& {
     value += rhs.value;
-    for (std::size_t i(0); i < N; ++i) {
+    for (std::size_t i{0}; i < N; ++i) {
         dual[i] += rhs.dual[i];
     }
     return *this;
@@ -431,11 +442,22 @@ inline auto Dual<N, T>::operator+=(const Dual<N, T>& rhs) -> Dual& {
 /// \f$\h{y}=y+\sum_{k=0}^{N-1}q'_k\epsilon_k\f$, we have
 /// \f$\h{x}-\h{y}=(x-y)+\sum_{k=0}^{N-1}(p'_k-q'_k)\epsilon_k\f$.
 template <std::size_t N, typename T>
-inline auto Dual<N, T>::operator-=(const Dual<N, T>& rhs) -> Dual& {
+template <std::convertible_to<T> U>
+inline auto Dual<N, T>::operator-=(const Dual<N, U>& rhs) -> Dual& {
     value -= rhs.value;
-    for (std::size_t i(0); i < N; ++i) {
+    for (std::size_t i{0}; i < N; ++i) {
         dual[i] -= rhs.dual[i];
     }
+    return *this;
+}
+
+template <std::size_t N, typename T>
+template <std::convertible_to<T> U>
+inline auto Dual<N, T>::operator*=(const U& rhs) -> Dual& {
+    for (auto& d : dual) {
+        d *= rhs;
+    }
+    value *= rhs;
     return *this;
 }
 
@@ -447,11 +469,22 @@ inline auto Dual<N, T>::operator-=(const Dual<N, T>& rhs) -> Dual& {
 ///  \\&=xy+\sum_{k=0}^{N-1}(yp'_k+xq'_k)\epsilon_k.
 /// \f}
 template <std::size_t N, typename T>
-inline auto Dual<N, T>::operator*=(const Dual<N, T>& rhs) -> Dual& {
-    for (std::size_t i(0); i < N; ++i) {
+template <std::convertible_to<T> U>
+inline auto Dual<N, T>::operator*=(const Dual<N, U>& rhs) -> Dual& {
+    for (std::size_t i{0}; i < N; ++i) {
         dual[i] = dual[i]*rhs.value + value*rhs.dual[i];
     }
     value *= rhs.value;
+    return *this;
+}
+
+template <std::size_t N, typename T>
+template <std::convertible_to<T> U>
+inline auto Dual<N, T>::operator/=(const U& rhs) -> Dual& {
+    for (auto& d : dual) {
+        d /= rhs;
+    }
+    value /= rhs;
     return *this;
 }
 
@@ -467,8 +500,9 @@ inline auto Dual<N, T>::operator*=(const Dual<N, T>& rhs) -> Dual& {
 ///   \left(p'_k-\frac{xq'_k}{y}\right)\epsilon_k.
 /// \f}
 template <std::size_t N, typename T>
-inline auto Dual<N, T>::operator/=(const Dual<N, T>& rhs) -> Dual& {
-    for (std::size_t i(0); i < N; ++i) {
+template <std::convertible_to<T> U>
+inline auto Dual<N, T>::operator/=(const Dual<N, U>& rhs) -> Dual& {
+    for (std::size_t i{0}; i < N; ++i) {
         dual[i] = (dual[i] - rhs.dual[i]*value/rhs.value)/rhs.value;
     }
     value /= rhs.value;
