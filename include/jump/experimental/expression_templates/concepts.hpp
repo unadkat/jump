@@ -20,14 +20,14 @@ concept VectorExpression = requires (Expr expr, std::size_t i) {
     expr.is_vector_expression_leaf;
     requires std::same_as<
         std::remove_cvref_t<decltype(expr.is_vector_expression_leaf)>, bool>;
-    // For use in evaluating the whole vector in a single loop
-    {expr.size()} -> std::same_as<std::size_t>;
     // Expression should evaluate, and to a value of appropriate type. They may
     // return results by value or by const reference (in the case of leaves of
     // an expression)
     expr[i];
     requires std::same_as<std::remove_cvref_t<decltype(expr[i])>,
              std::remove_cvref_t<typename Expr::ValueType>>;
+    // For use in evaluating the whole vector in a single loop
+    {expr.size()} -> std::same_as<std::size_t>;
 };
 
 template <typename Expr>
@@ -39,19 +39,23 @@ concept BandedMatrixExpression = requires (Expr expr) {
     requires std::same_as<
         std::remove_cvref_t<decltype(expr.is_banded_matrix_expression_leaf)>,
         bool>;
+    // Underlying data should be a VectorExpression, matrix operators will defer
+    // to vector expressions on the underlying data.
+    expr.as_vector();
+    requires VectorExpression<std::remove_cvref_t<decltype(expr.as_vector())>>;
     // For use in evaluating the whole matrix in a single loop, and verifying
     // compatibility
     {expr.size()} -> std::same_as<std::pair<std::size_t, std::size_t>>;
     {expr.num_elements()} -> std::same_as<std::size_t>;
     {expr.num_bands()} -> std::same_as<std::size_t>;
-    // Underlying data should be a VectorExpression, matrix operators will defer
-    // to vector expressions on the underlying data.
-    expr.as_vector();
-    requires VectorExpression<std::remove_cvref_t<decltype(expr.as_vector())>>;
 };
 
 template <typename Expr, typename T>
 concept VectorExpressionConvertibleTo = VectorExpression<Expr>
+        && std::convertible_to<typename Expr::ValueType, T>;
+
+template <typename Expr, typename T>
+concept BandedMatrixExpressionConvertibleTo = BandedMatrixExpression<Expr>
         && std::convertible_to<typename Expr::ValueType, T>;
 }   // namespace jump
 
