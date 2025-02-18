@@ -83,7 +83,6 @@ auto CommandLineArgs::get(const char& flag, bool& storage) -> bool {
 /// Query if a specified option appears in the command-line arguments (whether
 /// supplied with an accompanying value or not). If the argument exists, mark it
 /// as having been recognised.
-template <>
 auto CommandLineArgs::get(const std::string& option, bool& storage) -> bool {
     if (auto it{std::ranges::find(m_options, option, &Option::option)};
             it != m_options.end()) {

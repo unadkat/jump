@@ -22,7 +22,9 @@ class CommandLineArgs {
 
         /// \brief Attempt extraction of flag and indicate success.
         auto get(const char& flag, bool& storage) -> bool;
-        /// \brief Attempt extraction of option and indicate success.
+        /// \brief Attempt extraction of (bool) option and indicate success.
+        auto get(const std::string& option, bool& storage) -> bool;
+        /// \brief Attempt extraction of (valued) option and indicate success.
         template <typename T>
         auto get(const std::string& option, T& storage) -> bool;
 
