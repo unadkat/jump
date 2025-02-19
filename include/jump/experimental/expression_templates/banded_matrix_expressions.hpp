@@ -14,17 +14,16 @@
 #include <utility>
 
 namespace jump {
-template <typename Functor, BandedMatrixExpression Expr>
+template <template <typename> typename Functor, BandedMatrixExpression Expr>
 class UnaryBandedMatrixOp {
     public:
-        using ValueType = std::invoke_result_t<Functor,
-              typename Expr::ValueType>;
+        using InnerExpressionType = Functor<typename Expr::InnerExpressionType>;
 
         static constexpr bool is_banded_matrix_expression_leaf{false};
 
         constexpr UnaryBandedMatrixOp(const Expr& expr);
 
-        constexpr auto as_vector() const;
+        constexpr auto as_vector() const -> InnerExpressionType;
         constexpr auto size() const -> std::pair<std::size_t, std::size_t>;
         constexpr auto num_elements() const -> std::size_t;
         constexpr auto num_bands() const -> std::size_t;
@@ -32,37 +31,37 @@ class UnaryBandedMatrixOp {
     protected:
         typename std::conditional<Expr::is_banded_matrix_expression_leaf,
                  const Expr&, Expr>::type m_expr;
-        Functor m_operator{};
 };
 
 // ========================================================================
 // Implementation
 // ========================================================================
 
-template <typename Functor, BandedMatrixExpression Expr>
+template <template <typename> typename Functor, BandedMatrixExpression Expr>
 inline constexpr UnaryBandedMatrixOp<Functor, Expr>::UnaryBandedMatrixOp(
         const Expr& expr) :
     m_expr{expr} {
 }
 
-template <typename Functor, BandedMatrixExpression Expr>
-inline constexpr auto UnaryBandedMatrixOp<Functor, Expr>::as_vector() const {
-    return m_expr(m_expr.as_vector());
+template <template <typename> typename Functor, BandedMatrixExpression Expr>
+inline constexpr auto UnaryBandedMatrixOp<Functor, Expr>::as_vector() const
+        -> InnerExpressionType {
+    return InnerExpressionType{m_expr.as_vector()};
 }
 
-template <typename Functor, BandedMatrixExpression Expr>
+template <template <typename> typename Functor, BandedMatrixExpression Expr>
 inline constexpr auto UnaryBandedMatrixOp<Functor, Expr>::size() const
         -> std::pair<std::size_t, std::size_t> {
     return m_expr.size();
 }
 
-template <typename Functor, BandedMatrixExpression Expr>
+template <template <typename> typename Functor, BandedMatrixExpression Expr>
 inline constexpr auto UnaryBandedMatrixOp<Functor, Expr>::num_elements() const
         -> std::size_t {
     return m_expr.num_elements();
 }
 
-template <typename Functor, BandedMatrixExpression Expr>
+template <template <typename> typename Functor, BandedMatrixExpression Expr>
 inline constexpr auto UnaryBandedMatrixOp<Functor, Expr>::num_bands() const
         -> std::size_t {
     return m_expr.num_bands();

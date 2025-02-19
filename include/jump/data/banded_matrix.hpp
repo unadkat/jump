@@ -29,7 +29,7 @@ class BandedMatrix : public MatrixBase<T> {
         using ConstIterator = typename Vector<T>::ConstIterator;
 #ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
         /// \brief To satisfy BandedMatrixExpression concept
-        using ValueType = T;
+        using InnerExpressionType = Vector<T>;
 
         /// \brief To satisfy BandedMatrixExpression concept (and signal that
         /// this data structure can be referenced in evaluations).
@@ -50,11 +50,21 @@ class BandedMatrix : public MatrixBase<T> {
         BandedMatrix(const BandedMatrix<U>& other);
         /// \brief Default move constructor.
         BandedMatrix(BandedMatrix&& other) = default;
+#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+        /// \brief Construct from a BandedMatrixExpression.
+        template <BandedMatrixExpressionConvertibleTo<T> Expr>
+        BandedMatrix(const Expr& expr);
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
         /// \brief Default copy assignment.
         auto operator=(const BandedMatrix& other) -> BandedMatrix& = default;
         /// \brief Default move assignment.
         auto operator=(BandedMatrix&& other) -> BandedMatrix& = default;
+#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+        /// \brief Assignment from a BandedMatrixExpression.
+        template <BandedMatrixExpressionConvertibleTo<T> Expr>
+        auto operator=(const Expr& expr) -> BandedMatrix&;
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
         /// \brief Initialise matrix with the given size and number of
         /// off-leading diagonal diagonals.
@@ -264,6 +274,25 @@ inline BandedMatrix<T>::BandedMatrix(const BandedMatrix<U>& other) :
     m_num_bands{other.num_bands()} {
     m_storage = other.as_vector();
 }
+
+#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+template <typename T>
+template <BandedMatrixExpressionConvertibleTo<T> Expr>
+inline BandedMatrix<T>::BandedMatrix(const Expr& expr) :
+    MatrixBase<T>{expr.size()},
+    m_num_bands{expr.num_bands()},
+    m_storage{expr.as_vector()} {
+}
+
+template <typename T>
+template <BandedMatrixExpressionConvertibleTo<T> Expr>
+inline auto BandedMatrix<T>::operator=(const Expr& expr) -> BandedMatrix& {
+    MatrixBase<T>::initialise(expr.size());
+    m_num_bands = expr.num_bands();
+    m_storage = expr.as_vector();
+    return *this;
+}
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 /// Note that the internal storage takes the form of a dense matrix with
 /// `num_columns()` columns and `1 + 3*#num_bands()` rows.
