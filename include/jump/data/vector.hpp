@@ -427,13 +427,13 @@ inline Vector<T>::Vector(InputIt first, InputIt last) :
 #ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 template <typename T>
 template <VectorExpressionConvertibleTo<T> Expr>
-inline Vector<T>::Vector(const Expr& expr) : storage(expr.size()) {
+inline Vector<T>::Vector(const Expr& expr) :
+    storage(expr.size()) {
     for (std::size_t i{0}, N{expr.size()}; i < N; ++i) {
         storage[i] = expr[i];
     }
 }
 
-/// \brief Assignment from a VectorExpression.
 template <typename T>
 template <VectorExpressionConvertibleTo<T> Expr>
 inline auto Vector<T>::operator=(const Expr& expr) -> Vector& {
