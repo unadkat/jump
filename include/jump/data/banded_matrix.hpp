@@ -12,6 +12,10 @@
 #include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
 
+#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+#include "jump/experimental/expression_templates/banded_matrix_operators.hpp"
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+
 #include <format>
 #include <sstream>
 #include <string>
@@ -109,10 +113,12 @@ class BandedMatrix : public MatrixBase<T> {
         /// \brief Zero the matrix.
         virtual void zero() override;
 
+#ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
         /// \brief No operation on matrix.
         auto operator+() const -> const BandedMatrix&;
         /// \brief Negate matrix.
         auto operator-() const -> BandedMatrix;
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
         /// \brief Add two matrices together in place.
         template <std::convertible_to<T> U>
         auto operator+=(const BandedMatrix<U>& rhs) -> BandedMatrix&;
@@ -467,6 +473,7 @@ inline void BandedMatrix<T>::zero() {
     m_storage.zero();
 }
 
+#ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 template <typename T>
 inline auto BandedMatrix<T>::operator+() const -> const BandedMatrix& {
     return *this;
@@ -478,6 +485,7 @@ inline auto BandedMatrix<T>::operator-() const -> BandedMatrix {
     result *= T{-1};
     return result;
 }
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 template <typename T>
 template <std::convertible_to<T> U>
