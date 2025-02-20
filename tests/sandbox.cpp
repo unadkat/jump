@@ -95,6 +95,12 @@ int banded_matrix_test(int argc, char** argv) {
     randomise(rng_real, test);
     f(test);
 
+    BandedMatrix<Real> test2{-test};
+    f(test2);
+
+    BandedMatrix<Real> test3{+test};
+    f(test3);
+
     return 0;
 }
 
