@@ -17,7 +17,7 @@ namespace jump {
 template <typename T>
 class ConstantVectorExpression {
     public:
-        using ValueType = T;
+        using ValueType = std::remove_cvref_t<T>;
 
         // Even though this is logically a "leaf" of the expression, we need to
         // store this by value in an expression so we can update the size,
@@ -38,8 +38,8 @@ class ConstantVectorExpression {
 template <typename Functor, VectorExpression Expr>
 class UnaryVectorOp {
     public:
-        using ValueType = std::invoke_result_t<Functor,
-              typename Expr::ValueType>;
+        using ValueType = std::remove_cvref_t<std::invoke_result_t<Functor,
+              typename Expr::ValueType>>;
 
         static constexpr bool is_vector_expression_leaf{false};
 
@@ -57,8 +57,8 @@ class UnaryVectorOp {
 template <typename Functor, VectorExpression Left, VectorExpression Right>
 class BinaryVectorOp {
     public:
-        using ValueType = std::invoke_result_t<Functor,
-              typename Left::ValueType, typename Right::ValueType>;
+        using ValueType = std::remove_cvref_t<std::invoke_result_t<Functor,
+              typename Left::ValueType, typename Right::ValueType>>;
 
         static constexpr bool is_vector_expression_leaf{false};
 
