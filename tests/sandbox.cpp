@@ -21,7 +21,7 @@ void f(const Expr& M) {
 }
 #else
 template <typename T>
-void f(const BandedMatrix<T>& M) {
+void f([[maybe_unused]] const BandedMatrix<T>& M) {
     std::cout << "No expression template support" << std::endl;
 }
 #endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
@@ -90,6 +90,8 @@ int vector_test(int argc, char** argv) {
 }
 
 int banded_matrix_test(int argc, char** argv) {
+    CommandLineArgs args(argc, argv);
+
     BandedMatrix<Real> test{10, 2};
     RandomReal rng_real{0., 1.};
     randomise(rng_real, test);
