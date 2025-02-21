@@ -33,6 +33,29 @@ class UnaryBandedMatrixOp {
                  const Expr&, Expr>::type m_expr;
 };
 
+template <template <typename, typename> typename Functor,
+         BandedMatrixExpression Left, BandedMatrixExpression Right>
+class BinaryBandedMatrixOp {
+    public:
+        using InnerExpressionType = Functor<typename Left::InnerExpressionType,
+              typename Right::InnerExpressionType>;
+
+        static constexpr bool is_banded_matrix_expression_leaf{false};
+
+        constexpr BinaryBandedMatrixOp(const Left& lhs, const Right& rhs);
+
+        constexpr auto as_vector() const -> InnerExpressionType;
+        constexpr auto size() const -> std::pair<std::size_t, std::size_t>;
+        constexpr auto num_elements() const -> std::size_t;
+        constexpr auto num_bands() const -> std::size_t;
+
+    protected:
+        typename std::conditional<Left::is_banded_matrix_expression_leaf,
+                 const Left&, Left>::type m_lhs;
+        typename std::conditional<Right::is_banded_matrix_expression_leaf,
+                 const Right&, Right>::type m_rhs;
+};
+
 // ========================================================================
 // Implementation
 // ========================================================================
@@ -65,6 +88,53 @@ template <template <typename> typename Functor, BandedMatrixExpression Expr>
 inline constexpr auto UnaryBandedMatrixOp<Functor, Expr>::num_bands() const
         -> std::size_t {
     return m_expr.num_bands();
+}
+
+template <template <typename, typename> typename Functor,
+    BandedMatrixExpression Left, BandedMatrixExpression Right>
+inline constexpr BinaryBandedMatrixOp<Functor, Left, Right>::
+    BinaryBandedMatrixOp(const Left& lhs, const Right& rhs) :
+        m_lhs{lhs},
+        m_rhs{rhs} {
+#ifndef NDEBUG
+    if (lhs.size() != rhs.size()) {
+        throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+    if (lhs.num_bands() != rhs.num_bands()) {
+        throw RuntimeError{Mismatch2DError{.name1 = "lhs.num_bands()",
+            .size1 = lhs.num_bands(), .name2 = "rhs.num_bands()",
+            .size2 = rhs.num_bands()}};
+    }
+#endif  // NDEBUG
+}
+
+template <template <typename, typename> typename Functor,
+    BandedMatrixExpression Left, BandedMatrixExpression Right>
+inline constexpr auto BinaryBandedMatrixOp<Functor, Left, Right>::
+    as_vector() const -> InnerExpressionType {
+    return InnerExpressionType{m_lhs.as_vector(), m_rhs.as_vector()};
+}
+
+template <template <typename, typename> typename Functor,
+    BandedMatrixExpression Left, BandedMatrixExpression Right>
+inline constexpr auto BinaryBandedMatrixOp<Functor, Left, Right>::
+    size() const -> std::pair<std::size_t, std::size_t> {
+    return m_lhs.size();
+}
+
+template <template <typename, typename> typename Functor,
+    BandedMatrixExpression Left, BandedMatrixExpression Right>
+inline constexpr auto BinaryBandedMatrixOp<Functor, Left, Right>::
+    num_elements() const -> std::size_t {
+    return m_lhs.num_elements();
+}
+
+template <template <typename, typename> typename Functor,
+    BandedMatrixExpression Left, BandedMatrixExpression Right>
+inline constexpr auto BinaryBandedMatrixOp<Functor, Left, Right>::
+    num_bands() const -> std::size_t {
+    return m_lhs.num_bands();
 }
 }   // namespace jump
 
