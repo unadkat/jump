@@ -41,7 +41,7 @@ concept BandedMatrixExpression = requires (Expr expr) {
         std::remove_cvref_t<decltype(expr.is_banded_matrix_expression_leaf)>,
         bool>;
     // Underlying data should be a VectorExpression, matrix operators will defer
-    // to vector expressions on the underlying data.
+    // to vector expressions on the underlying data
     expr.as_vector();
     requires VectorExpression<std::remove_cvref_t<decltype(expr.as_vector())>>;
     requires std::same_as<std::remove_cvref_t<decltype(expr.as_vector())>,

@@ -5,6 +5,7 @@ and numerical facilities/interfaces.
 
 ![Debug workflow](https://github.com/unadkat/jump/actions/workflows/debug.yml/badge.svg)
 ![Release workflow](https://github.com/unadkat/jump/actions/workflows/release.yml/badge.svg)
+![Experimental workflow](https://github.com/unadkat/jump/actions/workflows/experimental.yml/badge.svg)
 
 ## Third-party libraries
 
