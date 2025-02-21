@@ -118,13 +118,21 @@ class BandedMatrix : public MatrixBase<T> {
         auto operator+() const -> const BandedMatrix&;
         /// \brief Negate matrix.
         auto operator-() const -> BandedMatrix;
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
         /// \brief Add two matrices together in place.
         template <std::convertible_to<T> U>
         auto operator+=(const BandedMatrix<U>& rhs) -> BandedMatrix&;
         /// \brief Subtract a matrix from another in place.
         template <std::convertible_to<T> U>
         auto operator-=(const BandedMatrix<U>& rhs) -> BandedMatrix&;
+#else
+        /// \brief Add BandedMatrixExpression to BandedMatrix in place.
+        template <BandedMatrixExpressionConvertibleTo<T> Expr>
+        auto operator+=(const Expr& expr) -> BandedMatrix&;
+        /// \brief Subtract a BandedMatrixExpression from a BandedMatrix in
+        /// place.
+        template <BandedMatrixExpressionConvertibleTo<T> Expr>
+        auto operator-=(const Expr& expr) -> BandedMatrix&;
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
         /// \brief Multiply matrix by scalar in place.
         template <std::convertible_to<T> U>
         auto operator*=(const U& k) -> BandedMatrix&;
@@ -485,7 +493,6 @@ inline auto BandedMatrix<T>::operator-() const -> BandedMatrix {
     result *= T{-1};
     return result;
 }
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 template <typename T>
 template <std::convertible_to<T> U>
@@ -526,6 +533,45 @@ inline auto BandedMatrix<T>::operator-=(const BandedMatrix<U>& rhs)
     m_storage -= rhs.as_vector();
     return *this;
 }
+#else
+template <typename T>
+template <BandedMatrixExpressionConvertibleTo<T> Expr>
+inline auto BandedMatrix<T>::operator+=(const Expr& expr) -> BandedMatrix& {
+#ifndef NDEBUG
+    if (this->size() != expr.size()) {
+        throw RuntimeError{Mismatch2DError{.size1 = this->size(),
+            .name2 = "expr", .size2 = expr.size()}};
+    }
+    if (num_bands() != expr.num_bands()) {
+        throw RuntimeError{InvalidArgumentError{.argument = "expr.num_bands()",
+            .value = std::format("{}", expr.num_bands()),
+            .expected = std::format("{}", num_bands())}};
+    }
+#endif  // NDEBUG
+
+    m_storage += expr.as_vector();
+    return *this;
+}
+
+template <typename T>
+template <BandedMatrixExpressionConvertibleTo<T> Expr>
+inline auto BandedMatrix<T>::operator-=(const Expr& expr) -> BandedMatrix& {
+#ifndef NDEBUG
+    if (this->size() != expr.size()) {
+        throw RuntimeError{Mismatch2DError{.size1 = this->size(),
+            .name2 = "expr", .size2 = expr.size()}};
+    }
+    if (num_bands() != expr.num_bands()) {
+        throw RuntimeError{InvalidArgumentError{.argument = "expr.num_bands()",
+            .value = std::format("{}", expr.num_bands()),
+            .expected = std::format("{}", num_bands())}};
+    }
+#endif  // NDEBUG
+
+    m_storage -= expr.as_vector();
+    return *this;
+}
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 template <typename T>
 template <std::convertible_to<T> U>
