@@ -39,12 +39,12 @@ constexpr auto operator*(const Left& lhs, const Right& rhs)
 
 template <typename T, VectorExpression Expr>
 requires (!VectorExpression<T>)
-inline constexpr auto operator*(const T& lhs, const Expr& rhs)
+constexpr auto operator*(const T& lhs, const Expr& rhs)
         -> VectorMultiply<ConstantVectorExpression<T>, Expr>;
 
 template <typename T, VectorExpression Expr>
 requires (!VectorExpression<T>)
-inline constexpr auto operator*(const Expr& lhs, const T& rhs)
+constexpr auto operator*(const Expr& lhs, const T& rhs)
         -> VectorMultiply<Expr, ConstantVectorExpression<T>>;
 
 template <VectorExpression Left, VectorExpression Right>
@@ -53,12 +53,12 @@ constexpr auto operator/(const Left& lhs, const Right& rhs)
 
 template <typename T, VectorExpression Expr>
 requires (!VectorExpression<T>)
-inline constexpr auto operator/(const T& lhs, const Expr& rhs)
+constexpr auto operator/(const T& lhs, const Expr& rhs)
         -> VectorDivide<ConstantVectorExpression<T>, Expr>;
 
 template <typename T, VectorExpression Expr>
 requires (!VectorExpression<T>)
-inline constexpr auto operator/(const Expr& lhs, const T& rhs)
+constexpr auto operator/(const Expr& lhs, const T& rhs)
         -> VectorDivide<Expr, ConstantVectorExpression<T>>;
 
 template <VectorExpression Left, VectorExpression Right,
@@ -77,7 +77,7 @@ template <VectorExpression Expr>
 constexpr auto log(const Expr& expr) -> VectorLog<Expr>;
 
 template <VectorExpression Expr>
-inline constexpr auto pow(const Expr& expr, const typename Expr::ValueType& p)
+constexpr auto pow(const Expr& expr, const typename Expr::ValueType& p)
         -> VectorPow<Expr>;
 
 template <VectorExpression Expr>
