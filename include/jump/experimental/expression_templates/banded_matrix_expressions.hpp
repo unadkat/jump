@@ -102,7 +102,7 @@ inline constexpr BinaryBandedMatrixOp<Functor, Left, Right>::
             .name2 = "rhs", .size2 = rhs.size()}};
     }
     if (lhs.num_bands() != rhs.num_bands()) {
-        throw RuntimeError{Mismatch2DError{.name1 = "lhs.num_bands()",
+        throw RuntimeError{Mismatch1DError{.name1 = "lhs.num_bands()",
             .size1 = lhs.num_bands(), .name2 = "rhs.num_bands()",
             .size2 = rhs.num_bands()}};
     }
