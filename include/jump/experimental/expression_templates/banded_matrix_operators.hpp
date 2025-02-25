@@ -23,6 +23,14 @@ constexpr auto operator+(const Expr& expr) -> BandedMatrixIdentity<Expr>;
 template <BandedMatrixExpression Expr>
 constexpr auto operator-(const Expr& expr) -> BandedMatrixNegate<Expr>;
 
+template <BandedMatrixExpression Left, BandedMatrixExpression Right>
+constexpr auto operator+(const Left& lhs, const Right& rhs)
+        -> BandedMatrixPlus<Left, Right>;
+
+template <BandedMatrixExpression Left, BandedMatrixExpression Right>
+constexpr auto operator-(const Left& lhs, const Right& rhs)
+        -> BandedMatrixMinus<Left, Right>;
+
 // ========================================================================
 // Implementation
 // ========================================================================
@@ -36,6 +44,18 @@ inline constexpr auto operator+(const Expr& expr)
 template <BandedMatrixExpression Expr>
 inline constexpr auto operator-(const Expr& expr) -> BandedMatrixNegate<Expr> {
     return {expr};
+}
+
+template <BandedMatrixExpression Left, BandedMatrixExpression Right>
+inline constexpr auto operator+(const Left& lhs, const Right& rhs)
+        -> BandedMatrixPlus<Left, Right> {
+    return {lhs, rhs};
+}
+
+template <BandedMatrixExpression Left, BandedMatrixExpression Right>
+inline constexpr auto operator-(const Left& lhs, const Right& rhs)
+        -> BandedMatrixMinus<Left, Right> {
+    return {lhs, rhs};
 }
 #endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 }   // namespace jump

@@ -24,6 +24,16 @@ template <BandedMatrixExpression Expr>
 struct BandedMatrixNegate : UnaryBandedMatrixOp<VectorNegate, Expr> {
     using UnaryBandedMatrixOp<VectorNegate, Expr>::UnaryBandedMatrixOp;
 };
+
+template <BandedMatrixExpression Left, BandedMatrixExpression Right>
+struct BandedMatrixPlus : BinaryBandedMatrixOp<VectorPlus, Left, Right> {
+    using BinaryBandedMatrixOp<VectorPlus, Left, Right>::BinaryBandedMatrixOp;
+};
+
+template <BandedMatrixExpression Left, BandedMatrixExpression Right>
+struct BandedMatrixMinus : BinaryBandedMatrixOp<VectorMinus, Left, Right> {
+    using BinaryBandedMatrixOp<VectorMinus, Left, Right>::BinaryBandedMatrixOp;
+};
 }   // namespace jump
 
 #endif  // JUMP_EXPRESSION_TEMPLATE_BANDED_MATRIX_FUNCTORS_HPP

@@ -169,6 +169,7 @@ class BandedMatrix : public MatrixBase<T> {
         Vector<T> m_storage;
 };
 
+#ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 /// \relates BandedMatrix
 /// \brief Addition of two BandedMatrices.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
@@ -214,6 +215,7 @@ auto operator-(const BandedMatrix<T>& lhs, BandedMatrix<U>&& rhs)
 /// \brief Difference of two BandedMatrices.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator-(BandedMatrix<T>&& lhs, BandedMatrix<U>&& rhs) -> BandedMatrix<R>;
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 /// \relates BandedMatrix
 /// \brief Left-hand multiplication by scalar.
@@ -650,6 +652,7 @@ inline auto BandedMatrix<T>::as_string() const -> std::string {
     return oss.str();
 }
 
+#ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 /// \relates BandedMatrix
 /// \brief Addition of two BandedMatrices.
 template <typename T, typename U, typename R>
@@ -773,6 +776,7 @@ inline auto operator-(BandedMatrix<T>&& lhs, BandedMatrix<U>&& rhs)
         return result;
     }
 }
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 /// \relates BandedMatrix
 /// \brief Left-hand multiplication by scalar.
