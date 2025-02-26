@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(Jump VERSION 0.2.6 LANGUAGES CXX)
+project(Jump VERSION 0.3.1 LANGUAGES CXX)
 
 option(USE_LAPACKE "" ON)
 option(BUILD_TESTING "" ON)
