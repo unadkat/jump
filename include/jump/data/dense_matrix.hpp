@@ -417,8 +417,8 @@ inline auto DenseMatrix<T>::column_iterators(std::size_t column)
     }
 #endif  // NDEBUG
 
-    return {m_storage.begin() + this->m_num_rows*column,
-            m_storage.begin() + this->m_num_rows*(column + 1)};
+    return {m_storage.begin() + this->num_rows()*column,
+            m_storage.begin() + this->num_rows()*(column + 1)};
 }
 
 /// Keeping in mind that the data is stored internally in column-major format,
@@ -434,8 +434,8 @@ inline auto DenseMatrix<T>::column_iterators(std::size_t column) const
     }
 #endif  // NDEBUG
 
-    return {m_storage.begin() + this->m_num_rows*column,
-            m_storage.begin() + this->m_num_rows*(column + 1)};
+    return {m_storage.begin() + this->num_rows()*column,
+            m_storage.begin() + this->num_rows()*(column + 1)};
 }
 
 template <typename T>

@@ -24,7 +24,8 @@ class UnaryBandedMatrixOp {
         constexpr UnaryBandedMatrixOp(const Expr& expr);
 
         constexpr auto as_vector() const -> InnerExpressionType;
-        constexpr auto size() const -> std::pair<std::size_t, std::size_t>;
+        constexpr auto size() const
+                -> const std::pair<std::size_t, std::size_t>&;
         constexpr auto num_elements() const -> std::size_t;
         constexpr auto num_bands() const -> std::size_t;
 
@@ -45,7 +46,8 @@ class BinaryBandedMatrixOp {
         constexpr BinaryBandedMatrixOp(const Left& lhs, const Right& rhs);
 
         constexpr auto as_vector() const -> InnerExpressionType;
-        constexpr auto size() const -> std::pair<std::size_t, std::size_t>;
+        constexpr auto size() const
+                -> const std::pair<std::size_t, std::size_t>&;
         constexpr auto num_elements() const -> std::size_t;
         constexpr auto num_bands() const -> std::size_t;
 
@@ -74,7 +76,7 @@ inline constexpr auto UnaryBandedMatrixOp<Functor, Expr>::as_vector() const
 
 template <template <typename> typename Functor, BandedMatrixExpression Expr>
 inline constexpr auto UnaryBandedMatrixOp<Functor, Expr>::size() const
-        -> std::pair<std::size_t, std::size_t> {
+        -> const std::pair<std::size_t, std::size_t>& {
     return m_expr.size();
 }
 
@@ -119,7 +121,7 @@ inline constexpr auto BinaryBandedMatrixOp<Functor, Left, Right>::
 template <template <typename, typename> typename Functor,
     BandedMatrixExpression Left, BandedMatrixExpression Right>
 inline constexpr auto BinaryBandedMatrixOp<Functor, Left, Right>::
-    size() const -> std::pair<std::size_t, std::size_t> {
+    size() const -> const std::pair<std::size_t, std::size_t>& {
     return m_lhs.size();
 }
 

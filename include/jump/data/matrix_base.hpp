@@ -31,9 +31,9 @@ class MatrixBase {
         auto num_columns() const -> std::size_t;
         /// \brief Interface for returning the number of elements actually
         /// stored by the matrix.
-        virtual std::size_t num_elements() const = 0;
+        virtual auto num_elements() const -> std::size_t = 0;
         /// \brief Return the size of the matrix as a pair (rows, columns).
-        auto size() const -> std::pair<std::size_t, std::size_t>;
+        auto size() const -> const std::pair<std::size_t, std::size_t>&;
 
         /// \brief Interface for zeroing the matrix.
         virtual void zero() = 0;
@@ -52,10 +52,8 @@ class MatrixBase {
         void initialise(std::size_t num_rows, std::size_t num_columns);
 
     protected:
-        /// \brief Number of matrix rows.
-        std::size_t m_num_rows{0};
-        /// \brief Number of matrix columns.
-        std::size_t m_num_columns{0};
+        /// \brief Matrix size (rows, columns).
+        std::pair<std::size_t, std::size_t> m_size{};
 };
 
 /// \relates MatrixBase
@@ -71,49 +69,47 @@ inline auto operator<<(std::ostream& out, const MatrixBase<T>& rhs)
 
 template <typename T>
 inline MatrixBase<T>::MatrixBase(std::size_t size) :
-    m_num_rows{size},
-    m_num_columns{size} {
+    m_size{size, size} {
 }
 
 template <typename T>
 inline MatrixBase<T>::MatrixBase(std::size_t num_rows,
         std::size_t num_columns) :
-    m_num_rows{num_rows},
-    m_num_columns{num_columns} {
+    m_size{num_rows, num_columns} {
 }
 
 template <typename T>
 inline MatrixBase<T>::MatrixBase(
         const std::pair<std::size_t, std::size_t>& size) :
-    m_num_rows{size.first},
-    m_num_columns{size.second} {
+    m_size{size} {
 }
 
 template <typename T>
 inline auto MatrixBase<T>::num_rows() const -> std::size_t {
-    return m_num_rows;
+    return m_size.first;
 }
 
 template <typename T>
 inline auto MatrixBase<T>::num_columns() const -> std::size_t {
-    return m_num_columns;
+    return m_size.second;
 }
 
 template <typename T>
-inline auto MatrixBase<T>::size() const -> std::pair<std::size_t, std::size_t> {
-    return {m_num_rows, m_num_columns};
+inline auto MatrixBase<T>::size() const
+        -> const std::pair<std::size_t, std::size_t>& {
+    return m_size;
 }
 
 template <typename T>
 inline void MatrixBase<T>::initialise(std::size_t size) {
-    m_num_rows = m_num_columns = size;
+    m_size.first = m_size.second = size;
 }
 
 template <typename T>
 inline void MatrixBase<T>::initialise(std::size_t num_rows,
         std::size_t num_columns) {
-    m_num_rows = num_rows;
-    m_num_columns = num_columns;
+    m_size.first = num_rows;
+    m_size.second = num_columns;
 }
 
 /// \relates MatrixBase

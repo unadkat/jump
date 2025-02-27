@@ -49,7 +49,8 @@ class ConstantMatrixExpression {
 
         constexpr auto as_vector() const
                 -> const ConstantVectorExpression<ValueType>&;
-        constexpr auto size() const -> std::pair<std::size_t, std::size_t>;
+        constexpr auto size() const
+                -> const std::pair<std::size_t, std::size_t>&;
         constexpr auto num_elements() const -> std::size_t;
         constexpr auto num_bands() const -> std::size_t;
 
@@ -132,7 +133,7 @@ inline constexpr auto ConstantMatrixExpression<T>::as_vector() const
 
 template <typename T>
 inline constexpr auto ConstantMatrixExpression<T>::size() const
-        -> std::pair<std::size_t, std::size_t> {
+        -> const std::pair<std::size_t, std::size_t>& {
     return m_size;
 }
 

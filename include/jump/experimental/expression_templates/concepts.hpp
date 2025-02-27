@@ -48,7 +48,7 @@ concept BandedMatrixExpression = requires (Expr expr) {
              std::remove_cvref_t<typename Expr::InnerExpressionType>>;
     // For use in evaluating the whole matrix in a single loop, and verifying
     // compatibility
-    {expr.size()} -> std::same_as<std::pair<std::size_t, std::size_t>>;
+    {expr.size()} -> std::same_as<const std::pair<std::size_t, std::size_t>&>;
     {expr.num_elements()} -> std::same_as<std::size_t>;
     {expr.num_bands()} -> std::same_as<std::size_t>;
 };
