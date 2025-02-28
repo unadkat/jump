@@ -12,6 +12,7 @@
 #include "jump/experimental/expression_templates/concepts.hpp"
 #include "jump/experimental/expression_templates/constants.hpp"
 
+#include <format>
 #include <utility>
 
 namespace jump {
@@ -117,9 +118,9 @@ inline constexpr BinaryBandedMatrixOp<Functor, Left, Right>::
             .name2 = "rhs", .size2 = rhs.size()}};
     }
     if (m_lhs.num_bands() != m_rhs.num_bands()) {
-        throw RuntimeError{Mismatch1DError{.name1 = "lhs.num_bands()",
-            .size1 = lhs.num_bands(), .name2 = "rhs.num_bands()",
-            .size2 = rhs.num_bands()}};
+        throw RuntimeError{InvalidArgumentError{.argument = "rhs.num_bands()",
+            .value = std::format("{}", rhs.num_bands()),
+            .expected = std::format("{}", lhs.num_bands())}};
     }
 #endif  // NDEBUG
 }
