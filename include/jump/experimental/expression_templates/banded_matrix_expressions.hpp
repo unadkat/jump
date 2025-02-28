@@ -112,11 +112,11 @@ inline constexpr BinaryBandedMatrixOp<Functor, Left, Right>::
         m_rhs.set_banded(lhs.size(), lhs.num_bands());
     }
 #ifndef NDEBUG
-    if (lhs.size() != rhs.size()) {
+    if (m_lhs.size() != m_rhs.size()) {
         throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
             .name2 = "rhs", .size2 = rhs.size()}};
     }
-    if (lhs.num_bands() != rhs.num_bands()) {
+    if (m_lhs.num_bands() != m_rhs.num_bands()) {
         throw RuntimeError{Mismatch1DError{.name1 = "lhs.num_bands()",
             .size1 = lhs.num_bands(), .name2 = "rhs.num_bands()",
             .size2 = rhs.num_bands()}};
