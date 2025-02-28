@@ -103,6 +103,17 @@ int banded_matrix_test(int argc, char** argv) {
     BandedMatrix<Real> test3{+test};
     f(test3);
 
+    std::cout << "scalar*matrix" << std::endl;
+    auto test4{4.*test};
+    std::cout << "matrix*scalar" << std::endl;
+    auto test5{test*5.};
+#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+    std::cout << "scalar/matrix" << std::endl;
+    auto test6{6./test};
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+    std::cout << "matrix/scalar" << std::endl;
+    auto test7{test/7.};
+
     return 0;
 }
 

@@ -34,6 +34,18 @@ template <BandedMatrixExpression Left, BandedMatrixExpression Right>
 struct BandedMatrixMinus : BinaryBandedMatrixOp<VectorMinus, Left, Right> {
     using BinaryBandedMatrixOp<VectorMinus, Left, Right>::BinaryBandedMatrixOp;
 };
+
+template <BandedMatrixExpression Left, BandedMatrixExpression Right>
+struct BandedMatrixMultiply : BinaryBandedMatrixOp<VectorMultiply, Left,
+        Right> {
+    using BinaryBandedMatrixOp<VectorMultiply, Left,
+            Right>::BinaryBandedMatrixOp;
+};
+
+template <BandedMatrixExpression Left, BandedMatrixExpression Right>
+struct BandedMatrixDivide : BinaryBandedMatrixOp<VectorDivide, Left, Right> {
+    using BinaryBandedMatrixOp<VectorDivide, Left, Right>::BinaryBandedMatrixOp;
+};
 }   // namespace jump
 
 #endif  // JUMP_EXPRESSION_TEMPLATE_BANDED_MATRIX_FUNCTORS_HPP

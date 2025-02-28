@@ -10,6 +10,7 @@
 #include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
 #include "jump/experimental/expression_templates/concepts.hpp"
+#include "jump/experimental/expression_templates/constants.hpp"
 
 #include <utility>
 
@@ -98,6 +99,18 @@ inline constexpr BinaryBandedMatrixOp<Functor, Left, Right>::
     BinaryBandedMatrixOp(const Left& lhs, const Right& rhs) :
         m_lhs{lhs},
         m_rhs{rhs} {
+    if constexpr (is_constant_matrix_expression_v<Left>
+            && is_constant_matrix_expression_v<Right>) {
+        throw RuntimeError{InvalidArgumentError{
+            .argument = "is_constant_matrix_expression_v<Left> "
+                "&& is_constant_matrix_expression_v<Right>",
+            .value = "true",
+            .expected = "only one of the arguments being constant"}};
+    } else if constexpr (is_constant_matrix_expression_v<Left>) {
+        m_lhs.set_banded(rhs.size(), rhs.num_bands());
+    } else if constexpr (is_constant_matrix_expression_v<Right>) {
+        m_rhs.set_banded(lhs.size(), lhs.num_bands());
+    }
 #ifndef NDEBUG
     if (lhs.size() != rhs.size()) {
         throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),

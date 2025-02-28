@@ -31,6 +31,26 @@ template <BandedMatrixExpression Left, BandedMatrixExpression Right>
 constexpr auto operator-(const Left& lhs, const Right& rhs)
         -> BandedMatrixMinus<Left, Right>;
 
+template <typename T, BandedMatrixExpression Expr>
+requires (!BandedMatrixExpression<T>)
+constexpr auto operator*(const T& lhs, const Expr& rhs)
+        -> BandedMatrixMultiply<ConstantMatrixExpression<T>, Expr>;
+
+template <typename T, BandedMatrixExpression Expr>
+requires (!BandedMatrixExpression<T>)
+constexpr auto operator*(const Expr& lhs, const T& rhs)
+        -> BandedMatrixMultiply<Expr, ConstantMatrixExpression<T>>;
+
+template <typename T, BandedMatrixExpression Expr>
+requires (!BandedMatrixExpression<T>)
+constexpr auto operator/(const T& lhs, const Expr& rhs)
+        -> BandedMatrixDivide<ConstantMatrixExpression<T>, Expr>;
+
+template <typename T, BandedMatrixExpression Expr>
+requires (!BandedMatrixExpression<T>)
+constexpr auto operator/(const Expr& lhs, const T& rhs)
+        -> BandedMatrixDivide<Expr, ConstantMatrixExpression<T>>;
+
 // ========================================================================
 // Implementation
 // ========================================================================
@@ -55,6 +75,34 @@ inline constexpr auto operator+(const Left& lhs, const Right& rhs)
 template <BandedMatrixExpression Left, BandedMatrixExpression Right>
 inline constexpr auto operator-(const Left& lhs, const Right& rhs)
         -> BandedMatrixMinus<Left, Right> {
+    return {lhs, rhs};
+}
+
+template <typename T, BandedMatrixExpression Expr>
+requires (!BandedMatrixExpression<T>)
+inline constexpr auto operator*(const T& lhs, const Expr& rhs)
+        -> BandedMatrixMultiply<ConstantMatrixExpression<T>, Expr> {
+    return {lhs, rhs};
+}
+
+template <typename T, BandedMatrixExpression Expr>
+requires (!BandedMatrixExpression<T>)
+inline constexpr auto operator*(const Expr& lhs, const T& rhs)
+        -> BandedMatrixMultiply<Expr, ConstantMatrixExpression<T>> {
+    return {lhs, rhs};
+}
+
+template <typename T, BandedMatrixExpression Expr>
+requires (!BandedMatrixExpression<T>)
+inline constexpr auto operator/(const T& lhs, const Expr& rhs)
+        -> BandedMatrixDivide<ConstantMatrixExpression<T>, Expr> {
+    return {lhs, rhs};
+}
+
+template <typename T, BandedMatrixExpression Expr>
+requires (!BandedMatrixExpression<T>)
+inline constexpr auto operator/(const Expr& lhs, const T& rhs)
+        -> BandedMatrixDivide<Expr, ConstantMatrixExpression<T>> {
     return {lhs, rhs};
 }
 #endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES

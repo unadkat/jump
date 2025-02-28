@@ -215,7 +215,6 @@ auto operator-(const BandedMatrix<T>& lhs, BandedMatrix<U>&& rhs)
 /// \brief Difference of two BandedMatrices.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator-(BandedMatrix<T>&& lhs, BandedMatrix<U>&& rhs) -> BandedMatrix<R>;
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 /// \relates BandedMatrix
 /// \brief Left-hand multiplication by scalar.
@@ -236,12 +235,14 @@ auto operator*(const BandedMatrix<T>& lhs, const U& rhs) -> BandedMatrix<R>;
 /// \brief Right-hand multiplication by scalar.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator*(BandedMatrix<T>&& lhs, const U& rhs) -> BandedMatrix<R>;
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 /// \relates BandedMatrix
 /// \brief Right-hand-side multiplication by vector.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator*(const BandedMatrix<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
 
+#ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 /// \relates BandedMatrix
 /// \brief Division by a scalar.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
@@ -251,6 +252,7 @@ auto operator/(const BandedMatrix<T>& lhs, const U& rhs) -> BandedMatrix<R>;
 /// \brief Division by a scalar.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator/(BandedMatrix<T>&& lhs, const U& rhs) -> BandedMatrix<R>;
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 // ========================================================================
 // Implementation
@@ -776,7 +778,6 @@ inline auto operator-(BandedMatrix<T>&& lhs, BandedMatrix<U>&& rhs)
         return result;
     }
 }
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 /// \relates BandedMatrix
 /// \brief Left-hand multiplication by scalar.
@@ -825,6 +826,7 @@ inline auto operator*(BandedMatrix<T>&& lhs, const U& rhs) -> BandedMatrix<R> {
         return result;
     }
 }
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 /// \relates BandedMatrix
 /// \brief Right-hand-side multiplication by vector.
@@ -849,6 +851,7 @@ inline auto operator*(const BandedMatrix<T>& lhs, const Vector<U>& rhs)
     return result;
 }
 
+#ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 /// \relates BandedMatrix
 /// \brief Division by a scalar.
 template <typename T, typename U, typename R>
@@ -872,6 +875,7 @@ inline auto operator/(BandedMatrix<T>&& lhs, const U& rhs) -> BandedMatrix<R> {
         return result;
     }
 }
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 }   // namespace jump
 
 #endif  // JUMP_BANDED_MATRIX_HPP
