@@ -114,6 +114,24 @@ int banded_matrix_test(int argc, char** argv) {
     std::cout << "matrix/scalar" << std::endl;
     auto test7{test/7.};
 
+    std::cout << BandedMatrix<Real>{exp(test)} << std::endl;
+    std::cout << BandedMatrix<Real>{log(test)} << std::endl;
+    std::cout << BandedMatrix<Real>{pow(test, 2.)} << std::endl;
+    std::cout << BandedMatrix<Real>{sin(test)} << std::endl;
+    std::cout << BandedMatrix<Real>{cos(test)} << std::endl;
+    std::cout << BandedMatrix<Real>{tan(test)} << std::endl;
+    std::cout << BandedMatrix<Real>{asin(test)} << std::endl;
+    std::cout << BandedMatrix<Real>{acos(test)} << std::endl;
+    std::cout << BandedMatrix<Real>{atan(test)} << std::endl;
+    std::cout << BandedMatrix<Real>{sinh(test)} << std::endl;
+    std::cout << BandedMatrix<Real>{cosh(test)} << std::endl;
+    std::cout << BandedMatrix<Real>{tanh(test)} << std::endl;
+    std::cout << BandedMatrix<Real>{asinh(test)} << std::endl;
+    std::cout << BandedMatrix<Real>{acosh(test)} << std::endl;
+    std::cout << BandedMatrix<Real>{atanh(test)} << std::endl;
+    std::cout << BandedMatrix<Real>{abs(test)} << std::endl;
+    std::cout << BandedMatrix<Real>{sgn(test)} << std::endl;
+
     return 0;
 }
 

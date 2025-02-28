@@ -73,7 +73,7 @@ inline constexpr UnaryBandedMatrixOp<Functor, Expr>::UnaryBandedMatrixOp(
 template <template <typename> typename Functor, BandedMatrixExpression Expr>
 inline constexpr auto UnaryBandedMatrixOp<Functor, Expr>::as_vector() const
         -> InnerExpressionType {
-    return InnerExpressionType{m_expr.as_vector()};
+    return {m_expr.as_vector()};
 }
 
 template <template <typename> typename Functor, BandedMatrixExpression Expr>
@@ -129,7 +129,7 @@ template <template <typename, typename> typename Functor,
     BandedMatrixExpression Left, BandedMatrixExpression Right>
 inline constexpr auto BinaryBandedMatrixOp<Functor, Left, Right>::
     as_vector() const -> InnerExpressionType {
-    return InnerExpressionType{m_lhs.as_vector(), m_rhs.as_vector()};
+    return {m_lhs.as_vector(), m_rhs.as_vector()};
 }
 
 template <template <typename, typename> typename Functor,

@@ -52,6 +52,70 @@ constexpr auto operator/(const Expr& lhs, const T& rhs)
         -> BandedMatrixDivide<Expr, ConstantMatrixExpression<T>>;
 
 // ========================================================================
+// Exponentiation
+// ========================================================================
+
+template <BandedMatrixExpression Expr>
+constexpr auto exp(const Expr& expr) -> BandedMatrixExp<Expr>;
+
+template <BandedMatrixExpression Expr>
+constexpr auto log(const Expr& expr) -> BandedMatrixLog<Expr>;
+
+// ========================================================================
+// Trigonometry
+// ========================================================================
+
+template <BandedMatrixExpression Expr>
+constexpr auto sin(const Expr& expr) -> BandedMatrixSin<Expr>;
+
+template <BandedMatrixExpression Expr>
+constexpr auto cos(const Expr& expr) -> BandedMatrixCos<Expr>;
+
+template <BandedMatrixExpression Expr>
+constexpr auto tan(const Expr& expr) -> BandedMatrixTan<Expr>;
+
+template <BandedMatrixExpression Expr>
+constexpr auto asin(const Expr& expr) -> BandedMatrixAsin<Expr>;
+
+template <BandedMatrixExpression Expr>
+constexpr auto acos(const Expr& expr) -> BandedMatrixAcos<Expr>;
+
+template <BandedMatrixExpression Expr>
+constexpr auto atan(const Expr& expr) -> BandedMatrixAtan<Expr>;
+
+// ========================================================================
+// Hyperbolics
+// ========================================================================
+
+template <BandedMatrixExpression Expr>
+constexpr auto sinh(const Expr& expr) -> BandedMatrixSinh<Expr>;
+
+template <BandedMatrixExpression Expr>
+constexpr auto cosh(const Expr& expr) -> BandedMatrixCosh<Expr>;
+
+template <BandedMatrixExpression Expr>
+constexpr auto tanh(const Expr& expr) -> BandedMatrixTanh<Expr>;
+
+template <BandedMatrixExpression Expr>
+constexpr auto asinh(const Expr& expr) -> BandedMatrixAsinh<Expr>;
+
+template <BandedMatrixExpression Expr>
+constexpr auto acosh(const Expr& expr) -> BandedMatrixAcosh<Expr>;
+
+template <BandedMatrixExpression Expr>
+constexpr auto atanh(const Expr& expr) -> BandedMatrixAtanh<Expr>;
+
+// ========================================================================
+// Miscellaneous
+// ========================================================================
+
+template <BandedMatrixExpression Expr>
+constexpr auto abs(const Expr& expr) -> BandedMatrixAbs<Expr>;
+
+template <BandedMatrixExpression Expr>
+constexpr auto sgn(const Expr& expr) -> BandedMatrixSgn<Expr>;
+
+// ========================================================================
 // Implementation
 // ========================================================================
 
@@ -104,6 +168,93 @@ requires (!BandedMatrixExpression<T>)
 inline constexpr auto operator/(const Expr& lhs, const T& rhs)
         -> BandedMatrixDivide<Expr, ConstantMatrixExpression<T>> {
     return {lhs, rhs};
+}
+
+template <BandedMatrixExpression Expr>
+inline constexpr auto exp(const Expr& expr) -> BandedMatrixExp<Expr> {
+    return {expr};
+}
+
+template <BandedMatrixExpression Expr>
+inline constexpr auto log(const Expr& expr) -> BandedMatrixLog<Expr> {
+    return {expr};
+}
+
+template <BandedMatrixExpression Expr>
+inline constexpr auto pow(const Expr& expr,
+        const typename Expr::InnerExpressionType::ValueType& p)
+        -> BandedMatrixPow<Expr> {
+    return {expr, p};
+}
+
+template <BandedMatrixExpression Expr>
+inline constexpr auto sin(const Expr& expr) -> BandedMatrixSin<Expr> {
+    return {expr};
+}
+
+template <BandedMatrixExpression Expr>
+inline constexpr auto cos(const Expr& expr) -> BandedMatrixCos<Expr> {
+    return {expr};
+}
+
+template <BandedMatrixExpression Expr>
+inline constexpr auto tan(const Expr& expr) -> BandedMatrixTan<Expr> {
+    return {expr};
+}
+
+template <BandedMatrixExpression Expr>
+inline constexpr auto asin(const Expr& expr) -> BandedMatrixAsin<Expr> {
+    return {expr};
+}
+
+template <BandedMatrixExpression Expr>
+inline constexpr auto acos(const Expr& expr) -> BandedMatrixAcos<Expr> {
+    return {expr};
+}
+
+template <BandedMatrixExpression Expr>
+inline constexpr auto atan(const Expr& expr) -> BandedMatrixAtan<Expr> {
+    return {expr};
+}
+
+template <BandedMatrixExpression Expr>
+inline constexpr auto sinh(const Expr& expr) -> BandedMatrixSinh<Expr> {
+    return {expr};
+}
+
+template <BandedMatrixExpression Expr>
+inline constexpr auto cosh(const Expr& expr) -> BandedMatrixCosh<Expr> {
+    return {expr};
+}
+
+template <BandedMatrixExpression Expr>
+inline constexpr auto tanh(const Expr& expr) -> BandedMatrixTanh<Expr> {
+    return {expr};
+}
+
+template <BandedMatrixExpression Expr>
+inline constexpr auto asinh(const Expr& expr) -> BandedMatrixAsinh<Expr> {
+    return {expr};
+}
+
+template <BandedMatrixExpression Expr>
+inline constexpr auto acosh(const Expr& expr) -> BandedMatrixAcosh<Expr> {
+    return {expr};
+}
+
+template <BandedMatrixExpression Expr>
+inline constexpr auto atanh(const Expr& expr) -> BandedMatrixAtanh<Expr> {
+    return {expr};
+}
+
+template <BandedMatrixExpression Expr>
+inline constexpr auto abs(const Expr& expr) -> BandedMatrixAbs<Expr> {
+    return {expr};
+}
+
+template <BandedMatrixExpression Expr>
+inline constexpr auto sgn(const Expr& expr) -> BandedMatrixSgn<Expr> {
+    return {expr};
 }
 #endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 }   // namespace jump

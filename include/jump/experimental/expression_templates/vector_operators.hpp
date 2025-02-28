@@ -81,6 +81,10 @@ template <VectorExpression Expr>
 constexpr auto pow(const Expr& expr, const typename Expr::ValueType& p)
         -> VectorPow<Expr>;
 
+// ========================================================================
+// Trigonometry
+// ========================================================================
+
 template <VectorExpression Expr>
 constexpr auto sin(const Expr& expr) -> VectorSin<Expr>;
 
@@ -99,6 +103,10 @@ constexpr auto acos(const Expr& expr) -> VectorAcos<Expr>;
 template <VectorExpression Expr>
 constexpr auto atan(const Expr& expr) -> VectorAtan<Expr>;
 
+// ========================================================================
+// Hyperbolics
+// ========================================================================
+
 template <VectorExpression Expr>
 constexpr auto sinh(const Expr& expr) -> VectorSinh<Expr>;
 
@@ -116,6 +124,10 @@ constexpr auto acosh(const Expr& expr) -> VectorAcosh<Expr>;
 
 template <VectorExpression Expr>
 constexpr auto atanh(const Expr& expr) -> VectorAtanh<Expr>;
+
+// ========================================================================
+// Miscellaneous
+// ========================================================================
 
 template <VectorExpression Expr>
 constexpr auto abs(const Expr& expr) -> VectorAbs<Expr>;
