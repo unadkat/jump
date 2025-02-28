@@ -54,7 +54,9 @@ class ConstantMatrixExpression {
         constexpr auto num_elements() const -> std::size_t;
         constexpr auto num_bands() const -> std::size_t;
 
-        constexpr void set_banded(std::size_t size, std::size_t num_bands);
+        constexpr void set_banded(
+                const std::pair<std::size_t, std::size_t>& size,
+                std::size_t num_bands);
 
     private:
         ConstantVectorExpression<ValueType> m_inner;
@@ -150,11 +152,12 @@ inline constexpr auto ConstantMatrixExpression<T>::num_bands() const
 }
 
 template <typename T>
-inline constexpr void ConstantMatrixExpression<T>::set_banded(std::size_t size,
+inline constexpr void ConstantMatrixExpression<T>::set_banded(
+        const std::pair<std::size_t, std::size_t>& size,
         std::size_t num_bands) {
-    m_size = {size, size};
+    m_size = size;
     m_num_bands = num_bands;
-    m_num_elements = size*(3*num_bands + 1);
+    m_num_elements = size.second*(3*num_bands + 1);
     m_inner.set_size(m_num_elements);
 }
 }   // namespace jump
