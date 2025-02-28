@@ -114,6 +114,7 @@ int banded_matrix_test(int argc, char** argv) {
     std::cout << "matrix/scalar" << std::endl;
     auto test7{test/7.};
 
+#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
     std::cout << BandedMatrix<Real>{exp(test)} << std::endl;
     std::cout << BandedMatrix<Real>{log(test)} << std::endl;
     std::cout << BandedMatrix<Real>{pow(test, 2.)} << std::endl;
@@ -131,6 +132,7 @@ int banded_matrix_test(int argc, char** argv) {
     std::cout << BandedMatrix<Real>{atanh(test)} << std::endl;
     std::cout << BandedMatrix<Real>{abs(test)} << std::endl;
     std::cout << BandedMatrix<Real>{sgn(test)} << std::endl;
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
     return 0;
 }
