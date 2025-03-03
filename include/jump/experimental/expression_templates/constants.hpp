@@ -24,13 +24,13 @@ class ConstantVectorExpression {
 
         constexpr ConstantVectorExpression(const T& value);
 
-        constexpr auto operator[](std::size_t index) const -> ValueType;
+        constexpr auto operator[](std::size_t index) const -> const ValueType&;
         constexpr auto size() const -> std::size_t;
 
         constexpr void set_size(std::size_t N);
 
     private:
-        T m_value{};
+        ValueType m_value{};
         std::size_t m_size{};
 };
 
@@ -107,7 +107,7 @@ inline constexpr ConstantVectorExpression<T>::ConstantVectorExpression(
 
 template <typename T>
 inline constexpr auto ConstantVectorExpression<T>::operator[](
-        [[maybe_unused]] std::size_t index) const -> ValueType {
+        [[maybe_unused]] std::size_t index) const -> const ValueType& {
     return m_value;
 }
 
