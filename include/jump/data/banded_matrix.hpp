@@ -252,6 +252,90 @@ auto operator/(const BandedMatrix<T>& lhs, const U& rhs) -> BandedMatrix<R>;
 /// \brief Division by a scalar.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator/(BandedMatrix<T>&& lhs, const U& rhs) -> BandedMatrix<R>;
+
+// ========================================================================
+// Exponentiation
+// ========================================================================
+
+/// \relates BandedMatrix
+template <typename T>
+auto exp(const BandedMatrix<T>& M) -> BandedMatrix<T>;
+
+/// \relates BandedMatrix
+template <typename T>
+auto log(const BandedMatrix<T>& M) -> BandedMatrix<T>;
+
+/// \relates BandedMatrix
+template <typename T>
+auto pow(const BandedMatrix<T>& M, T p) -> BandedMatrix<T>;
+
+// ========================================================================
+// Trigonometry
+// ========================================================================
+
+/// \relates BandedMatrix
+template <typename T>
+auto sin(const BandedMatrix<T>& M) -> BandedMatrix<T>;
+
+/// \relates BandedMatrix
+template <typename T>
+auto cos(const BandedMatrix<T>& M) -> BandedMatrix<T>;
+
+/// \relates BandedMatrix
+template <typename T>
+auto tan(const BandedMatrix<T>& M) -> BandedMatrix<T>;
+
+/// \relates BandedMatrix
+template <typename T>
+auto asin(const BandedMatrix<T>& M) -> BandedMatrix<T>;
+
+/// \relates BandedMatrix
+template <typename T>
+auto acos(const BandedMatrix<T>& M) -> BandedMatrix<T>;
+
+/// \relates BandedMatrix
+template <typename T>
+auto atan(const BandedMatrix<T>& M) -> BandedMatrix<T>;
+
+// ========================================================================
+// Hyperbolics
+// ========================================================================
+
+/// \relates BandedMatrix
+template <typename T>
+auto sinh(const BandedMatrix<T>& M) -> BandedMatrix<T>;
+
+/// \relates BandedMatrix
+template <typename T>
+auto cosh(const BandedMatrix<T>& M) -> BandedMatrix<T>;
+
+/// \relates BandedMatrix
+template <typename T>
+auto tanh(const BandedMatrix<T>& M) -> BandedMatrix<T>;
+
+/// \relates BandedMatrix
+template <typename T>
+auto asinh(const BandedMatrix<T>& M) -> BandedMatrix<T>;
+
+/// \relates BandedMatrix
+template <typename T>
+auto acosh(const BandedMatrix<T>& M) -> BandedMatrix<T>;
+
+/// \relates BandedMatrix
+template <typename T>
+auto atanh(const BandedMatrix<T>& M) -> BandedMatrix<T>;
+
+// ========================================================================
+// Miscellaneous
+// ========================================================================
+
+/// \relates BandedMatrix
+template <typename T>
+auto abs(const BandedMatrix<T>& M) -> BandedMatrix<T>;
+
+/// \relates BandedMatrix
+template <typename T>
+auto sgn(const BandedMatrix<T>& M) -> BandedMatrix<T>;
 #endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 // ========================================================================
@@ -874,6 +958,108 @@ inline auto operator/(BandedMatrix<T>&& lhs, const U& rhs) -> BandedMatrix<R> {
         result /= rhs;
         return result;
     }
+}
+
+/// \relates BandedMatrix
+template <typename T>
+inline auto exp(const BandedMatrix<T>& M) -> BandedMatrix<T> {
+    return {M.size().first, M.num_bands(), exp(M.as_vector())};
+}
+
+/// \relates BandedMatrix
+template <typename T>
+inline auto log(const BandedMatrix<T>& M) -> BandedMatrix<T> {
+    return {M.size().first, M.num_bands(), log(M.as_vector())};
+}
+
+/// \relates BandedMatrix
+template <typename T>
+inline auto pow(const BandedMatrix<T>& M, T p) -> BandedMatrix<T> {
+    return {M.size().first, M.num_bands(), pow(M.as_vector(), p)};
+}
+
+/// \relates BandedMatrix
+template <typename T>
+inline auto sin(const BandedMatrix<T>& M) -> BandedMatrix<T> {
+    return {M.size().first, M.num_bands(), sin(M.as_vector())};
+}
+
+/// \relates BandedMatrix
+template <typename T>
+inline auto cos(const BandedMatrix<T>& M) -> BandedMatrix<T> {
+    return {M.size().first, M.num_bands(), cos(M.as_vector())};
+}
+
+/// \relates BandedMatrix
+template <typename T>
+inline auto tan(const BandedMatrix<T>& M) -> BandedMatrix<T> {
+    return {M.size().first, M.num_bands(), tan(M.as_vector())};
+}
+
+/// \relates BandedMatrix
+template <typename T>
+inline auto asin(const BandedMatrix<T>& M) -> BandedMatrix<T> {
+    return {M.size().first, M.num_bands(), asin(M.as_vector())};
+}
+
+/// \relates BandedMatrix
+template <typename T>
+inline auto acos(const BandedMatrix<T>& M) -> BandedMatrix<T> {
+    return {M.size().first, M.num_bands(), acos(M.as_vector())};
+}
+
+/// \relates BandedMatrix
+template <typename T>
+inline auto atan(const BandedMatrix<T>& M) -> BandedMatrix<T> {
+    return {M.size().first, M.num_bands(), atan(M.as_vector())};
+}
+
+/// \relates BandedMatrix
+template <typename T>
+inline auto sinh(const BandedMatrix<T>& M) -> BandedMatrix<T> {
+    return {M.size().first, M.num_bands(), sinh(M.as_vector())};
+}
+
+/// \relates BandedMatrix
+template <typename T>
+inline auto cosh(const BandedMatrix<T>& M) -> BandedMatrix<T> {
+    return {M.size().first, M.num_bands(), cosh(M.as_vector())};
+}
+
+/// \relates BandedMatrix
+template <typename T>
+inline auto tanh(const BandedMatrix<T>& M) -> BandedMatrix<T> {
+    return {M.size().first, M.num_bands(), tanh(M.as_vector())};
+}
+
+/// \relates BandedMatrix
+template <typename T>
+inline auto asinh(const BandedMatrix<T>& M) -> BandedMatrix<T> {
+    return {M.size().first, M.num_bands(), asinh(M.as_vector())};
+}
+
+/// \relates BandedMatrix
+template <typename T>
+inline auto acosh(const BandedMatrix<T>& M) -> BandedMatrix<T> {
+    return {M.size().first, M.num_bands(), acosh(M.as_vector())};
+}
+
+/// \relates BandedMatrix
+template <typename T>
+inline auto atanh(const BandedMatrix<T>& M) -> BandedMatrix<T> {
+    return {M.size().first, M.num_bands(), atanh(M.as_vector())};
+}
+
+/// \relates BandedMatrix
+template <typename T>
+inline auto abs(const BandedMatrix<T>& M) -> BandedMatrix<T> {
+    return {M.size().first, M.num_bands(), abs(M.as_vector())};
+}
+
+/// \relates BandedMatrix
+template <typename T>
+inline auto sgn(const BandedMatrix<T>& M) -> BandedMatrix<T> {
+    return {M.size().first, M.num_bands(), sgn(M.as_vector())};
 }
 #endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 }   // namespace jump
