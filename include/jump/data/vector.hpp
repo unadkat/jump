@@ -178,6 +178,16 @@ struct Vector {
 template <typename T>
 auto operator<<(std::ostream& out, const Vector<T>& rhs) -> std::ostream&;
 
+#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+/// \relates Vector
+template <VectorExpression Expr>
+constexpr auto evaluate(const Expr& expr) -> Vector<typename Expr::ValueType>;
+#else
+/// \relates Vector
+template <typename T>
+constexpr auto evaluate(const Vector<T>& v) -> const Vector<T>&;
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+
 #ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 /// \relates Vector
 /// \brief Addition of two Vectors.
@@ -765,6 +775,20 @@ inline auto operator<<(std::ostream& out, const Vector<T>& rhs)
     }
     return out;
 }
+
+#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+/// \relates Vector
+template <VectorExpression Expr>
+inline constexpr auto evaluate(const Expr& expr) -> Vector<typename Expr::ValueType> {
+    return {expr};
+}
+#else
+/// \relates Vector
+template <typename T>
+constexpr auto evaluate(const Vector<T>& v) -> const Vector<T>& {
+    return v;
+}
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 #ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 /// \relates Vector

@@ -169,6 +169,17 @@ class BandedMatrix : public MatrixBase<T> {
         Vector<T> m_storage;
 };
 
+#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+/// \relates BandedMatrix
+template <BandedMatrixExpression Expr>
+constexpr auto evaluate(const Expr& expr)
+        -> BandedMatrix<typename Expr::InnerExpressionType::ValueType>;
+#else
+/// \relates BandedMatrix
+template <typename T>
+constexpr auto evaluate(const BandedMatrix<T>& M) -> const BandedMatrix<T>&;
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+
 #ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 /// \relates BandedMatrix
 /// \brief Addition of two BandedMatrices.
@@ -737,6 +748,21 @@ inline auto BandedMatrix<T>::as_string() const -> std::string {
 
     return oss.str();
 }
+
+#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+/// \relates BandedMatrix
+template <BandedMatrixExpression Expr>
+inline constexpr auto evaluate(const Expr& expr)
+        -> BandedMatrix<typename Expr::InnerExpressionType::ValueType> {
+    return {expr};
+}
+#else
+/// \relates BandedMatrix
+template <typename T>
+constexpr auto evaluate(const BandedMatrix<T>& M) -> const BandedMatrix<T>& {
+    return M;
+}
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 #ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 /// \relates BandedMatrix
