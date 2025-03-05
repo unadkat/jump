@@ -44,6 +44,7 @@ class ConstantMatrixExpression {
         // store this by value in an expression so we can update the size, etc.,
         // proper leaves are stored by const reference which is insufficient
         static constexpr bool is_banded_matrix_expression_leaf{false};
+        static constexpr bool is_dense_matrix_expression_leaf{false};
 
         constexpr ConstantMatrixExpression(const T& value);
 
@@ -57,6 +58,8 @@ class ConstantMatrixExpression {
         constexpr void set_banded(
                 const std::pair<std::size_t, std::size_t>& size,
                 std::size_t num_bands);
+        constexpr void set_dense(
+                const std::pair<std::size_t, std::size_t>& size);
 
     private:
         ConstantVectorExpression<ValueType> m_inner;
@@ -158,6 +161,15 @@ inline constexpr void ConstantMatrixExpression<T>::set_banded(
     m_size = size;
     m_num_bands = num_bands;
     m_num_elements = size.second*(3*num_bands + 1);
+    m_inner.set_size(m_num_elements);
+}
+
+template <typename T>
+inline constexpr void ConstantMatrixExpression<T>::set_dense(
+        const std::pair<std::size_t, std::size_t>& size) {
+    m_size = size;
+    m_num_bands = {};
+    m_num_elements = size.first*size.second;
     m_inner.set_size(m_num_elements);
 }
 }   // namespace jump

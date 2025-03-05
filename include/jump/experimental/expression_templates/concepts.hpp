@@ -53,12 +53,38 @@ concept BandedMatrixExpression = requires (Expr expr) {
     {expr.num_bands()} -> std::same_as<std::size_t>;
 };
 
+template <typename Expr>
+concept DenseMatrixExpression = requires (Expr expr) {
+    // Typedef required for the expression template operator delegation system.
+    typename Expr::InnerExpressionType;
+    // Matrix expressions should define a bool member that determines if it is a
+    // leaf of a compound expression or not
+    expr.is_dense_matrix_expression_leaf;
+    requires std::same_as<
+        std::remove_cvref_t<decltype(expr.is_dense_matrix_expression_leaf)>,
+        bool>;
+    // Underlying data should be a VectorExpression, matrix operators will defer
+    // to vector expressions on the underlying data
+    expr.as_vector();
+    requires VectorExpression<std::remove_cvref_t<decltype(expr.as_vector())>>;
+    requires std::same_as<std::remove_cvref_t<decltype(expr.as_vector())>,
+             std::remove_cvref_t<typename Expr::InnerExpressionType>>;
+    // For use in evaluating the whole matrix in a single loop, and verifying
+    // compatibility
+    {expr.size()} -> std::same_as<const std::pair<std::size_t, std::size_t>&>;
+    {expr.num_elements()} -> std::same_as<std::size_t>;
+};
+
 template <typename Expr, typename T>
 concept VectorExpressionConvertibleTo = VectorExpression<Expr>
         && std::convertible_to<typename Expr::ValueType, T>;
 
 template <typename Expr, typename T>
 concept BandedMatrixExpressionConvertibleTo = BandedMatrixExpression<Expr>
+        && VectorExpressionConvertibleTo<typename Expr::InnerExpressionType, T>;
+
+template <typename Expr, typename T>
+concept DenseMatrixExpressionConvertibleTo = DenseMatrixExpression<Expr>
         && VectorExpressionConvertibleTo<typename Expr::InnerExpressionType, T>;
 }   // namespace jump
 
