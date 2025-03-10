@@ -14,6 +14,10 @@
 #include "jump/debug/exception.hpp"
 #include "jump/utility/types.hpp"
 
+#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+#include "jump/experimental/expression_templates/dense_matrix_operators.hpp"
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+
 #include <algorithm>
 #include <cmath>
 #include <format>
@@ -128,6 +132,7 @@ class DenseMatrix : public MatrixBase<T> {
         /// \brief Zero the matrix.
         virtual void zero() override;
 
+#ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
         /// \brief No operation on matrix.
         auto operator+() const -> const DenseMatrix&;
         /// \brief Negate matrix.
@@ -138,12 +143,23 @@ class DenseMatrix : public MatrixBase<T> {
         /// \brief Subtract a matrix from another in place.
         template <std::convertible_to<T> U>
         auto operator-=(const DenseMatrix<U>& rhs) -> DenseMatrix&;
+        /// \brief Multiply matrix by another in place.
+        template <std::convertible_to<T> U>
+        auto operator*=(const DenseMatrix<U>& rhs) -> DenseMatrix&;
+#else
+        /// \brief Add DenseMatrixExpression to DenseMatrix in place.
+        template <DenseMatrixExpressionConvertibleTo<T> Expr>
+        auto operator+=(const Expr& expr) -> DenseMatrix&;
+        /// \brief Subtract a DenseMatrixExpression from a DenseMatrix in place.
+        template <DenseMatrixExpressionConvertibleTo<T> Expr>
+        auto operator-=(const Expr& expr) -> DenseMatrix&;
+        /// \brief Multiply a DenseMatrix by a DenseMatrixExpression in place.
+        template <DenseMatrixExpressionConvertibleTo<T> Expr>
+        auto operator*=(const Expr& expr) -> DenseMatrix&;
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
         /// \brief Multiply matrix by scalar in place.
         template <std::convertible_to<T> U>
         auto operator*=(const U& k) -> DenseMatrix&;
-        /// \brief Multiply matrix by another in place
-        template <std::convertible_to<T> U>
-        auto operator*=(const DenseMatrix<U>& rhs) -> DenseMatrix&;
         /// \brief Divide matrix by scalar in place.
         template <std::convertible_to<T> U>
         auto operator/=(const U& k) -> DenseMatrix&;
@@ -196,6 +212,7 @@ template <typename T>
 constexpr auto evaluate(const DenseMatrix<T>& M) -> const DenseMatrix<T>&;
 #endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
+#ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 /// \relates DenseMatrix
 /// \brief Addition of two DenseMatrices.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
@@ -261,6 +278,7 @@ auto operator*(const DenseMatrix<T>& lhs, const U& rhs) -> DenseMatrix<R>;
 /// \brief Right-hand multiplication by scalar.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator*(DenseMatrix<T>&& lhs, const U& rhs) -> DenseMatrix<R>;
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 /// \relates DenseMatrix
 /// \brief Right-hand-side multiplication by vector.
@@ -273,6 +291,7 @@ template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator*(const DenseMatrix<T>& lhs, const DenseMatrix<U>& rhs)
         -> DenseMatrix<R>;
 
+#ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 /// \relates DenseMatrix
 /// \brief Division by a scalar.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
@@ -282,6 +301,7 @@ auto operator/(const DenseMatrix<T>& lhs, const U& rhs) -> DenseMatrix<R>;
 /// \brief Division by a scalar.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator/(DenseMatrix<T>&& lhs, const U& rhs) -> DenseMatrix<R>;
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 // ========================================================================
 // Implementation
@@ -494,6 +514,7 @@ inline void DenseMatrix<T>::zero() {
     m_storage.zero();
 }
 
+#ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 template <typename T>
 inline auto DenseMatrix<T>::operator+() const -> const DenseMatrix& {
     return *this;
@@ -538,13 +559,6 @@ inline auto DenseMatrix<T>::operator-=(const DenseMatrix<U>& rhs)
 
 template <typename T>
 template <std::convertible_to<T> U>
-inline auto DenseMatrix<T>::operator*=(const U& k) -> DenseMatrix& {
-    m_storage *= k;
-    return *this;
-}
-
-template <typename T>
-template <std::convertible_to<T> U>
 inline auto DenseMatrix<T>::operator*=(const DenseMatrix<U>& rhs)
         -> DenseMatrix& {
 #ifndef NDEBUG
@@ -567,6 +581,74 @@ inline auto DenseMatrix<T>::operator*=(const DenseMatrix<U>& rhs)
     }
 
     return *this = std::move(result);
+}
+#else
+/// \brief Add DenseMatrixExpression to DenseMatrix in place.
+template <typename T>
+template <DenseMatrixExpressionConvertibleTo<T> Expr>
+inline auto DenseMatrix<T>::operator+=(const Expr& expr) -> DenseMatrix& {
+#ifndef NDEBUG
+    if (this->size() != expr.size()) {
+        throw RuntimeError{Mismatch2DError{.size1 = this->size(),
+            .name2 = "expr", .size2 = expr.size()}};
+    }
+#endif  // NDEBUG
+
+    m_storage += expr.as_vector();
+    return *this;
+}
+
+/// \brief Subtract a DenseMatrixExpression from a DenseMatrix in place.
+template <typename T>
+template <DenseMatrixExpressionConvertibleTo<T> Expr>
+inline auto DenseMatrix<T>::operator-=(const Expr& expr) -> DenseMatrix& {
+#ifndef NDEBUG
+    if (this->size() != expr.size()) {
+        throw RuntimeError{Mismatch2DError{.size1 = this->size(),
+            .name2 = "expr", .size2 = expr.size()}};
+    }
+#endif  // NDEBUG
+
+    m_storage -= expr.as_vector();
+    return *this;
+}
+
+/// \brief Multiply a DenseMatrix by a DenseMatrixExpression in place.
+template <typename T>
+template <DenseMatrixExpressionConvertibleTo<T> Expr>
+inline auto DenseMatrix<T>::operator*=(const Expr& expr) -> DenseMatrix& {
+#ifndef NDEBUG
+    if (this->num_columns() != expr.size().first) {
+        throw RuntimeError{Mismatch2DError{.size1 = this->size(),
+            .name2 = "expr", .size2 = expr.size()}};
+    }
+#endif  // NDEBUG
+
+    // TODO: ranges
+    std::size_t N{this->num_rows()}, M{expr.size().second};
+    std::size_t X{this->num_columns()};
+    auto index{[&X](std::size_t row, std::size_t col) -> std::size_t {
+        return col*X + row;
+    }};
+    DenseMatrix<T> result{N, M};
+    for (std::size_t col{0}; col < M; ++col) {
+        for (std::size_t row{0}; row < N; ++row) {
+            for (std::size_t i{0}; i < X; ++i) {
+                result[row, col] +=
+                    (*this)[row, i]*expr.as_vector()[index(i, col)];
+            }
+        }
+    }
+
+    return *this = std::move(result);
+}
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+
+template <typename T>
+template <std::convertible_to<T> U>
+inline auto DenseMatrix<T>::operator*=(const U& k) -> DenseMatrix& {
+    m_storage *= k;
+    return *this;
 }
 
 template <typename T>
@@ -713,6 +795,7 @@ constexpr auto evaluate(const DenseMatrix<T>& M) -> const DenseMatrix<T>& {
 }
 #endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
+#ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 /// \relates DenseMatrix
 /// \brief Addition of two DenseMatrices.
 template <typename T, typename U, typename R>
@@ -878,6 +961,7 @@ inline auto operator*(DenseMatrix<T>&& lhs, const U& rhs) -> DenseMatrix<R> {
         return result;
     }
 }
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 /// \relates DenseMatrix
 /// \brief Right-hand-side multiplication by vector.
@@ -929,6 +1013,7 @@ inline auto operator*(const DenseMatrix<T>& lhs, const DenseMatrix<U>& rhs)
     return result;
 }
 
+#ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 /// \relates DenseMatrix
 /// \brief Division by a scalar.
 template <typename T, typename U, typename R>
@@ -952,6 +1037,7 @@ inline auto operator/(DenseMatrix<T>&& lhs, const U& rhs) -> DenseMatrix<R> {
         return result;
     }
 }
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 }   // namespace jump
 
 #endif  // JUMP_DENSE_MATRIX_HPP
