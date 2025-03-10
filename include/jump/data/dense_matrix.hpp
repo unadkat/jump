@@ -43,6 +43,14 @@ class DenseMatrix : public MatrixBase<T> {
         using Iterator = typename Vector<T>::Iterator;
         /// \brief Iterator for algorithms.
         using ConstIterator = typename Vector<T>::ConstIterator;
+#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+        /// \brief To satisfy DenseMatrixExpression concept
+        using InnerExpressionType = Vector<T>;
+
+        /// \brief To satisfy DenseMatrixExpression concept (and signal that
+        /// this data structure can be referenced in evaluations).
+        static constexpr bool is_dense_matrix_expression_leaf{true};
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
         /// \brief Construct square matrix with the given size.
         explicit DenseMatrix(std::size_t size = 0);
@@ -59,11 +67,21 @@ class DenseMatrix : public MatrixBase<T> {
         DenseMatrix(const DenseMatrix<U>& other);
         /// \brief Default move constructor.
         DenseMatrix(DenseMatrix&& other) = default;
+#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+        /// \brief Construct from a DenseMatrixExpression.
+        template <DenseMatrixExpressionConvertibleTo<T> Expr>
+        DenseMatrix(const Expr& expr);
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
         /// \brief Default copy assignment.
         auto operator=(const DenseMatrix& other) -> DenseMatrix& = default;
         /// \brief Default move assignment.
         auto operator=(DenseMatrix&& other) -> DenseMatrix& = default;
+#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+        /// \brief Assignment from a DenseMatrixExpression.
+        template <DenseMatrixExpressionConvertibleTo<T> Expr>
+        auto operator=(const Expr& expr) -> DenseMatrix&;
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
         /// \brief Initialise a square matrix with the given size.
         void assign(std::size_t size);
@@ -166,6 +184,17 @@ class DenseMatrix : public MatrixBase<T> {
         /// `m_storage[j*num_rows() + i]`.
         Vector<T> m_storage;
 };
+
+#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+/// \relates DenseMatrix
+template <DenseMatrixExpression Expr>
+constexpr auto evaluate(const Expr& expr)
+        -> DenseMatrix<typename Expr::InnerExpressionType::ValueType>;
+#else
+/// \relates DenseMatrix
+template <typename T>
+constexpr auto evaluate(const DenseMatrix<T>& M) -> const DenseMatrix<T>&;
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 /// \relates DenseMatrix
 /// \brief Addition of two DenseMatrices.
@@ -294,6 +323,23 @@ inline DenseMatrix<T>::DenseMatrix(const DenseMatrix<U>& other) :
     MatrixBase<T>{other.size()} {
     m_storage = other.as_vector();
 }
+
+#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+template <typename T>
+template <DenseMatrixExpressionConvertibleTo<T> Expr>
+inline DenseMatrix<T>::DenseMatrix(const Expr& expr) :
+    MatrixBase<T>{expr.size()},
+    m_storage{expr.as_vector()} {
+}
+
+template <typename T>
+template <DenseMatrixExpressionConvertibleTo<T> Expr>
+inline auto DenseMatrix<T>::operator=(const Expr& expr) -> DenseMatrix& {
+    MatrixBase<T>::initialise(expr.size());
+    m_storage = expr.as_vector();
+    return *this;
+}
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 template <typename T>
 inline void DenseMatrix<T>::assign(std::size_t size) {
@@ -651,6 +697,21 @@ inline auto DenseMatrix<T>::identity(std::size_t size) -> DenseMatrix {
     }
     return I;
 }
+
+#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+/// \relates DenseMatrix
+template <DenseMatrixExpression Expr>
+inline constexpr auto evaluate(const Expr& expr)
+        -> DenseMatrix<typename Expr::InnerExpressionType::ValueType> {
+    return {expr};
+}
+#else
+/// \relates DenseMatrix
+template <typename T>
+constexpr auto evaluate(const DenseMatrix<T>& M) -> const DenseMatrix<T>& {
+    return M;
+}
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 /// \relates DenseMatrix
 /// \brief Addition of two DenseMatrices.
