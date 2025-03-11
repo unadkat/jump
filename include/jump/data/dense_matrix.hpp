@@ -291,6 +291,16 @@ template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator*(const DenseMatrix<T>& lhs, const DenseMatrix<U>& rhs)
         -> DenseMatrix<R>;
 
+#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+/// \relates DenseMatrix
+/// \brief Multiplication of two DenseMatrixExpressions.
+template <DenseMatrixExpression Left, DenseMatrixExpression Right,
+    typename R = std::common_type_t<
+        typename Left::InnerExpressionType::ValueType,
+        typename Right::InnerExpressionType::ValueType>>
+auto operator*(const Left& lhs, const Right& rhs) -> DenseMatrix<R>;
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+
 #ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 /// \relates DenseMatrix
 /// \brief Division by a scalar.
@@ -1012,6 +1022,17 @@ inline auto operator*(const DenseMatrix<T>& lhs, const DenseMatrix<U>& rhs)
 
     return result;
 }
+
+#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+/// \relates DenseMatrix
+/// \brief Multiplication of two DenseMatrixExpressions.
+template <DenseMatrixExpression Left, DenseMatrixExpression Right, typename R>
+auto operator*(const Left& lhs, const Right& rhs) -> DenseMatrix<R> {
+    DenseMatrix<R> result{lhs};
+    result *= rhs;
+    return result;
+}
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 #ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 /// \relates DenseMatrix
