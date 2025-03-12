@@ -278,7 +278,6 @@ auto operator*(const DenseMatrix<T>& lhs, const U& rhs) -> DenseMatrix<R>;
 /// \brief Right-hand multiplication by scalar.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator*(DenseMatrix<T>&& lhs, const U& rhs) -> DenseMatrix<R>;
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 /// \relates DenseMatrix
 /// \brief Right-hand-side multiplication by vector.
@@ -290,8 +289,18 @@ auto operator*(const DenseMatrix<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator*(const DenseMatrix<T>& lhs, const DenseMatrix<U>& rhs)
         -> DenseMatrix<R>;
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 #ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+/// \relates DenseMatrix
+/// \brief Right-hand-side multiplication of DenseMatrixExpression by a
+/// VectorExpression.
+template <DenseMatrixExpression Left, VectorExpression Right,
+    typename R = std::common_type_t<
+        typename Left::InnerExpressionType::ValueType,
+        typename Right::ValueType>>
+constexpr auto operator*(const Left& lhs, const Right& rhs) -> Vector<R>;
+
 /// \relates DenseMatrix
 /// \brief Multiplication of two DenseMatrixExpressions.
 template <DenseMatrixExpression Left, DenseMatrixExpression Right,
@@ -971,7 +980,6 @@ inline auto operator*(DenseMatrix<T>&& lhs, const U& rhs) -> DenseMatrix<R> {
         return result;
     }
 }
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 /// \relates DenseMatrix
 /// \brief Right-hand-side multiplication by vector.
@@ -1022,14 +1030,68 @@ inline auto operator*(const DenseMatrix<T>& lhs, const DenseMatrix<U>& rhs)
 
     return result;
 }
+#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 #ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 /// \relates DenseMatrix
+/// \brief Right-hand-side multiplication of DenseMatrixExpression by a
+/// VectorExpression.
+template <DenseMatrixExpression Left, VectorExpression Right, typename R>
+inline constexpr auto operator*(const Left& lhs, const Right& rhs)
+        -> Vector<R> {
+#ifndef NDEBUG
+    if (lhs.size().second != rhs.size()) {
+        throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = {rhs.size(), 1}}};
+    }
+#endif  // NDEBUG
+
+    // TODO: ranges
+    std::size_t N{lhs.size().first}, X{lhs.size().second};
+    auto lhs_index{[&N](std::size_t row, std::size_t col) -> std::size_t {
+        return col*N + row;
+    }};
+
+    Vector<R> result(N);
+    for (std::size_t i{0}; i < X; ++i) {
+        for (std::size_t row{0}; row < N; ++row) {
+            result[row] += lhs.as_vector()[lhs_index(row, i)]*rhs[i];
+        }
+    }
+    return result;
+}
+
+/// \relates DenseMatrix
 /// \brief Multiplication of two DenseMatrixExpressions.
 template <DenseMatrixExpression Left, DenseMatrixExpression Right, typename R>
-inline constexpr auto operator*(const Left& lhs, const Right& rhs) -> DenseMatrix<R> {
-    DenseMatrix<R> result{lhs};
-    result *= rhs;
+inline constexpr auto operator*(const Left& lhs, const Right& rhs)
+        -> DenseMatrix<R> {
+#ifndef NDEBUG
+    if (lhs.size().second != rhs.size().first) {
+        throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    // TODO: ranges
+    std::size_t N{lhs.size().first}, M{rhs.size().second};
+    std::size_t X{lhs.size().second};
+    auto lhs_index{[&N](std::size_t row, std::size_t col) -> std::size_t {
+        return col*N + row;
+    }};
+    auto rhs_index{[&X](std::size_t row, std::size_t col) -> std::size_t {
+        return col*X + row;
+    }};
+
+    DenseMatrix<R> result{N, M};
+    for (std::size_t col{0}; col < M; ++col) {
+        for (std::size_t row{0}; row < N; ++row) {
+            for (std::size_t i{0}; i < X; ++i) {
+                result[row, col] += lhs.as_vector()[lhs_index(row, i)]
+                    *rhs.as_vector()[rhs_index(i, col)];
+            }
+        }
+    }
     return result;
 }
 #endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
