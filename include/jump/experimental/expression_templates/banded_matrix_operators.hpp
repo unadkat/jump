@@ -32,22 +32,22 @@ constexpr auto operator-(const Left& lhs, const Right& rhs)
         -> BandedMatrixMinus<Left, Right>;
 
 template <typename T, BandedMatrixExpression Expr>
-requires (!BandedMatrixExpression<T>)
+requires (!ExpressionTemplate<T>)
 constexpr auto operator*(const T& lhs, const Expr& rhs)
         -> BandedMatrixMultiply<ConstantMatrixExpression<T>, Expr>;
 
 template <typename T, BandedMatrixExpression Expr>
-requires (!BandedMatrixExpression<T>)
+requires (!ExpressionTemplate<T>)
 constexpr auto operator*(const Expr& lhs, const T& rhs)
         -> BandedMatrixMultiply<Expr, ConstantMatrixExpression<T>>;
 
 template <typename T, BandedMatrixExpression Expr>
-requires (!BandedMatrixExpression<T>)
+requires (!ExpressionTemplate<T>)
 constexpr auto operator/(const T& lhs, const Expr& rhs)
         -> BandedMatrixDivide<ConstantMatrixExpression<T>, Expr>;
 
 template <typename T, BandedMatrixExpression Expr>
-requires (!BandedMatrixExpression<T>)
+requires (!ExpressionTemplate<T>)
 constexpr auto operator/(const Expr& lhs, const T& rhs)
         -> BandedMatrixDivide<Expr, ConstantMatrixExpression<T>>;
 
@@ -143,28 +143,28 @@ inline constexpr auto operator-(const Left& lhs, const Right& rhs)
 }
 
 template <typename T, BandedMatrixExpression Expr>
-requires (!BandedMatrixExpression<T>)
+requires (!ExpressionTemplate<T>)
 inline constexpr auto operator*(const T& lhs, const Expr& rhs)
         -> BandedMatrixMultiply<ConstantMatrixExpression<T>, Expr> {
     return {lhs, rhs};
 }
 
 template <typename T, BandedMatrixExpression Expr>
-requires (!BandedMatrixExpression<T>)
+requires (!ExpressionTemplate<T>)
 inline constexpr auto operator*(const Expr& lhs, const T& rhs)
         -> BandedMatrixMultiply<Expr, ConstantMatrixExpression<T>> {
     return {lhs, rhs};
 }
 
 template <typename T, BandedMatrixExpression Expr>
-requires (!BandedMatrixExpression<T>)
+requires (!ExpressionTemplate<T>)
 inline constexpr auto operator/(const T& lhs, const Expr& rhs)
         -> BandedMatrixDivide<ConstantMatrixExpression<T>, Expr> {
     return {lhs, rhs};
 }
 
 template <typename T, BandedMatrixExpression Expr>
-requires (!BandedMatrixExpression<T>)
+requires (!ExpressionTemplate<T>)
 inline constexpr auto operator/(const Expr& lhs, const T& rhs)
         -> BandedMatrixDivide<Expr, ConstantMatrixExpression<T>> {
     return {lhs, rhs};

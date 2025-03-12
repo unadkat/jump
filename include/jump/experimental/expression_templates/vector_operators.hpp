@@ -39,12 +39,12 @@ constexpr auto operator*(const Left& lhs, const Right& rhs)
         -> VectorMultiply<Left, Right>;
 
 template <typename T, VectorExpression Expr>
-requires (!VectorExpression<T>)
+requires (!ExpressionTemplate<T>)
 constexpr auto operator*(const T& lhs, const Expr& rhs)
         -> VectorMultiply<ConstantVectorExpression<T>, Expr>;
 
 template <typename T, VectorExpression Expr>
-requires (!VectorExpression<T>)
+requires (!ExpressionTemplate<T>)
 constexpr auto operator*(const Expr& lhs, const T& rhs)
         -> VectorMultiply<Expr, ConstantVectorExpression<T>>;
 
@@ -53,12 +53,12 @@ constexpr auto operator/(const Left& lhs, const Right& rhs)
         -> VectorDivide<Left, Right>;
 
 template <typename T, VectorExpression Expr>
-requires (!VectorExpression<T>)
+requires (!ExpressionTemplate<T>)
 constexpr auto operator/(const T& lhs, const Expr& rhs)
         -> VectorDivide<ConstantVectorExpression<T>, Expr>;
 
 template <typename T, VectorExpression Expr>
-requires (!VectorExpression<T>)
+requires (!ExpressionTemplate<T>)
 constexpr auto operator/(const Expr& lhs, const T& rhs)
         -> VectorDivide<Expr, ConstantVectorExpression<T>>;
 
@@ -168,14 +168,14 @@ inline constexpr auto operator*(const Left& lhs, const Right& rhs)
 }
 
 template <typename T, VectorExpression Expr>
-requires (!VectorExpression<T>)
+requires (!ExpressionTemplate<T>)
 inline constexpr auto operator*(const T& lhs, const Expr& rhs)
         -> VectorMultiply<ConstantVectorExpression<T>, Expr> {
     return {lhs, rhs};
 }
 
 template <typename T, VectorExpression Expr>
-requires (!VectorExpression<T>)
+requires (!ExpressionTemplate<T>)
 inline constexpr auto operator*(const Expr& lhs, const T& rhs)
         -> VectorMultiply<Expr, ConstantVectorExpression<T>> {
     return {lhs, rhs};
@@ -188,14 +188,14 @@ inline constexpr auto operator/(const Left& lhs, const Right& rhs)
 }
 
 template <typename T, VectorExpression Expr>
-requires (!VectorExpression<T>)
+requires (!ExpressionTemplate<T>)
 inline constexpr auto operator/(const T& lhs, const Expr& rhs)
         -> VectorDivide<ConstantVectorExpression<T>, Expr> {
     return {lhs, rhs};
 }
 
 template <typename T, VectorExpression Expr>
-requires (!VectorExpression<T>)
+requires (!ExpressionTemplate<T>)
 inline constexpr auto operator/(const Expr& lhs, const T& rhs)
         -> VectorDivide<Expr, ConstantVectorExpression<T>> {
     return {lhs, rhs};

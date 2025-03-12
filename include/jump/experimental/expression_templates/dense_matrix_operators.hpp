@@ -32,22 +32,22 @@ constexpr auto operator-(const Left& lhs, const Right& rhs)
         -> DenseMatrixMinus<Left, Right>;
 
 template <typename T, DenseMatrixExpression Expr>
-requires (!DenseMatrixExpression<T>)
+requires (!ExpressionTemplate<T>)
 constexpr auto operator*(const T& lhs, const Expr& rhs)
         -> DenseMatrixMultiply<ConstantMatrixExpression<T>, Expr>;
 
 template <typename T, DenseMatrixExpression Expr>
-requires (!DenseMatrixExpression<T>)
+requires (!ExpressionTemplate<T>)
 constexpr auto operator*(const Expr& lhs, const T& rhs)
         -> DenseMatrixMultiply<Expr, ConstantMatrixExpression<T>>;
 
 template <typename T, DenseMatrixExpression Expr>
-requires (!DenseMatrixExpression<T>)
+requires (!ExpressionTemplate<T>)
 constexpr auto operator/(const T& lhs, const Expr& rhs)
         -> DenseMatrixDivide<ConstantMatrixExpression<T>, Expr>;
 
 template <typename T, DenseMatrixExpression Expr>
-requires (!DenseMatrixExpression<T>)
+requires (!ExpressionTemplate<T>)
 constexpr auto operator/(const Expr& lhs, const T& rhs)
         -> DenseMatrixDivide<Expr, ConstantMatrixExpression<T>>;
 
@@ -143,28 +143,28 @@ inline constexpr auto operator-(const Left& lhs, const Right& rhs)
 }
 
 template <typename T, DenseMatrixExpression Expr>
-requires (!DenseMatrixExpression<T>)
+requires (!ExpressionTemplate<T>)
 inline constexpr auto operator*(const T& lhs, const Expr& rhs)
         -> DenseMatrixMultiply<ConstantMatrixExpression<T>, Expr> {
     return {lhs, rhs};
 }
 
 template <typename T, DenseMatrixExpression Expr>
-requires (!DenseMatrixExpression<T>)
+requires (!ExpressionTemplate<T>)
 inline constexpr auto operator*(const Expr& lhs, const T& rhs)
         -> DenseMatrixMultiply<Expr, ConstantMatrixExpression<T>> {
     return {lhs, rhs};
 }
 
 template <typename T, DenseMatrixExpression Expr>
-requires (!DenseMatrixExpression<T>)
+requires (!ExpressionTemplate<T>)
 inline constexpr auto operator/(const T& lhs, const Expr& rhs)
         -> DenseMatrixDivide<ConstantMatrixExpression<T>, Expr> {
     return {lhs, rhs};
 }
 
 template <typename T, DenseMatrixExpression Expr>
-requires (!DenseMatrixExpression<T>)
+requires (!ExpressionTemplate<T>)
 inline constexpr auto operator/(const Expr& lhs, const T& rhs)
         -> DenseMatrixDivide<Expr, ConstantMatrixExpression<T>> {
     return {lhs, rhs};

@@ -75,6 +75,13 @@ concept DenseMatrixExpression = requires (Expr expr) {
     {expr.num_elements()} -> std::same_as<std::size_t>;
 };
 
+template <typename Expr>
+concept MatrixExpression = BandedMatrixExpression<Expr>
+        || DenseMatrixExpression<Expr>;
+
+template <typename Expr>
+concept ExpressionTemplate = VectorExpression<Expr> || MatrixExpression<Expr>;
+
 template <typename Expr, typename T>
 concept VectorExpressionConvertibleTo = VectorExpression<Expr>
         && std::convertible_to<typename Expr::ValueType, T>;
