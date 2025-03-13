@@ -10,6 +10,10 @@
 #include "jump/experimental/expression_templates/concepts.hpp"
 #endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
+#ifdef JUMP_ENABLE_SMALL_VEC
+#include "jump/experimental/data/vec2.hpp"
+#endif  // JUMP_ENABLE_SMALL_VEC
+
 #include <iostream>
 
 using namespace jump;
@@ -28,22 +32,28 @@ void f([[maybe_unused]] const BandedMatrix<T>& M) {
 
 int banded_matrix_test(int argc, char** argv);
 int vector_test(int argc, char** argv);
+int small_vector_test(int argc, char** argv);
 
 int main(int argc, char** argv) {
     CommandLineArgs args(argc, argv);
 
     bool do_vector_test{false};
     bool do_banded_matrix_test{false};
+    bool do_small_vector_test{false};
     int sum_return_vals{0};
 
     args.get("vector", do_vector_test);
     args.get("banded_matrix", do_banded_matrix_test);
+    args.get("small_vector", do_small_vector_test);
 
     if (do_vector_test) {
         sum_return_vals += vector_test(argc, argv);
     }
     if (do_banded_matrix_test) {
         sum_return_vals += banded_matrix_test(argc, argv);
+    }
+    if (do_small_vector_test) {
+        sum_return_vals += small_vector_test(argc, argv);
     }
 
     return sum_return_vals;
@@ -131,6 +141,20 @@ int banded_matrix_test(int argc, char** argv) {
     std::cout << evaluate(atanh(test)) << std::endl;
     std::cout << evaluate(abs(test)) << std::endl;
     std::cout << evaluate(sgn(test)) << std::endl;
+
+    return 0;
+}
+
+int small_vector_test(int argc, char** argv) {
+    CommandLineArgs args(argc, argv);
+
+#ifdef JUMP_ENABLE_SMALL_VEC
+    Vec<float, 2> test;
+    test.x = 5.f;
+    test.g = 10.f;
+
+    std::cout << test.x << ' ' << test.y << std::endl;
+#endif  // JUMP_ENABLE_SMALL_VEC
 
     return 0;
 }
