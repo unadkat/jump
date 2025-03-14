@@ -7,12 +7,21 @@
 #ifndef JUMP_VEC_HPP
 #define JUMP_VEC_HPP
 
-#include <cstddef>
+#include <ostream>
 
 namespace jump {
 template <typename T, std::size_t N>
 struct Vec {
 };
+
+template <typename T, std::size_t N>
+inline auto operator<<(std::ostream& out, const Vec<T, N>& rhs)
+        -> std::ostream& {
+    for (std::size_t i{0}; i < rhs.size(); ++i) {
+        out << rhs[i] << ' ';
+    }
+    return out;
+}
 }   // namespace jump
 
 #endif  // JUMP_VEC_HPP

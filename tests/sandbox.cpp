@@ -149,11 +149,9 @@ int small_vector_test(int argc, char** argv) {
     CommandLineArgs args(argc, argv);
 
 #ifdef JUMP_ENABLE_SMALL_VEC
-    Vec<float, 2> test;
-    test.x = 5.f;
-    test.g = 10.f;
+    Vec<float, 2> test{42};
 
-    std::cout << test.x << ' ' << test.y << std::endl;
+    std::cout << test << std::endl;
 #endif  // JUMP_ENABLE_SMALL_VEC
 
     return 0;
