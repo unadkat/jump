@@ -11,7 +11,9 @@
 #include "jump/debug/exception.hpp"
 
 #include "jump/experimental/data/vec.hpp"
+#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 #include "jump/experimental/expression_templates/concepts.hpp"
+#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 #include <type_traits>
 
