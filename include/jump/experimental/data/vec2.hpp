@@ -56,6 +56,20 @@ class Vec<T, 2> {
         std::array<ValueType, 2> m_storage;
 };
 
+// ========================================================================
+// Aliases
+// ========================================================================
+
+using Vec2f = Vec<float, 2>;
+using Vec2d = Vec<double, 2>;
+using Vec2i = Vec<int, 2>;
+using Vec2u = Vec<unsigned int, 2>;
+using Vec2z = Vec<std::size_t, 2>;
+
+// ========================================================================
+// Implementation
+// ========================================================================
+
 template <typename T>
 inline constexpr Vec<T, 2>::Vec(const ValueType& value) :
     m_storage{value, value} {
