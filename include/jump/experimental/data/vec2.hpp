@@ -37,8 +37,20 @@ class Vec<T, 2> {
         constexpr auto operator[](std::size_t index) const -> const ValueType&;
         constexpr auto operator[](std::size_t index) -> ValueType&;
 
+        constexpr auto x() const -> const ValueType&;
+        constexpr auto x() -> ValueType&;
+        constexpr auto r() const -> const ValueType&;
+        constexpr auto r() -> ValueType&;
+
+        constexpr auto y() const -> const ValueType&;
+        constexpr auto y() -> ValueType&;
+        constexpr auto g() const -> const ValueType&;
+        constexpr auto g() -> ValueType&;
+
         constexpr auto size() const -> std::size_t;
 
+        constexpr auto data() const -> const ValueType*;
+        constexpr auto data() -> ValueType*;
 
     private:
         std::array<ValueType, 2> m_storage;
@@ -86,8 +98,58 @@ inline constexpr auto Vec<T, 2>::operator[](std::size_t index) -> ValueType& {
 }
 
 template <typename T>
+inline constexpr auto Vec<T, 2>::x() const -> const ValueType& {
+    return m_storage[0];
+}
+
+template <typename T>
+inline constexpr auto Vec<T, 2>::x() -> ValueType& {
+    return m_storage[0];
+}
+
+template <typename T>
+inline constexpr auto Vec<T, 2>::r() const -> const ValueType& {
+    return m_storage[0];
+}
+
+template <typename T>
+inline constexpr auto Vec<T, 2>::r() -> ValueType& {
+    return m_storage[0];
+}
+
+template <typename T>
+inline constexpr auto Vec<T, 2>::y() const -> const ValueType& {
+    return m_storage[1];
+}
+
+template <typename T>
+inline constexpr auto Vec<T, 2>::y() -> ValueType& {
+    return m_storage[1];
+}
+
+template <typename T>
+inline constexpr auto Vec<T, 2>::g() const -> const ValueType& {
+    return m_storage[1];
+}
+
+template <typename T>
+inline constexpr auto Vec<T, 2>::g() -> ValueType& {
+    return m_storage[1];
+}
+
+template <typename T>
 inline constexpr auto Vec<T, 2>::size() const -> std::size_t {
     return 2;
+}
+
+template <typename T>
+inline constexpr auto Vec<T, 2>::data() const -> const ValueType* {
+    return m_storage.data();
+}
+
+template <typename T>
+inline constexpr auto Vec<T, 2>::data() -> ValueType* {
+    return m_storage.data();
 }
 }   // namespace jump
 
