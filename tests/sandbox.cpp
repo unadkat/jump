@@ -6,10 +6,7 @@
 
 #include "jump/jump.hpp"
 
-#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 #include "jump/experimental/expression_templates/concepts.hpp"
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
-
 #ifdef JUMP_ENABLE_SMALL_VEC
 #include "jump/experimental/data/vec2.hpp"
 #endif  // JUMP_ENABLE_SMALL_VEC
@@ -18,17 +15,10 @@
 
 using namespace jump;
 
-#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 template <BandedMatrixExpression Expr>
 void f(const Expr& M) {
     std::cout << M << std::endl;
 }
-#else
-template <typename T>
-void f([[maybe_unused]] const BandedMatrix<T>& M) {
-    std::cout << "No expression template support" << std::endl;
-}
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 int banded_matrix_test(int argc, char** argv);
 int vector_test(int argc, char** argv);
@@ -117,10 +107,8 @@ int banded_matrix_test(int argc, char** argv) {
     auto test4{4.*test};
     std::cout << "matrix*scalar" << std::endl;
     auto test5{test*5.};
-#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
     std::cout << "scalar/matrix" << std::endl;
     auto test6{6./test};
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
     std::cout << "matrix/scalar" << std::endl;
     auto test7{test/7.};
 

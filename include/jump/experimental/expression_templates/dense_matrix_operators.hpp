@@ -12,7 +12,6 @@
 #include "jump/experimental/expression_templates/dense_matrix_expressions.hpp"
 
 namespace jump {
-#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 // ========================================================================
 // Arithmetic
 // ========================================================================
@@ -256,7 +255,6 @@ template <DenseMatrixExpression Expr>
 inline constexpr auto sgn(const Expr& expr) -> DenseMatrixSgn<Expr> {
     return {expr};
 }
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 }   // namespace jump
 
 #endif  // JUMP_EXPRESSION_TEMPLATE_DENSE_MATRIX_OPERATORS_HPP

@@ -10,12 +10,9 @@
 #include "jump/autodiff/dual.hpp"
 #include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
+#include "jump/experimental/expression_templates/vector_operators.hpp"
 #include "jump/utility/types.hpp"
 #include "jump/utility/utility.hpp"
-
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-#include "jump/experimental/expression_templates/vector_operators.hpp"
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 #include <algorithm>
 #include <cmath>
@@ -37,14 +34,12 @@ struct Vector {
     using Iterator = typename std::vector<T>::iterator;
     /// \brief Iterator for algorithms.
     using ConstIterator = typename std::vector<T>::const_iterator;
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
     /// \brief To satisfy VectorExpression concept
     using ValueType = T;
 
     /// \brief To satisfy VectorExpression concept (and signal that this data
     /// structure can be referenced in evaluations).
     static constexpr bool is_vector_expression_leaf{true};
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
     /// \brief Internal contiguous storage.
     std::vector<T> storage;
@@ -66,21 +61,17 @@ struct Vector {
     Vector(const Vector<U>& other);
     /// \brief Default move constructor.
     Vector(Vector&& other) = default;
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
     /// \brief Construct from a VectorExpression.
     template <VectorExpressionConvertibleTo<T> Expr>
     Vector(const Expr& expr);
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
     /// \brief Default copy assignment.
     auto operator=(const Vector& other) -> Vector& = default;
     /// \brief Default move assignment.
     auto operator=(Vector&& other) -> Vector& = default;
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
     /// \brief Assignment from a VectorExpression.
     template <VectorExpressionConvertibleTo<T> Expr>
     auto operator=(const Expr& expr) -> Vector&;
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
     /// \brief Set size and fill with a given value.
     void assign(std::size_t size, const T& value = T{0});
@@ -116,24 +107,6 @@ struct Vector {
     /// \brief Fill vector with zeroes.
     void zero();
 
-#ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-    /// \brief No operation on `Vector`.
-    auto operator+() const -> const Vector&;
-    /// \brief Negate `Vector`.
-    auto operator-() const -> Vector;
-    /// \brief Add two Vectors together in place.
-    template <std::convertible_to<T> U>
-    auto operator+=(const Vector<U>& rhs) -> Vector&;
-    /// \brief Subtract one `Vector` from another in place.
-    template <std::convertible_to<T> U>
-    auto operator-=(const Vector<U>& rhs) -> Vector&;
-    /// \brief Elementwise product by another Vector.
-    template <std::convertible_to<T> U>
-    auto operator*=(const Vector<U>& rhs) -> Vector&;
-    /// \brief Elementwise division by another Vector.
-    template <std::convertible_to<T> U>
-    auto operator/=(const Vector<U>& rhs) -> Vector&;
-#else
     /// \brief Add VectorExpression to Vector in place.
     template <VectorExpressionConvertibleTo<T> Expr>
     auto operator+=(const Expr& expr) -> Vector&;
@@ -146,7 +119,6 @@ struct Vector {
     /// \brief Elementwise division by a VectorExpression.
     template <VectorExpressionConvertibleTo<T> Expr>
     auto operator/=(const Expr& expr) -> Vector&;
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
     /// \brief Multiply by scalar in place.
     template <std::convertible_to<T> U>
     auto operator*=(const U& rhs) -> Vector&;
@@ -178,226 +150,9 @@ struct Vector {
 template <typename T>
 auto operator<<(std::ostream& out, const Vector<T>& rhs) -> std::ostream&;
 
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 /// \relates Vector
 template <VectorExpression Expr>
 constexpr auto evaluate(const Expr& expr) -> Vector<typename Expr::ValueType>;
-#else
-/// \relates Vector
-template <typename T>
-constexpr auto evaluate(const Vector<T>& v) -> const Vector<T>&;
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-
-#ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-/// \relates Vector
-/// \brief Addition of two Vectors.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator+(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Addition of two Vectors.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator+(Vector<T>&& lhs, const Vector<U>& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Addition of two Vectors.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator+(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Addition of two Vectors.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator+(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Difference of two Vectors.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator-(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Difference of two Vectors.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator-(Vector<T>&& lhs, const Vector<U>& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Difference of two Vectors.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator-(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Difference of two Vectors.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator-(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Left-hand multiplication by scalar.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator*(const T& lhs, const Vector<U>& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Left-hand multiplication by scalar.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator*(const T& lhs, Vector<U>&& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Right-hand multiplication by scalar.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator*(const Vector<T>& lhs, const U& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Right-hand multiplication by scalar.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator*(Vector<T>&& lhs, const U& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Elementwise product of two Vectors.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator*(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Elementwise product of two Vectors.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator*(Vector<T>&& lhs, const Vector<U>& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Elementwise product of two Vectors.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator*(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Elementwise product of two Vectors.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator*(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Inner product of two Vectors.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto dot(const Vector<T>& lhs, const Vector<U>& rhs) -> R;
-
-/// \relates Vector
-/// \brief Right-hand division by scalar.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator/(const Vector<T>& lhs, const U& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Right-hand division by scalar.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator/(Vector<T>&& lhs, const U& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Quotient with scalar.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator/(const T& lhs, const Vector<U>& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Quotient with scalar.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator/(const T& lhs, Vector<U>&& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Elementwise division of two Vectors.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator/(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Elementwise division of two Vectors.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator/(Vector<T>&& lhs, const Vector<U>& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Elementwise division of two Vectors.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator/(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R>;
-
-/// \relates Vector
-/// \brief Elementwise division of two Vectors.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator/(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R>;
-
-// ========================================================================
-// Exponentiation
-// ========================================================================
-
-/// \relates Vector
-template <typename T>
-auto exp(Vector<T> v) -> Vector<T>;
-
-/// \relates Vector
-template <typename T>
-auto log(Vector<T> v) -> Vector<T>;
-
-/// \relates Vector
-template <typename T>
-auto pow(Vector<T> v, T p) -> Vector<T>;
-
-// ========================================================================
-// Trigonometry
-// ========================================================================
-
-/// \relates Vector
-template <typename T>
-auto sin(Vector<T> v) -> Vector<T>;
-
-/// \relates Vector
-template <typename T>
-auto cos(Vector<T> v) -> Vector<T>;
-
-/// \relates Vector
-template <typename T>
-auto tan(Vector<T> v) -> Vector<T>;
-
-/// \relates Vector
-template <typename T>
-auto asin(Vector<T> v) -> Vector<T>;
-
-/// \relates Vector
-template <typename T>
-auto acos(Vector<T> v) -> Vector<T>;
-
-/// \relates Vector
-template <typename T>
-auto atan(Vector<T> v) -> Vector<T>;
-
-// ========================================================================
-// Hyperbolics
-// ========================================================================
-
-/// \relates Vector
-template <typename T>
-auto sinh(Vector<T> v) -> Vector<T>;
-
-/// \relates Vector
-template <typename T>
-auto cosh(Vector<T> v) -> Vector<T>;
-
-/// \relates Vector
-template <typename T>
-auto tanh(Vector<T> v) -> Vector<T>;
-
-/// \relates Vector
-template <typename T>
-auto asinh(Vector<T> v) -> Vector<T>;
-
-/// \relates Vector
-template <typename T>
-auto acosh(Vector<T> v) -> Vector<T>;
-
-/// \relates Vector
-template <typename T>
-auto atanh(Vector<T> v) -> Vector<T>;
-
-// ========================================================================
-// Miscellaneous
-// ========================================================================
-
-/// \relates Vector
-template <typename T>
-auto abs(Vector<T> v) -> Vector<T>;
-
-/// \relates Vector
-template <typename T>
-auto sgn(Vector<T> v) -> Vector<T>;
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 // ========================================================================
 // Implementation
@@ -434,7 +189,6 @@ inline Vector<T>::Vector(InputIt first, InputIt last) :
     storage(first, last) {
 }
 
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 template <typename T>
 template <VectorExpressionConvertibleTo<T> Expr>
 inline Vector<T>::Vector(const Expr& expr) :
@@ -454,7 +208,6 @@ inline auto Vector<T>::operator=(const Expr& expr) -> Vector& {
     }
     return *this;
 }
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 template <typename T>
 inline void Vector<T>::assign(std::size_t size, const T& value) {
@@ -534,82 +287,6 @@ inline void Vector<T>::zero() {
     fill(T{0});
 }
 
-#ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-template <typename T>
-inline auto Vector<T>::operator+() const -> const Vector<T>& {
-    return *this;
-}
-
-template <typename T>
-inline auto Vector<T>::operator-() const -> Vector<T> {
-    Vector<T> temp{*this};
-    return temp *= T{-1};
-}
-
-template <typename T>
-template <std::convertible_to<T> U>
-inline auto Vector<T>::operator+=(const Vector<U>& rhs) -> Vector& {
-#ifndef NDEBUG
-    if (size() != rhs.size()) {
-        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
-            .size2 = rhs.size()}};
-    }
-#endif  // NDEBUG
-
-    for (std::size_t i{0}, N{size()}; i < N; ++i) {
-        storage[i] += rhs[i];
-    }
-    return *this;
-}
-
-template <typename T>
-template <std::convertible_to<T> U>
-inline auto Vector<T>::operator-=(const Vector<U>& rhs) -> Vector& {
-#ifndef NDEBUG
-    if (size() != rhs.size()) {
-        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
-            .size2 = rhs.size()}};
-    }
-#endif  // NDEBUG
-
-    for (std::size_t i{0}, N{size()}; i < N; ++i) {
-        storage[i] -= rhs[i];
-    }
-    return *this;
-}
-
-template <typename T>
-template <std::convertible_to<T> U>
-inline auto Vector<T>::operator*=(const Vector<U>& rhs) -> Vector& {
-#ifndef NDEBUG
-    if (size() != rhs.size()) {
-        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
-            .size2 = rhs.size()}};
-    }
-#endif  // NDEBUG
-
-    for (std::size_t i{0}, N{size()}; i < N; ++i) {
-        storage[i] *= rhs[i];
-    }
-    return *this;
-}
-
-template <typename T>
-template <std::convertible_to<T> U>
-inline auto Vector<T>::operator/=(const Vector<U>& rhs) -> Vector& {
-#ifndef NDEBUG
-    if (size() != rhs.size()) {
-        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "rhs",
-            .size2 = rhs.size()}};
-    }
-#endif  // NDEBUG
-
-    for (std::size_t i{0}, N{size()}; i < N; ++i) {
-        storage[i] /= rhs[i];
-    }
-    return *this;
-}
-#else
 /// \brief Add VectorExpression to Vector in place.
 template <typename T>
 template <VectorExpressionConvertibleTo<T> Expr>
@@ -677,7 +354,6 @@ inline auto Vector<T>::operator/=(const Expr& expr) -> Vector& {
     }
     return *this;
 }
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 template <typename T>
 template <std::convertible_to<T> U>
@@ -776,575 +452,11 @@ inline auto operator<<(std::ostream& out, const Vector<T>& rhs)
     return out;
 }
 
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 /// \relates Vector
 template <VectorExpression Expr>
 inline constexpr auto evaluate(const Expr& expr) -> Vector<typename Expr::ValueType> {
     return {expr};
 }
-#else
-/// \relates Vector
-template <typename T>
-constexpr auto evaluate(const Vector<T>& v) -> const Vector<T>& {
-    return v;
-}
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-
-#ifndef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-/// \relates Vector
-/// \brief Addition of two Vectors.
-template <typename T, typename U, typename R>
-inline auto operator+(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R> {
-    if constexpr (std::is_same_v<T, R>) {
-        Vector<R> result{lhs};
-        result += rhs;
-        return result;
-    } else {
-        Vector<R> result{rhs};
-        result += lhs;
-        return result;
-    }
-}
-
-/// \relates Vector
-/// \brief Addition of two Vectors.
-template <typename T, typename U, typename R>
-inline auto operator+(Vector<T>&& lhs, const Vector<U>& rhs) -> Vector<R> {
-    if constexpr (std::is_same_v<T, R>) {
-        lhs += rhs;
-        return lhs;
-    } else {
-        Vector<R> result{rhs};
-        result += lhs;
-        return result;
-    }
-}
-
-/// \relates Vector
-/// \brief Addition of two Vectors.
-template <typename T, typename U, typename R>
-inline auto operator+(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R> {
-    if constexpr (std::is_same_v<U, R>) {
-        rhs += lhs;
-        return rhs;
-    } else {
-        Vector<R> result{lhs};
-        result += rhs;
-        return result;
-    }
-}
-
-/// \relates Vector
-/// \brief Addition of two Vectors.
-template <typename T, typename U, typename R>
-inline auto operator+(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R> {
-    if constexpr (std::is_same_v<T, R>) {
-        lhs += rhs;
-        return lhs;
-    } else if constexpr (std::is_same_v<U, R>) {
-        rhs += lhs;
-        return rhs;
-    } else {
-        Vector<R> result{lhs};
-        result += rhs;
-        return result;
-    }
-}
-
-/// \relates Vector
-/// \brief Difference of two Vectors.
-template <typename T, typename U, typename R>
-inline auto operator-(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R> {
-    Vector<R> result{lhs};
-    result -= rhs;
-    return result;
-}
-
-/// \relates Vector
-/// \brief Difference of two Vectors.
-template <typename T, typename U, typename R>
-inline auto operator-(Vector<T>&& lhs, const Vector<U>& rhs) -> Vector<R> {
-    if constexpr (std::is_same_v<T, R>) {
-        lhs -= rhs;
-        return lhs;
-    } else {
-        Vector<R> result{lhs};
-        result -= rhs;
-        return result;
-    }
-}
-
-/// \relates Vector
-/// \brief Difference of two Vectors.
-template <typename T, typename U, typename R>
-inline auto operator-(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R> {
-    if constexpr (std::is_same_v<U, R>) {
-#ifndef NDEBUG
-        if (lhs.size() != rhs.size()) {
-            throw RuntimeError{Mismatch1DError{.name1 = "lhs",
-                .size1 = lhs.size(), .name2 = "rhs", .size2 = rhs.size()}};
-        }
-#endif  // NDEBUG
-
-        for (std::size_t i{0}, N{lhs.size()}; i < N; ++i) {
-            rhs.storage[i] = lhs.storage[i] - rhs.storage[i];
-        }
-        return rhs;
-    } else {
-        Vector<R> result{lhs};
-        result -= rhs;
-        return result;
-    }
-}
-
-/// \relates Vector
-/// \brief Difference of two Vectors.
-template <typename T, typename U, typename R>
-inline auto operator-(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R> {
-    if constexpr (std::is_same_v<T, R>) {
-        lhs -= rhs;
-        return lhs;
-    } else if constexpr (std::is_same_v<U, R>) {
-#ifndef NDEBUG
-        if (lhs.size() != rhs.size()) {
-            throw RuntimeError{Mismatch1DError{.name1 = "lhs",
-                .size1 = lhs.size(), .name2 = "rhs", .size2 = rhs.size()}};
-        }
-#endif  // NDEBUG
-
-        for (std::size_t i{0}, N{lhs.size()}; i < N; ++i) {
-            rhs.storage[i] = lhs.storage[i] - rhs.storage[i];
-        }
-        return rhs;
-    } else {
-        Vector<R> result{lhs};
-        result -= rhs;
-        return result;
-    }
-}
-
-/// \relates Vector
-/// \brief Left-hand multiplication by scalar.
-template <typename T, typename U, typename R>
-inline auto operator*(const T& lhs, const Vector<U>& rhs) -> Vector<R> {
-    Vector<R> result{rhs};
-    result *= lhs;
-    return result;
-}
-
-/// \relates Vector
-/// \brief Left-hand multiplication by scalar.
-template <typename T, typename U, typename R>
-inline auto operator*(const T& lhs, Vector<U>&& rhs) -> Vector<R> {
-    if constexpr (std::is_same_v<U, R>) {
-        rhs *= lhs;
-        return rhs;
-    } else {
-        Vector<T> result{rhs};
-        result *= lhs;
-        return result;
-    }
-}
-
-/// \relates Vector
-/// \brief Right-hand multiplication by scalar.
-template <typename T, typename U, typename R>
-inline auto operator*(const Vector<T>& lhs, const U& rhs) -> Vector<R> {
-    Vector<R> result{lhs};
-    result *= rhs;
-    return result;
-}
-
-/// \relates Vector
-/// \brief Right-hand multiplication by scalar.
-template <typename T, typename U, typename R>
-inline auto operator*(Vector<T>&& lhs, const U& rhs) -> Vector<R> {
-    if constexpr (std::is_same_v<T, R>) {
-        lhs *= rhs;
-        return lhs;
-    } else {
-        Vector<R> result{lhs};
-        result *= rhs;
-        return result;
-    }
-}
-
-/// \relates Vector
-/// \brief Elementwise product of two Vectors.
-template <typename T, typename U, typename R>
-inline auto operator*(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R> {
-    if constexpr (std::is_same_v<T, R>) {
-        Vector<R> result{lhs};
-        result *= rhs;
-        return result;
-    } else {
-        Vector<R> result{rhs};
-        result *= lhs;
-        return result;
-    }
-}
-
-/// \relates Vector
-/// \brief Elementwise product of two Vectors.
-template <typename T, typename U, typename R>
-inline auto operator*(Vector<T>&& lhs, const Vector<U>& rhs) -> Vector<R> {
-    if constexpr (std::is_same_v<T, R>) {
-        lhs *= rhs;
-        return lhs;
-    } else {
-        Vector<R> result{rhs};
-        result *= lhs;
-        return result;
-    }
-}
-
-/// \relates Vector
-/// \brief Elementwise product of two Vectors.
-template <typename T, typename U, typename R>
-inline auto operator*(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R> {
-    if constexpr (std::is_same_v<U, R>) {
-        rhs *= lhs;
-        return rhs;
-    } else {
-        Vector<R> result{lhs};
-        result *= rhs;
-        return result;
-    }
-}
-
-/// \relates Vector
-/// \brief Elementwise product of two Vectors.
-template <typename T, typename U, typename R>
-inline auto operator*(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R> {
-    if constexpr (std::is_same_v<T, R>) {
-        lhs *= rhs;
-        return lhs;
-    } else if constexpr (std::is_same_v<U, R>) {
-        rhs *= lhs;
-        return rhs;
-    } else {
-        Vector<R> result{lhs};
-        lhs *= rhs;
-        return result;
-    }
-}
-
-/// \relates Vector
-/// \brief Inner product of two Vectors.
-template <typename T, typename U, typename R>
-inline auto dot(const Vector<T>& lhs, const Vector<U>& rhs) -> R {
-#ifndef NDEBUG
-    if (lhs.size() != rhs.size()) {
-        throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
-            .name2 = "rhs", .size2 = rhs.size()}};
-    }
-#endif  // NDEBUG
-
-    return std::inner_product(lhs.begin(), lhs.end(), rhs.begin(), R{0});
-}
-
-/// \relates Vector
-/// \brief Right-hand division by scalar.
-template <typename T, typename U, typename R>
-inline auto operator/(const Vector<T>& lhs, const U& rhs) -> Vector<R> {
-    Vector<R> result{lhs};
-    result /= rhs;
-    return result;
-}
-
-/// \relates Vector
-/// \brief Right-hand division by scalar.
-template <typename T, typename U, typename R>
-auto operator/(Vector<T>&& lhs, const U& rhs) -> Vector<R> {
-    if constexpr (std::is_same_v<T, R>) {
-        lhs /= rhs;
-        return lhs;
-    } else {
-        Vector<R> result{lhs};
-        result /= rhs;
-        return result;
-    }
-}
-
-/// \relates Vector
-/// \brief Quotient with scalar.
-template <typename T, typename U, typename R>
-auto operator/(const T& lhs, const Vector<U>& rhs) -> Vector<R> {
-    std::size_t N{rhs.size()};
-    Vector<R> result(N, R{lhs});
-    for (std::size_t i{0}; i < N; ++i) {
-        result[i] /= rhs[i];
-    }
-    return result;
-}
-
-/// \relates Vector
-/// \brief Quotient with scalar.
-template <typename T, typename U, typename R>
-auto operator/(const T& lhs, Vector<U>&& rhs) -> Vector<R> {
-    std::size_t N{rhs.size()};
-    if constexpr (std::is_same_v<U, R>) {
-        for (std::size_t i{0}; i < N; ++i) {
-            rhs[i] = lhs/rhs[i];
-        }
-        return rhs;
-    } else {
-        Vector<R> result(N, R{lhs});
-        for (std::size_t i{0}; i < N; ++i) {
-            result[i] /= rhs[i];
-        }
-        return result;
-    }
-}
-
-/// \relates Vector
-/// \brief Elementwise division of two Vectors.
-template <typename T, typename U, typename R>
-inline auto operator/(const Vector<T>& lhs, const Vector<U>& rhs) -> Vector<R> {
-    Vector<R> result{lhs};
-    result /= rhs;
-    return result;
-}
-
-/// \relates Vector
-/// \brief Elementwise division of two Vectors.
-template <typename T, typename U, typename R>
-inline auto operator/(Vector<T>&& lhs, const Vector<U>& rhs) -> Vector<R> {
-    if constexpr (std::is_same_v<T, R>) {
-        lhs /= rhs;
-        return lhs;
-    } else {
-        Vector<R> result{lhs};
-        result /= rhs;
-        return result;
-    }
-}
-
-/// \relates Vector
-/// \brief Elementwise division of two Vectors.
-template <typename T, typename U, typename R>
-inline auto operator/(const Vector<T>& lhs, Vector<U>&& rhs) -> Vector<R> {
-#ifndef NDEBUG
-    if (lhs.size() != rhs.size()) {
-        throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
-            .name2 = "rhs", .size2 = rhs.size()}};
-    }
-#endif  // NDEBUG
-
-    std::size_t N{lhs.size()};
-    if constexpr (std::is_same_v<U, R>) {
-        for (std::size_t i{0}; i < N; ++i) {
-            rhs[i] = lhs[i]/rhs[i];
-        }
-        return rhs;
-    } else {
-        Vector<R> result{lhs};
-        for (std::size_t i{0}; i < N; ++i) {
-            result[i] /= rhs[i];
-        }
-        return result;
-    }
-}
-
-/// \relates Vector
-/// \brief Elementwise division of two Vectors.
-template <typename T, typename U, typename R>
-inline auto operator/(Vector<T>&& lhs, Vector<U>&& rhs) -> Vector<R> {
-#ifndef NDEBUG
-    if (lhs.size() != rhs.size()) {
-        throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
-            .name2 = "rhs", .size2 = rhs.size()}};
-    }
-#endif  // NDEBUG
-
-    std::size_t N{lhs.size()};
-    if constexpr (std::is_same_v<T, R>) {
-        for (std::size_t i{0}; i < N; ++i) {
-            lhs[i] /= rhs[i];
-        }
-        return lhs;
-    } else if constexpr (std::is_same_v<U, R>) {
-        for (std::size_t i{0}; i < N; ++i) {
-            rhs[i] = lhs[i]/rhs[i];
-        }
-        return rhs;
-    } else {
-        Vector<R> result{lhs};
-        for (std::size_t i{0}; i < N; ++i) {
-            result[i] /= rhs[i];
-        }
-        return result;
-    }
-}
-
-// ========================================================================
-// Exponentiation
-// ========================================================================
-
-/// \relates Vector
-template <typename T>
-inline auto exp(Vector<T> v) -> Vector<T> {
-    using std::exp;
-    std::transform(v.begin(), v.end(), v.begin(),
-            [&](const T& x) { return exp(x); });
-    return v;
-}
-
-/// \relates Vector
-template <typename T>
-inline auto log(Vector<T> v) -> Vector<T> {
-    using std::log;
-    std::transform(v.begin(), v.end(), v.begin(),
-            [&](const T& x) { return log(x); });
-    return v;
-}
-
-/// \relates Vector
-template <typename T>
-inline auto pow(Vector<T> v, T p) -> Vector<T> {
-    using std::pow;
-    std::transform(v.begin(), v.end(), v.begin(),
-            [&](const T& x) { return pow(x, p); });
-    return v;
-}
-
-// ========================================================================
-// Trigonometry
-// ========================================================================
-
-/// \relates Vector
-template <typename T>
-inline auto sin(Vector<T> v) -> Vector<T> {
-    using std::sin;
-    std::transform(v.begin(), v.end(), v.begin(),
-            [&](const T& x) { return sin(x); });
-    return v;
-}
-
-/// \relates Vector
-template <typename T>
-inline auto cos(Vector<T> v) -> Vector<T> {
-    using std::cos;
-    std::transform(v.begin(), v.end(), v.begin(),
-            [&](const T& x) { return cos(x); });
-    return v;
-}
-
-/// \relates Vector
-template <typename T>
-inline auto tan(Vector<T> v) -> Vector<T> {
-    using std::tan;
-    std::transform(v.begin(), v.end(), v.begin(),
-            [&](const T& x) { return tan(x); });
-    return v;
-}
-
-/// \relates Vector
-template <typename T>
-inline auto asin(Vector<T> v) -> Vector<T> {
-    using std::asin;
-    std::transform(v.begin(), v.end(), v.begin(),
-            [&](const T& x) { return asin(x); });
-    return v;
-}
-
-/// \relates Vector
-template <typename T>
-inline auto acos(Vector<T> v) -> Vector<T> {
-    using std::acos;
-    std::transform(v.begin(), v.end(), v.begin(),
-            [&](const T& x) { return acos(x); });
-    return v;
-}
-
-/// \relates Vector
-template <typename T>
-inline auto atan(Vector<T> v) -> Vector<T> {
-    using std::atan;
-    std::transform(v.begin(), v.end(), v.begin(),
-            [&](const T& x) { return atan(x); });
-    return v;
-}
-
-// ========================================================================
-// Hyperbolics
-// ========================================================================
-
-/// \relates Vector
-template <typename T>
-inline auto sinh(Vector<T> v) -> Vector<T> {
-    using std::sinh;
-    std::transform(v.begin(), v.end(), v.begin(),
-            [&](const T& x) { return sinh(x); });
-    return v;
-}
-
-/// \relates Vector
-template <typename T>
-inline auto cosh(Vector<T> v) -> Vector<T> {
-    using std::cosh;
-    std::transform(v.begin(), v.end(), v.begin(),
-            [&](const T& x) { return cosh(x); });
-    return v;
-}
-
-/// \relates Vector
-template <typename T>
-inline auto tanh(Vector<T> v) -> Vector<T> {
-    using std::tanh;
-    std::transform(v.begin(), v.end(), v.begin(),
-            [&](const T& x) { return tanh(x); });
-    return v;
-}
-
-/// \relates Vector
-template <typename T>
-inline auto asinh(Vector<T> v) -> Vector<T> {
-    using std::asinh;
-    std::transform(v.begin(), v.end(), v.begin(),
-            [&](const T& x) { return asinh(x); });
-    return v;
-}
-
-/// \relates Vector
-template <typename T>
-inline auto acosh(Vector<T> v) -> Vector<T> {
-    using std::acosh;
-    std::transform(v.begin(), v.end(), v.begin(),
-            [&](const T& x) { return acosh(x); });
-    return v;
-}
-
-/// \relates Vector
-template <typename T>
-inline auto atanh(Vector<T> v) -> Vector<T> {
-    using std::atanh;
-    std::transform(v.begin(), v.end(), v.begin(),
-            [&](const T& x) { return atanh(x); });
-    return v;
-}
-
-// ========================================================================
-// Miscellaneous
-// ========================================================================
-
-/// \relates Vector
-template <typename T>
-inline auto abs(Vector<T> v) -> Vector<T> {
-    using std::abs;
-    std::transform(v.begin(), v.end(), v.begin(),
-            [&](const T& x) { return abs(x); });
-    return v;
-}
-
-/// \relates Vector
-template <typename T>
-inline auto sgn(Vector<T> v) -> Vector<T> {
-    std::transform(v.begin(), v.end(), v.begin(),
-            [&](const T& x) { return sgn(x); });
-    return v;
-}
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 }   // namespace jump
 
 #endif  // JUMP_VECTOR_HPP

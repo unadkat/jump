@@ -10,14 +10,12 @@
 #include "jump/autodiff/dual.hpp"
 #include "jump/data/banded_matrix.hpp"
 #include "jump/data/dense_matrix.hpp"
-#include "jump/utility/types.hpp"
 #include "jump/data/vector.hpp"
 #include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
-
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 #include "jump/experimental/expression_templates/concepts.hpp"
-#endif //   JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
+#include "jump/utility/types.hpp"
+
 
 #include <cmath>
 #include <complex>
@@ -66,38 +64,25 @@ inline Real epsilon_relative{1e-6};
 inline Real epsilon_absolute{1e-12};
 
 template <typename T, typename U>
-requires (true
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-    && !VectorExpression<T> && !VectorExpression<U>
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+requires (!VectorExpression<T> && !VectorExpression<U>
     && !BandedMatrixExpression<T> && !BandedMatrixExpression<U>
     && !DenseMatrixExpression<T> && !DenseMatrixExpression<U>
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 )
 auto approx(const T& lhs, const U& rhs) -> bool;
 
 template <typename T>
-requires (true
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-    && !VectorExpression<T>
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+requires (!VectorExpression<T>
     && !BandedMatrixExpression<T>
     && !DenseMatrixExpression<T>
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 )
 auto vanishes(const T& x) -> bool;
 
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 template <VectorExpression Left, VectorExpression Right>
 constexpr auto approx(const Left& lhs, const Right& rhs) -> bool;
 
 template <VectorExpression Expr>
 constexpr auto vanishes(const Expr& expr) -> bool;
-#endif //   JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
-#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 template <BandedMatrixExpression Left, BandedMatrixExpression Right>
 constexpr auto approx(const Left& lhs, const Right& rhs) -> bool;
 
@@ -109,21 +94,15 @@ constexpr auto approx(const Left& lhs, const Right& rhs) -> bool;
 
 template <DenseMatrixExpression Expr>
 constexpr auto vanishes(const Expr& expr) -> bool;
-#endif //   JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 // ========================================================================
 // Implementation
 // ========================================================================
 
 template <typename T, typename U>
-requires (true
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-    && !VectorExpression<T> && !VectorExpression<U>
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+requires (!VectorExpression<T> && !VectorExpression<U>
     && !BandedMatrixExpression<T> && !BandedMatrixExpression<U>
     && !DenseMatrixExpression<T> && !DenseMatrixExpression<U>
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 )
 inline auto approx(const T& lhs, const U& rhs) -> bool {
     if (lhs == rhs) {
@@ -185,15 +164,56 @@ inline auto approx(const DenseMatrix<T>& lhs, const DenseMatrix<T>& rhs)
     return approx(lhs.as_vector(), rhs.as_vector());
 }
 
+template <VectorExpression Left, VectorExpression Right>
+inline constexpr auto approx(const Left& lhs, const Right& rhs) -> bool {
+#ifndef NDEBUG
+    if (lhs.size() != rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    for (std::size_t i{0}, N{lhs.size()}; i < N; ++i) {
+        if (!approx(lhs[i], rhs[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <BandedMatrixExpression Left, BandedMatrixExpression Right>
+inline constexpr auto approx(const Left& lhs, const Right& rhs) -> bool {
+#ifndef NDEBUG
+    if (lhs.size() != rhs.size()) {
+        throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+    if (lhs.num_bands() != rhs.num_bands()) {
+        throw RuntimeError{Mismatch1DError{.name1 = "lhs.num_bands()",
+            .size1 = lhs.num_bands(), .name2 = "rhs.num_bands()",
+            .size2 = rhs.num_bands()}};
+    }
+#endif  // NDEBUG
+
+    return approx(lhs.as_vector(), rhs.as_vector());
+}
+
+template <DenseMatrixExpression Left, DenseMatrixExpression Right>
+inline constexpr auto approx(const Left& lhs, const Right& rhs) -> bool {
+#ifndef NDEBUG
+    if (lhs.size() != rhs.size()) {
+        throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
+            .name2 = "rhs", .size2 = rhs.size()}};
+    }
+#endif  // NDEBUG
+
+    return approx(lhs.as_vector(), rhs.as_vector());
+}
+
 template <typename T>
-requires (true
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-    && !VectorExpression<T>
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
+requires (!VectorExpression<T>
     && !BandedMatrixExpression<T>
     && !DenseMatrixExpression<T>
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 )
 inline auto vanishes(const T& x) -> bool {
     return approx(x, T{0});
@@ -219,24 +239,6 @@ inline auto vanishes(const DenseMatrix<T>& M) -> bool {
     return vanishes(M.as_vector());
 }
 
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-template <VectorExpression Left, VectorExpression Right>
-inline constexpr auto approx(const Left& lhs, const Right& rhs) -> bool {
-#ifndef NDEBUG
-    if (lhs.size() != rhs.size()) {
-        throw RuntimeError{Mismatch1DError{.name1 = "lhs", .size1 = lhs.size(),
-            .name2 = "rhs", .size2 = rhs.size()}};
-    }
-#endif  // NDEBUG
-
-    for (std::size_t i{0}, N{lhs.size()}; i < N; ++i) {
-        if (!approx(lhs[i], rhs[i])) {
-            return false;
-        }
-    }
-    return true;
-}
-
 template <VectorExpression Expr>
 inline constexpr auto vanishes(const Expr& expr) -> bool {
     for (std::size_t i{0}, N{expr.size()}; i < N; ++i) {
@@ -246,48 +248,16 @@ inline constexpr auto vanishes(const Expr& expr) -> bool {
     }
     return true;
 }
-#endif //   JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-
-#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
-template <BandedMatrixExpression Left, BandedMatrixExpression Right>
-inline constexpr auto approx(const Left& lhs, const Right& rhs) -> bool {
-#ifndef NDEBUG
-    if (lhs.size() != rhs.size()) {
-        throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
-            .name2 = "rhs", .size2 = rhs.size()}};
-    }
-    if (lhs.num_bands() != rhs.num_bands()) {
-        throw RuntimeError{Mismatch1DError{.name1 = "lhs.num_bands()",
-            .size1 = lhs.num_bands(), .name2 = "rhs.num_bands()",
-            .size2 = rhs.num_bands()}};
-    }
-#endif  // NDEBUG
-
-    return approx(lhs.as_vector(), rhs.as_vector());
-}
 
 template <BandedMatrixExpression Expr>
 inline constexpr auto vanishes(const Expr& expr) -> bool {
     return vanishes(expr.as_vector());
 }
 
-template <DenseMatrixExpression Left, DenseMatrixExpression Right>
-inline constexpr auto approx(const Left& lhs, const Right& rhs) -> bool {
-#ifndef NDEBUG
-    if (lhs.size() != rhs.size()) {
-        throw RuntimeError{Mismatch2DError{.name1 = "lhs", .size1 = lhs.size(),
-            .name2 = "rhs", .size2 = rhs.size()}};
-    }
-#endif  // NDEBUG
-
-    return approx(lhs.as_vector(), rhs.as_vector());
-}
-
 template <DenseMatrixExpression Expr>
 inline constexpr auto vanishes(const Expr& expr) -> bool {
     return vanishes(expr.as_vector());
 }
-#endif //   JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 }   // namespace jump
 
 #endif  // JUMP_TEST_RESULT_HPP

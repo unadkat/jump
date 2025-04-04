@@ -15,7 +15,6 @@
 #include "jump/experimental/expression_templates/vector_expressions.hpp"
 
 namespace jump {
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 // ========================================================================
 // Arithmetic
 // ========================================================================
@@ -302,7 +301,6 @@ template <VectorExpression Expr>
 inline constexpr auto sgn(const Expr& expr) -> VectorSgn<Expr> {
     return {expr};
 }
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 }   // namespace jump
 
 #endif  // JUMP_EXPRESSION_TEMPLATE_VECTOR_OPERATORS_HPP

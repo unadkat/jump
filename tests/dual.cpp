@@ -6,28 +6,19 @@
 
 #include "jump/autodiff/dual.hpp"
 #include "jump/data/vector.hpp"
+#include "jump/experimental/expression_templates/concepts.hpp"
 #include "jump/utility/random.hpp"
 #include "jump/testing/testing.hpp"
-
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
-#include "jump/experimental/expression_templates/concepts.hpp"
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 #include <cmath>
 
 using namespace jump;
 
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 template <VectorExpression DualExpr, VectorExpression ValuePart,
     VectorExpression DualPart>
 requires (is_dual_v<typename DualExpr::ValueType>)
 auto vector_compare(const DualExpr& dual_vector, const ValuePart& values,
         const DualPart& derivatives) -> bool;
-#else
-template <std::size_t N, typename T>
-auto vector_compare(const Vector<Dual<N, T>>& dual_vector,
-        const Vector<T>& values, const Vector<T>& derivatives) -> bool;
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 auto populate_real(Real min, Real max, std::size_t N)
         -> std::pair<Vector<d1f64>, Vector<Real>>;
@@ -51,17 +42,11 @@ int main() {
     return report.failed() > 0;
 }
 
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 template <VectorExpression DualExpr, VectorExpression ValuePart,
     VectorExpression DualPart>
 requires (is_dual_v<typename DualExpr::ValueType>)
 auto vector_compare(const DualExpr& dual_vector, const ValuePart& values,
         const DualPart& derivatives) -> bool {
-#else
-template <std::size_t N, typename T>
-auto vector_compare(const Vector<Dual<N, T>>& dual_vector,
-        const Vector<T>& values, const Vector<T>& derivatives) -> bool {
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
     if (dual_vector.size() != values.size()
             || dual_vector.size() != derivatives.size()) {
         return false;

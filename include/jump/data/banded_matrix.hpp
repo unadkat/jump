@@ -11,10 +11,7 @@
 #include "jump/data/vector.hpp"
 #include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
-
-#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 #include "jump/experimental/expression_templates/banded_matrix_operators.hpp"
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 #include <format>
 #include <sstream>
@@ -31,14 +28,12 @@ class BandedMatrix : public MatrixBase<T> {
         using Iterator = typename Vector<T>::Iterator;
         /// \brief Iterator for algorithms.
         using ConstIterator = typename Vector<T>::ConstIterator;
-#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
         /// \brief To satisfy BandedMatrixExpression concept
         using InnerExpressionType = Vector<T>;
 
         /// \brief To satisfy BandedMatrixExpression concept (and signal that
         /// this data structure can be referenced in evaluations).
         static constexpr bool is_banded_matrix_expression_leaf{true};
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
         /// \brief Construct a square matrix with the given number of diagonals
         /// on each side of the leading diagonal.
@@ -54,21 +49,17 @@ class BandedMatrix : public MatrixBase<T> {
         BandedMatrix(const BandedMatrix<U>& other);
         /// \brief Default move constructor.
         BandedMatrix(BandedMatrix&& other) = default;
-#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
         /// \brief Construct from a BandedMatrixExpression.
         template <BandedMatrixExpressionConvertibleTo<T> Expr>
         BandedMatrix(const Expr& expr);
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
         /// \brief Default copy assignment.
         auto operator=(const BandedMatrix& other) -> BandedMatrix& = default;
         /// \brief Default move assignment.
         auto operator=(BandedMatrix&& other) -> BandedMatrix& = default;
-#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
         /// \brief Assignment from a BandedMatrixExpression.
         template <BandedMatrixExpressionConvertibleTo<T> Expr>
         auto operator=(const Expr& expr) -> BandedMatrix&;
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
         /// \brief Initialise matrix with the given size and number of
         /// off-leading diagonal diagonals.
@@ -113,18 +104,6 @@ class BandedMatrix : public MatrixBase<T> {
         /// \brief Zero the matrix.
         virtual void zero() override;
 
-#ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
-        /// \brief No operation on matrix.
-        auto operator+() const -> const BandedMatrix&;
-        /// \brief Negate matrix.
-        auto operator-() const -> BandedMatrix;
-        /// \brief Add two matrices together in place.
-        template <std::convertible_to<T> U>
-        auto operator+=(const BandedMatrix<U>& rhs) -> BandedMatrix&;
-        /// \brief Subtract a matrix from another in place.
-        template <std::convertible_to<T> U>
-        auto operator-=(const BandedMatrix<U>& rhs) -> BandedMatrix&;
-#else
         /// \brief Add BandedMatrixExpression to BandedMatrix in place.
         template <BandedMatrixExpressionConvertibleTo<T> Expr>
         auto operator+=(const Expr& expr) -> BandedMatrix&;
@@ -132,7 +111,6 @@ class BandedMatrix : public MatrixBase<T> {
         /// place.
         template <BandedMatrixExpressionConvertibleTo<T> Expr>
         auto operator-=(const Expr& expr) -> BandedMatrix&;
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
         /// \brief Multiply matrix by scalar in place.
         template <std::convertible_to<T> U>
         auto operator*=(const U& k) -> BandedMatrix&;
@@ -169,185 +147,15 @@ class BandedMatrix : public MatrixBase<T> {
         Vector<T> m_storage;
 };
 
-#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 /// \relates BandedMatrix
 template <BandedMatrixExpression Expr>
 constexpr auto evaluate(const Expr& expr)
         -> BandedMatrix<typename Expr::InnerExpressionType::ValueType>;
-#else
-/// \relates BandedMatrix
-template <typename T>
-constexpr auto evaluate(const BandedMatrix<T>& M) -> const BandedMatrix<T>&;
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
-
-#ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
-/// \relates BandedMatrix
-/// \brief Addition of two BandedMatrices.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator+(const BandedMatrix<T>& lhs, const BandedMatrix<U>& rhs)
-        -> BandedMatrix<R>;
-
-/// \relates BandedMatrix
-/// \brief Addition of two BandedMatrices.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator+(BandedMatrix<T>&& lhs, const BandedMatrix<U>& rhs)
-        -> BandedMatrix<R>;
-
-/// \relates BandedMatrix
-/// \brief Addition of two BandedMatrices.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator+(const BandedMatrix<T>& lhs, BandedMatrix<U>&& rhs)
-        -> BandedMatrix<R>;
-
-/// \relates BandedMatrix
-/// \brief Addition of two BandedMatrices.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator+(BandedMatrix<T>&& lhs, BandedMatrix<U>&& rhs) -> BandedMatrix<R>;
-
-/// \relates BandedMatrix
-/// \brief Difference of two BandedMatrices.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator-(const BandedMatrix<T>& lhs, const BandedMatrix<U>& rhs)
-        -> BandedMatrix<R>;
-
-/// \relates BandedMatrix
-/// \brief Difference of two BandedMatrices.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator-(BandedMatrix<T>&& lhs, const BandedMatrix<U>& rhs)
-        -> BandedMatrix<R>;
-
-/// \relates BandedMatrix
-/// \brief Difference of two BandedMatrices.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator-(const BandedMatrix<T>& lhs, BandedMatrix<U>&& rhs)
-        -> BandedMatrix<R>;
-
-/// \relates BandedMatrix
-/// \brief Difference of two BandedMatrices.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator-(BandedMatrix<T>&& lhs, BandedMatrix<U>&& rhs) -> BandedMatrix<R>;
-
-/// \relates BandedMatrix
-/// \brief Left-hand multiplication by scalar.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator*(const T& lhs, const BandedMatrix<U>& rhs) -> BandedMatrix<R>;
-
-/// \relates BandedMatrix
-/// \brief Left-hand multiplication by scalar.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator*(const T& lhs, BandedMatrix<U>&& rhs) -> BandedMatrix<R>;
-
-/// \relates BandedMatrix
-/// \brief Right-hand multiplication by scalar.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator*(const BandedMatrix<T>& lhs, const U& rhs) -> BandedMatrix<R>;
-
-/// \relates BandedMatrix
-/// \brief Right-hand multiplication by scalar.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator*(BandedMatrix<T>&& lhs, const U& rhs) -> BandedMatrix<R>;
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 /// \relates BandedMatrix
 /// \brief Right-hand-side multiplication by vector.
 template <typename T, typename U, typename R = std::common_type_t<T, U>>
 auto operator*(const BandedMatrix<T>& lhs, const Vector<U>& rhs) -> Vector<R>;
-
-#ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
-/// \relates BandedMatrix
-/// \brief Division by a scalar.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator/(const BandedMatrix<T>& lhs, const U& rhs) -> BandedMatrix<R>;
-
-/// \relates BandedMatrix
-/// \brief Division by a scalar.
-template <typename T, typename U, typename R = std::common_type_t<T, U>>
-auto operator/(BandedMatrix<T>&& lhs, const U& rhs) -> BandedMatrix<R>;
-
-// ========================================================================
-// Exponentiation
-// ========================================================================
-
-/// \relates BandedMatrix
-template <typename T>
-auto exp(const BandedMatrix<T>& M) -> BandedMatrix<T>;
-
-/// \relates BandedMatrix
-template <typename T>
-auto log(const BandedMatrix<T>& M) -> BandedMatrix<T>;
-
-/// \relates BandedMatrix
-template <typename T>
-auto pow(const BandedMatrix<T>& M, T p) -> BandedMatrix<T>;
-
-// ========================================================================
-// Trigonometry
-// ========================================================================
-
-/// \relates BandedMatrix
-template <typename T>
-auto sin(const BandedMatrix<T>& M) -> BandedMatrix<T>;
-
-/// \relates BandedMatrix
-template <typename T>
-auto cos(const BandedMatrix<T>& M) -> BandedMatrix<T>;
-
-/// \relates BandedMatrix
-template <typename T>
-auto tan(const BandedMatrix<T>& M) -> BandedMatrix<T>;
-
-/// \relates BandedMatrix
-template <typename T>
-auto asin(const BandedMatrix<T>& M) -> BandedMatrix<T>;
-
-/// \relates BandedMatrix
-template <typename T>
-auto acos(const BandedMatrix<T>& M) -> BandedMatrix<T>;
-
-/// \relates BandedMatrix
-template <typename T>
-auto atan(const BandedMatrix<T>& M) -> BandedMatrix<T>;
-
-// ========================================================================
-// Hyperbolics
-// ========================================================================
-
-/// \relates BandedMatrix
-template <typename T>
-auto sinh(const BandedMatrix<T>& M) -> BandedMatrix<T>;
-
-/// \relates BandedMatrix
-template <typename T>
-auto cosh(const BandedMatrix<T>& M) -> BandedMatrix<T>;
-
-/// \relates BandedMatrix
-template <typename T>
-auto tanh(const BandedMatrix<T>& M) -> BandedMatrix<T>;
-
-/// \relates BandedMatrix
-template <typename T>
-auto asinh(const BandedMatrix<T>& M) -> BandedMatrix<T>;
-
-/// \relates BandedMatrix
-template <typename T>
-auto acosh(const BandedMatrix<T>& M) -> BandedMatrix<T>;
-
-/// \relates BandedMatrix
-template <typename T>
-auto atanh(const BandedMatrix<T>& M) -> BandedMatrix<T>;
-
-// ========================================================================
-// Miscellaneous
-// ========================================================================
-
-/// \relates BandedMatrix
-template <typename T>
-auto abs(const BandedMatrix<T>& M) -> BandedMatrix<T>;
-
-/// \relates BandedMatrix
-template <typename T>
-auto sgn(const BandedMatrix<T>& M) -> BandedMatrix<T>;
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 // ========================================================================
 // Implementation
@@ -388,7 +196,6 @@ inline BandedMatrix<T>::BandedMatrix(const BandedMatrix<U>& other) :
     m_storage = other.as_vector();
 }
 
-#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 template <typename T>
 template <BandedMatrixExpressionConvertibleTo<T> Expr>
 inline BandedMatrix<T>::BandedMatrix(const Expr& expr) :
@@ -405,7 +212,6 @@ inline auto BandedMatrix<T>::operator=(const Expr& expr) -> BandedMatrix& {
     m_storage = expr.as_vector();
     return *this;
 }
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 /// Note that the internal storage takes the form of a dense matrix with
 /// `num_columns()` columns and `1 + 3*#num_bands()` rows.
@@ -580,59 +386,6 @@ inline void BandedMatrix<T>::zero() {
     m_storage.zero();
 }
 
-#ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
-template <typename T>
-inline auto BandedMatrix<T>::operator+() const -> const BandedMatrix& {
-    return *this;
-}
-
-template <typename T>
-inline auto BandedMatrix<T>::operator-() const -> BandedMatrix {
-    BandedMatrix<T> result{*this};
-    result *= T{-1};
-    return result;
-}
-
-template <typename T>
-template <std::convertible_to<T> U>
-inline auto BandedMatrix<T>::operator+=(const BandedMatrix<U>& rhs)
-        -> BandedMatrix& {
-#ifndef NDEBUG
-    if (this->size() != rhs.size()) {
-        throw RuntimeError{Mismatch2DError{.size1 = this->size(),
-            .name2 = "rhs", .size2 = rhs.size()}};
-    }
-    if (num_bands() != rhs.num_bands()) {
-        throw RuntimeError{InvalidArgumentError{.argument = "rhs.num_bands()",
-            .value = std::format("{}", rhs.num_bands()),
-            .expected = std::format("{}", num_bands())}};
-    }
-#endif  // NDEBUG
-
-    m_storage += rhs.as_vector();
-    return *this;
-}
-
-template <typename T>
-template <std::convertible_to<T> U>
-inline auto BandedMatrix<T>::operator-=(const BandedMatrix<U>& rhs)
-        -> BandedMatrix& {
-#ifndef NDEBUG
-    if (this->size() != rhs.size()) {
-        throw RuntimeError{Mismatch2DError{.size1 = this->size(),
-            .name2 = "rhs", .size2 = rhs.size()}};
-    }
-    if (num_bands() != rhs.num_bands()) {
-        throw RuntimeError{InvalidArgumentError{.argument = "rhs.num_bands()",
-            .value = std::format("{}", rhs.num_bands()),
-            .expected = std::format("{}", num_bands())}};
-    }
-#endif  // NDEBUG
-
-    m_storage -= rhs.as_vector();
-    return *this;
-}
-#else
 template <typename T>
 template <BandedMatrixExpressionConvertibleTo<T> Expr>
 inline auto BandedMatrix<T>::operator+=(const Expr& expr) -> BandedMatrix& {
@@ -670,7 +423,6 @@ inline auto BandedMatrix<T>::operator-=(const Expr& expr) -> BandedMatrix& {
     m_storage -= expr.as_vector();
     return *this;
 }
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 template <typename T>
 template <std::convertible_to<T> U>
@@ -749,194 +501,12 @@ inline auto BandedMatrix<T>::as_string() const -> std::string {
     return oss.str();
 }
 
-#ifdef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 /// \relates BandedMatrix
 template <BandedMatrixExpression Expr>
 inline constexpr auto evaluate(const Expr& expr)
         -> BandedMatrix<typename Expr::InnerExpressionType::ValueType> {
     return {expr};
 }
-#else
-/// \relates BandedMatrix
-template <typename T>
-constexpr auto evaluate(const BandedMatrix<T>& M) -> const BandedMatrix<T>& {
-    return M;
-}
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
-
-#ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
-/// \relates BandedMatrix
-/// \brief Addition of two BandedMatrices.
-template <typename T, typename U, typename R>
-inline auto operator+(const BandedMatrix<T>& lhs, const BandedMatrix<U>& rhs)
-        -> BandedMatrix<R> {
-    if constexpr (std::is_same_v<T, R>) {
-        BandedMatrix<R> result{lhs};
-        result += rhs;
-        return result;
-    } else {
-        BandedMatrix<R> result{rhs};
-        result += lhs;
-        return result;
-    }
-}
-
-/// \relates BandedMatrix
-/// \brief Addition of two BandedMatrices.
-template <typename T, typename U, typename R>
-inline auto operator+(BandedMatrix<T>&& lhs, const BandedMatrix<U>& rhs)
-        -> BandedMatrix<R> {
-    if constexpr (std::is_same_v<T, R>) {
-        lhs += rhs;
-        return lhs;
-    } else {
-        BandedMatrix<R> result{rhs};
-        result += lhs;
-        return result;
-    }
-}
-
-/// \relates BandedMatrix
-/// \brief Addition of two BandedMatrices.
-template <typename T, typename U, typename R>
-inline auto operator+(const BandedMatrix<T>& lhs, BandedMatrix<U>&& rhs)
-        -> BandedMatrix<R> {
-    if constexpr (std::is_same_v<U, R>) {
-        rhs += lhs;
-        return rhs;
-    } else {
-        BandedMatrix<R> result{lhs};
-        result += rhs;
-        return result;
-    }
-}
-
-/// \relates BandedMatrix
-/// \brief Addition of two BandedMatrices.
-template <typename T, typename U, typename R>
-inline auto operator+(BandedMatrix<T>&& lhs, BandedMatrix<U>&& rhs)
-        -> BandedMatrix<R> {
-    if constexpr (std::is_same_v<T, R>) {
-        lhs += rhs;
-        return lhs;
-    } else if constexpr (std::is_same_v<U, R>) {
-        rhs += lhs;
-        return rhs;
-    } else {
-        BandedMatrix<R> result{lhs};
-        result += rhs;
-        return result;
-    }
-}
-
-/// \relates BandedMatrix
-/// \brief Difference of two BandedMatrices.
-template <typename T, typename U, typename R>
-inline auto operator-(const BandedMatrix<T>& lhs, const BandedMatrix<U>& rhs)
-        -> BandedMatrix<R> {
-    BandedMatrix<R> result{lhs};
-    result -= rhs;
-    return result;
-}
-
-/// \relates BandedMatrix
-/// \brief Difference of two BandedMatrices.
-template <typename T, typename U, typename R>
-inline auto operator-(BandedMatrix<T>&& lhs, const BandedMatrix<U>& rhs)
-        -> BandedMatrix<R> {
-    if constexpr (std::is_same_v<T, R>) {
-        lhs -= rhs;
-        return lhs;
-    } else {
-        BandedMatrix<R> result{lhs};
-        result -= rhs;
-        return result;
-    }
-}
-
-/// \relates BandedMatrix
-/// \brief Difference of two BandedMatrices.
-template <typename T, typename U, typename R>
-inline auto operator-(const BandedMatrix<T>& lhs, BandedMatrix<U>&& rhs)
-        -> BandedMatrix<R> {
-    if constexpr (std::is_same_v<U, R>) {
-        rhs *= R{-1};
-        rhs += lhs;
-        return rhs;
-    } else {
-        BandedMatrix<R> result{lhs};
-        result -= rhs;
-        return result;
-    }
-}
-
-/// \relates BandedMatrix
-/// \brief Difference of two BandedMatrices.
-template <typename T, typename U, typename R>
-inline auto operator-(BandedMatrix<T>&& lhs, BandedMatrix<U>&& rhs)
-        -> BandedMatrix<R> {
-    if constexpr (std::is_same_v<T, R>) {
-        lhs -= rhs;
-        return lhs;
-    } else if constexpr (std::is_same_v<U, R>) {
-        rhs *= R{-1};
-        rhs += lhs;
-        return rhs;
-    } else {
-        BandedMatrix<R> result{lhs};
-        result -= rhs;
-        return result;
-    }
-}
-
-/// \relates BandedMatrix
-/// \brief Left-hand multiplication by scalar.
-template <typename T, typename U, typename R>
-inline auto operator*(const T& lhs, const BandedMatrix<U>& rhs)
-        -> BandedMatrix<R> {
-    BandedMatrix<R> result{rhs};
-    result *= lhs;
-    return result;
-}
-
-/// \relates BandedMatrix
-/// \brief Left-hand multiplication by scalar.
-template <typename T, typename U, typename R>
-inline auto operator*(const T& lhs, BandedMatrix<U>&& rhs) -> BandedMatrix<R> {
-    if constexpr (std::is_same_v<U, R>) {
-        rhs *= lhs;
-        return rhs;
-    } else {
-        BandedMatrix<R> result{rhs};
-        result *= lhs;
-        return result;
-    }
-}
-
-/// \relates BandedMatrix
-/// \brief Right-hand multiplication by scalar.
-template <typename T, typename U, typename R>
-inline auto operator*(const BandedMatrix<T>& lhs, const U& rhs)
-        -> BandedMatrix<R> {
-    BandedMatrix<R> result{lhs};
-    result *= rhs;
-    return result;
-}
-
-/// \relates BandedMatrix
-/// \brief Right-hand multiplication by scalar.
-template <typename T, typename U, typename R>
-inline auto operator*(BandedMatrix<T>&& lhs, const U& rhs) -> BandedMatrix<R> {
-    if constexpr (std::is_same_v<T, R>) {
-        lhs *= rhs;
-        return lhs;
-    } else {
-        BandedMatrix<R> result{lhs};
-        result *= rhs;
-        return result;
-    }
-}
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 
 /// \relates BandedMatrix
 /// \brief Right-hand-side multiplication by vector.
@@ -960,134 +530,6 @@ inline auto operator*(const BandedMatrix<T>& lhs, const Vector<U>& rhs)
 
     return result;
 }
-
-#ifndef JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
-/// \relates BandedMatrix
-/// \brief Division by a scalar.
-template <typename T, typename U, typename R>
-inline auto operator/(const BandedMatrix<T>& lhs, const U& rhs)
-        -> BandedMatrix<R> {
-    BandedMatrix<R> result{lhs};
-    result /= rhs;
-    return result;
-}
-
-/// \relates BandedMatrix
-/// \brief Division by a scalar.
-template <typename T, typename U, typename R>
-inline auto operator/(BandedMatrix<T>&& lhs, const U& rhs) -> BandedMatrix<R> {
-    if constexpr (std::is_same_v<T, R>) {
-        lhs /= rhs;
-        return lhs;
-    } else {
-        BandedMatrix<R> result{lhs};
-        result /= rhs;
-        return result;
-    }
-}
-
-/// \relates BandedMatrix
-template <typename T>
-inline auto exp(const BandedMatrix<T>& M) -> BandedMatrix<T> {
-    return {M.size().first, M.num_bands(), exp(M.as_vector())};
-}
-
-/// \relates BandedMatrix
-template <typename T>
-inline auto log(const BandedMatrix<T>& M) -> BandedMatrix<T> {
-    return {M.size().first, M.num_bands(), log(M.as_vector())};
-}
-
-/// \relates BandedMatrix
-template <typename T>
-inline auto pow(const BandedMatrix<T>& M, T p) -> BandedMatrix<T> {
-    return {M.size().first, M.num_bands(), pow(M.as_vector(), p)};
-}
-
-/// \relates BandedMatrix
-template <typename T>
-inline auto sin(const BandedMatrix<T>& M) -> BandedMatrix<T> {
-    return {M.size().first, M.num_bands(), sin(M.as_vector())};
-}
-
-/// \relates BandedMatrix
-template <typename T>
-inline auto cos(const BandedMatrix<T>& M) -> BandedMatrix<T> {
-    return {M.size().first, M.num_bands(), cos(M.as_vector())};
-}
-
-/// \relates BandedMatrix
-template <typename T>
-inline auto tan(const BandedMatrix<T>& M) -> BandedMatrix<T> {
-    return {M.size().first, M.num_bands(), tan(M.as_vector())};
-}
-
-/// \relates BandedMatrix
-template <typename T>
-inline auto asin(const BandedMatrix<T>& M) -> BandedMatrix<T> {
-    return {M.size().first, M.num_bands(), asin(M.as_vector())};
-}
-
-/// \relates BandedMatrix
-template <typename T>
-inline auto acos(const BandedMatrix<T>& M) -> BandedMatrix<T> {
-    return {M.size().first, M.num_bands(), acos(M.as_vector())};
-}
-
-/// \relates BandedMatrix
-template <typename T>
-inline auto atan(const BandedMatrix<T>& M) -> BandedMatrix<T> {
-    return {M.size().first, M.num_bands(), atan(M.as_vector())};
-}
-
-/// \relates BandedMatrix
-template <typename T>
-inline auto sinh(const BandedMatrix<T>& M) -> BandedMatrix<T> {
-    return {M.size().first, M.num_bands(), sinh(M.as_vector())};
-}
-
-/// \relates BandedMatrix
-template <typename T>
-inline auto cosh(const BandedMatrix<T>& M) -> BandedMatrix<T> {
-    return {M.size().first, M.num_bands(), cosh(M.as_vector())};
-}
-
-/// \relates BandedMatrix
-template <typename T>
-inline auto tanh(const BandedMatrix<T>& M) -> BandedMatrix<T> {
-    return {M.size().first, M.num_bands(), tanh(M.as_vector())};
-}
-
-/// \relates BandedMatrix
-template <typename T>
-inline auto asinh(const BandedMatrix<T>& M) -> BandedMatrix<T> {
-    return {M.size().first, M.num_bands(), asinh(M.as_vector())};
-}
-
-/// \relates BandedMatrix
-template <typename T>
-inline auto acosh(const BandedMatrix<T>& M) -> BandedMatrix<T> {
-    return {M.size().first, M.num_bands(), acosh(M.as_vector())};
-}
-
-/// \relates BandedMatrix
-template <typename T>
-inline auto atanh(const BandedMatrix<T>& M) -> BandedMatrix<T> {
-    return {M.size().first, M.num_bands(), atanh(M.as_vector())};
-}
-
-/// \relates BandedMatrix
-template <typename T>
-inline auto abs(const BandedMatrix<T>& M) -> BandedMatrix<T> {
-    return {M.size().first, M.num_bands(), abs(M.as_vector())};
-}
-
-/// \relates BandedMatrix
-template <typename T>
-inline auto sgn(const BandedMatrix<T>& M) -> BandedMatrix<T> {
-    return {M.size().first, M.num_bands(), sgn(M.as_vector())};
-}
-#endif  // JUMP_ENABLE_MATRIX_EXPRESSION_TEMPLATES
 }   // namespace jump
 
 #endif  // JUMP_BANDED_MATRIX_HPP
