@@ -14,6 +14,7 @@
 #include "jump/experimental/expression_templates/concepts.hpp"
 
 #include <array>
+#include <cmath>
 #include <type_traits>
 
 namespace jump {
@@ -61,12 +62,21 @@ class Vec<T, 2> {
         template <std::convertible_to<T> U>
         constexpr auto operator/=(const U& rhs) -> Vec&;
 
+        constexpr auto squared_magnitude() const -> T;
+        constexpr auto magnitude() const -> T;
+        constexpr auto direction() const -> Vec;
+        constexpr auto normalise() -> Vec&;
+
         constexpr auto data() const -> const ValueType*;
         constexpr auto data() -> ValueType*;
 
     private:
         std::array<ValueType, 2> m_storage;
 };
+
+template <typename T, typename U>
+constexpr auto dot(const Vec<T, 2>& lhs, const Vec<U, 2>& rhs)
+        -> std::common_type_t<T, U>;
 
 // ========================================================================
 // Aliases
@@ -225,6 +235,28 @@ inline constexpr auto Vec<T, 2>::operator/=(const U& rhs) -> Vec& {
 }
 
 template <typename T>
+inline constexpr auto Vec<T, 2>::squared_magnitude() const -> T {
+    return m_storage[0]*m_storage[0] + m_storage[1]*m_storage[1];
+}
+
+template <typename T>
+inline constexpr auto Vec<T, 2>::magnitude() const -> T {
+    return std::sqrt(squared_magnitude());
+}
+
+template <typename T>
+inline constexpr auto Vec<T, 2>::direction() const -> Vec {
+    auto scale{1/magnitude()};
+    return {scale*m_storage[0], scale*m_storage[1]};
+}
+
+template <typename T>
+inline constexpr auto Vec<T, 2>::normalise() -> Vec& {
+    auto scale{1/magnitude()};
+    return (*this) *= scale;
+}
+
+template <typename T>
 inline constexpr auto Vec<T, 2>::data() const -> const ValueType* {
     return m_storage.data();
 }
@@ -232,6 +264,12 @@ inline constexpr auto Vec<T, 2>::data() const -> const ValueType* {
 template <typename T>
 inline constexpr auto Vec<T, 2>::data() -> ValueType* {
     return m_storage.data();
+}
+
+template <typename T, typename U>
+inline constexpr auto dot(const Vec<T, 2>& lhs, const Vec<U, 2>& rhs)
+        -> std::common_type_t<T, U> {
+    return lhs[0]*rhs[0] + lhs[1]*rhs[1];
 }
 }   // namespace jump
 
