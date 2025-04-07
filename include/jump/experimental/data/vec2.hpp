@@ -11,9 +11,7 @@
 #include "jump/debug/exception.hpp"
 
 #include "jump/experimental/data/vec.hpp"
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 #include "jump/experimental/expression_templates/concepts.hpp"
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 #include <array>
 #include <type_traits>
@@ -28,11 +26,9 @@ class Vec<T, 2> {
         constexpr Vec(const ValueType& value = ValueType{0});
         constexpr Vec(const ValueType& x, const ValueType& y);
         constexpr Vec(const Vec& other) = default;
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
         /// \brief Construct from a VectorExpression.
         template <VectorExpressionConvertibleTo<ValueType> Expr>
         constexpr Vec(const Expr& expr);
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
         constexpr auto operator[](std::size_t index) const -> const ValueType&;
         constexpr auto operator[](std::size_t index) -> ValueType&;
@@ -80,13 +76,11 @@ inline constexpr Vec<T, 2>::Vec(const ValueType& x, const ValueType& y) :
     m_storage{x, y} {
 }
 
-#ifdef JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 template <typename T>
 template <VectorExpressionConvertibleTo<typename Vec<T, 2>::ValueType> Expr>
 inline constexpr Vec<T, 2>::Vec(const Expr& expr) :
     m_storage{expr[0], expr[1]} {
 }
-#endif  // JUMP_ENABLE_VECTOR_EXPRESSION_TEMPLATES
 
 template <typename T>
 inline constexpr auto Vec<T, 2>::operator[](std::size_t index) const
