@@ -45,6 +45,22 @@ class Vec<T, 2> {
 
         constexpr auto size() const -> std::size_t;
 
+        constexpr void fill(const T& value);
+        constexpr void zero();
+
+        template <VectorExpressionConvertibleTo<T> Expr>
+        constexpr auto operator+=(const Expr& expr) -> Vec&;
+        template <VectorExpressionConvertibleTo<T> Expr>
+        constexpr auto operator-=(const Expr& expr) -> Vec&;
+        template <VectorExpressionConvertibleTo<T> Expr>
+        constexpr auto operator*=(const Expr& expr) -> Vec&;
+        template <VectorExpressionConvertibleTo<T> Expr>
+        constexpr auto operator/=(const Expr& expr) -> Vec&;
+        template <std::convertible_to<T> U>
+        constexpr auto operator*=(const U& rhs) -> Vec&;
+        template <std::convertible_to<T> U>
+        constexpr auto operator/=(const U& rhs) -> Vec&;
+
         constexpr auto data() const -> const ValueType*;
         constexpr auto data() -> ValueType*;
 
@@ -148,6 +164,64 @@ inline constexpr auto Vec<T, 2>::g() -> ValueType& {
 template <typename T>
 inline constexpr auto Vec<T, 2>::size() const -> std::size_t {
     return 2;
+}
+
+template <typename T>
+inline constexpr void Vec<T, 2>::fill(const T& value) {
+    m_storage[0] = m_storage[1] = value;
+}
+
+template <typename T>
+inline constexpr void Vec<T, 2>::zero() {
+    m_storage[0] = m_storage[1] = T{0};
+}
+
+template <typename T>
+template <VectorExpressionConvertibleTo<T> Expr>
+inline constexpr auto Vec<T, 2>::operator+=(const Expr& expr) -> Vec& {
+    m_storage[0] += expr[0];
+    m_storage[1] += expr[1];
+    return *this;
+}
+
+template <typename T>
+template <VectorExpressionConvertibleTo<T> Expr>
+inline constexpr auto Vec<T, 2>::operator-=(const Expr& expr) -> Vec& {
+    m_storage[0] -= expr[0];
+    m_storage[1] -= expr[1];
+    return *this;
+}
+
+template <typename T>
+template <VectorExpressionConvertibleTo<T> Expr>
+inline constexpr auto Vec<T, 2>::operator*=(const Expr& expr) -> Vec& {
+    m_storage[0] *= expr[0];
+    m_storage[1] *= expr[1];
+    return *this;
+}
+
+template <typename T>
+template <VectorExpressionConvertibleTo<T> Expr>
+inline constexpr auto Vec<T, 2>::operator/=(const Expr& expr) -> Vec& {
+    m_storage[0] /= expr[0];
+    m_storage[1] /= expr[1];
+    return *this;
+}
+
+template <typename T>
+template <std::convertible_to<T> U>
+inline constexpr auto Vec<T, 2>::operator*=(const U& rhs) -> Vec& {
+    m_storage[0] *= rhs;
+    m_storage[1] *= rhs;
+    return *this;
+}
+
+template <typename T>
+template <std::convertible_to<T> U>
+inline constexpr auto Vec<T, 2>::operator/=(const U& rhs) -> Vec& {
+    m_storage[0] /= rhs;
+    m_storage[1] /= rhs;
+    return *this;
 }
 
 template <typename T>
