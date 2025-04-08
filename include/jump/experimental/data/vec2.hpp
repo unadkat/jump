@@ -56,21 +56,21 @@ class Vec<T, 2> {
         constexpr void fill(const T& value);
         constexpr void zero();
 
-        template <VectorExpressionConvertibleTo<T> Expr>
+        template <VectorExpressionConvertibleTo<ValueType> Expr>
         constexpr auto operator+=(const Expr& expr) -> Vec&;
-        template <VectorExpressionConvertibleTo<T> Expr>
+        template <VectorExpressionConvertibleTo<ValueType> Expr>
         constexpr auto operator-=(const Expr& expr) -> Vec&;
-        template <VectorExpressionConvertibleTo<T> Expr>
+        template <VectorExpressionConvertibleTo<ValueType> Expr>
         constexpr auto operator*=(const Expr& expr) -> Vec&;
-        template <VectorExpressionConvertibleTo<T> Expr>
+        template <VectorExpressionConvertibleTo<ValueType> Expr>
         constexpr auto operator/=(const Expr& expr) -> Vec&;
-        template <std::convertible_to<T> U>
+        template <std::convertible_to<ValueType> U>
         constexpr auto operator*=(const U& rhs) -> Vec&;
-        template <std::convertible_to<T> U>
+        template <std::convertible_to<ValueType> U>
         constexpr auto operator/=(const U& rhs) -> Vec&;
 
-        constexpr auto squared_magnitude() const -> T;
-        constexpr auto magnitude() const -> T;
+        constexpr auto squared_magnitude() const -> ValueType;
+        constexpr auto magnitude() const -> ValueType;
         constexpr auto direction() const -> Vec;
         constexpr auto normalise() -> Vec&;
 
@@ -208,7 +208,7 @@ inline constexpr void Vec<T, 2>::zero() {
 }
 
 template <typename T>
-template <VectorExpressionConvertibleTo<T> Expr>
+template <VectorExpressionConvertibleTo<typename Vec<T, 2>::ValueType> Expr>
 inline constexpr auto Vec<T, 2>::operator+=(const Expr& expr) -> Vec& {
     m_storage[0] += expr[0];
     m_storage[1] += expr[1];
@@ -216,7 +216,7 @@ inline constexpr auto Vec<T, 2>::operator+=(const Expr& expr) -> Vec& {
 }
 
 template <typename T>
-template <VectorExpressionConvertibleTo<T> Expr>
+template <VectorExpressionConvertibleTo<typename Vec<T, 2>::ValueType> Expr>
 inline constexpr auto Vec<T, 2>::operator-=(const Expr& expr) -> Vec& {
     m_storage[0] -= expr[0];
     m_storage[1] -= expr[1];
@@ -224,7 +224,7 @@ inline constexpr auto Vec<T, 2>::operator-=(const Expr& expr) -> Vec& {
 }
 
 template <typename T>
-template <VectorExpressionConvertibleTo<T> Expr>
+template <VectorExpressionConvertibleTo<typename Vec<T, 2>::ValueType> Expr>
 inline constexpr auto Vec<T, 2>::operator*=(const Expr& expr) -> Vec& {
     m_storage[0] *= expr[0];
     m_storage[1] *= expr[1];
@@ -232,7 +232,7 @@ inline constexpr auto Vec<T, 2>::operator*=(const Expr& expr) -> Vec& {
 }
 
 template <typename T>
-template <VectorExpressionConvertibleTo<T> Expr>
+template <VectorExpressionConvertibleTo<typename Vec<T, 2>::ValueType> Expr>
 inline constexpr auto Vec<T, 2>::operator/=(const Expr& expr) -> Vec& {
     m_storage[0] /= expr[0];
     m_storage[1] /= expr[1];
@@ -240,7 +240,7 @@ inline constexpr auto Vec<T, 2>::operator/=(const Expr& expr) -> Vec& {
 }
 
 template <typename T>
-template <std::convertible_to<T> U>
+template <std::convertible_to<typename Vec<T, 2>::ValueType> U>
 inline constexpr auto Vec<T, 2>::operator*=(const U& rhs) -> Vec& {
     m_storage[0] *= rhs;
     m_storage[1] *= rhs;
@@ -248,7 +248,7 @@ inline constexpr auto Vec<T, 2>::operator*=(const U& rhs) -> Vec& {
 }
 
 template <typename T>
-template <std::convertible_to<T> U>
+template <std::convertible_to<typename Vec<T, 2>::ValueType> U>
 inline constexpr auto Vec<T, 2>::operator/=(const U& rhs) -> Vec& {
     m_storage[0] /= rhs;
     m_storage[1] /= rhs;
@@ -256,12 +256,12 @@ inline constexpr auto Vec<T, 2>::operator/=(const U& rhs) -> Vec& {
 }
 
 template <typename T>
-inline constexpr auto Vec<T, 2>::squared_magnitude() const -> T {
+inline constexpr auto Vec<T, 2>::squared_magnitude() const -> ValueType {
     return m_storage[0]*m_storage[0] + m_storage[1]*m_storage[1];
 }
 
 template <typename T>
-inline constexpr auto Vec<T, 2>::magnitude() const -> T {
+inline constexpr auto Vec<T, 2>::magnitude() const -> ValueType {
     return std::sqrt(squared_magnitude());
 }
 
