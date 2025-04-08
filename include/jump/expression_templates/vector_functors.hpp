@@ -7,8 +7,8 @@
 #ifndef JUMP_EXPRESSION_TEMPLATE_VECTOR_FUNCTORS_HPP
 #define JUMP_EXPRESSION_TEMPLATE_VECTOR_FUNCTORS_HPP
 
-#include "jump/experimental/expression_templates/functional.hpp"
-#include "jump/experimental/expression_templates/vector_expressions.hpp"
+#include "jump/expression_templates/functional.hpp"
+#include "jump/expression_templates/vector_expressions.hpp"
 
 #include <functional>
 

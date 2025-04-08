@@ -7,8 +7,8 @@
 #ifndef JUMP_EXPRESSION_TEMPLATE_BANDED_MATRIX_FUNCTORS_HPP
 #define JUMP_EXPRESSION_TEMPLATE_BANDED_MATRIX_FUNCTORS_HPP
 
-#include "jump/experimental/expression_templates/banded_matrix_expressions.hpp"
-#include "jump/experimental/expression_templates/vector_functors.hpp"
+#include "jump/expression_templates/banded_matrix_expressions.hpp"
+#include "jump/expression_templates/vector_functors.hpp"
 
 namespace jump {
 // ========================================================================

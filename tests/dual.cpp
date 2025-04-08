@@ -6,7 +6,6 @@
 
 #include "jump/autodiff/dual.hpp"
 #include "jump/data/vector.hpp"
-#include "jump/experimental/expression_templates/concepts.hpp"
 #include "jump/utility/random.hpp"
 #include "jump/testing/testing.hpp"
 

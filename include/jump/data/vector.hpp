@@ -10,7 +10,7 @@
 #include "jump/autodiff/dual.hpp"
 #include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
-#include "jump/experimental/expression_templates/vector_operators.hpp"
+#include "jump/expression_templates/vector_operators.hpp"
 #include "jump/utility/types.hpp"
 #include "jump/utility/utility.hpp"
 

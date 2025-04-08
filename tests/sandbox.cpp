@@ -6,7 +6,6 @@
 
 #include "jump/jump.hpp"
 
-#include "jump/experimental/expression_templates/concepts.hpp"
 #ifdef JUMP_ENABLE_SMALL_VEC
 #include "jump/experimental/data/vec2.hpp"
 #endif  // JUMP_ENABLE_SMALL_VEC
