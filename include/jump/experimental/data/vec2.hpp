@@ -15,6 +15,7 @@
 
 #include <array>
 #include <cmath>
+#include <concepts>
 #include <type_traits>
 
 namespace jump {
@@ -27,9 +28,15 @@ class Vec<T, 2> {
         constexpr Vec(const ValueType& value = ValueType{0});
         constexpr Vec(const ValueType& x, const ValueType& y);
         constexpr Vec(const Vec& other) = default;
+        template <std::convertible_to<ValueType> U>
+        constexpr Vec(const Vec<U, 2>& other);
         /// \brief Construct from a VectorExpression.
         template <VectorExpressionConvertibleTo<ValueType> Expr>
         constexpr Vec(const Expr& expr);
+
+        constexpr auto operator=(const Vec& other) -> Vec& = default;
+        template <VectorExpressionConvertibleTo<ValueType> Expr>
+        constexpr auto operator=(const Expr& expr) -> Vec&;
 
         constexpr auto operator[](std::size_t index) const -> const ValueType&;
         constexpr auto operator[](std::size_t index) -> ValueType&;
@@ -103,9 +110,23 @@ inline constexpr Vec<T, 2>::Vec(const ValueType& x, const ValueType& y) :
 }
 
 template <typename T>
+template <std::convertible_to<typename Vec<T, 2>::ValueType> U>
+inline constexpr Vec<T, 2>::Vec(const Vec<U, 2>& other) :
+    m_storage{other[0], other[1]} {
+}
+
+template <typename T>
 template <VectorExpressionConvertibleTo<typename Vec<T, 2>::ValueType> Expr>
 inline constexpr Vec<T, 2>::Vec(const Expr& expr) :
     m_storage{expr[0], expr[1]} {
+}
+
+template <typename T>
+template <VectorExpressionConvertibleTo<typename Vec<T, 2>::ValueType> Expr>
+inline constexpr auto Vec<T, 2>::operator=(const Expr& expr) -> Vec& {
+    m_storage[0] = expr[0];
+    m_storage[1] = expr[1];
+    return *this;
 }
 
 template <typename T>
