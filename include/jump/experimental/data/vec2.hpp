@@ -124,6 +124,13 @@ inline constexpr Vec<T, 2>::Vec(const Expr& expr) :
 template <typename T>
 template <VectorExpressionConvertibleTo<typename Vec<T, 2>::ValueType> Expr>
 inline constexpr auto Vec<T, 2>::operator=(const Expr& expr) -> Vec& {
+#ifndef NDEBUG
+    if (size() != expr.size()) {
+        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "expr",
+            .size2 = expr.size()}};
+    }
+#endif  // NDEBUG
+
     m_storage[0] = expr[0];
     m_storage[1] = expr[1];
     return *this;
@@ -204,12 +211,19 @@ inline constexpr void Vec<T, 2>::fill(const T& value) {
 
 template <typename T>
 inline constexpr void Vec<T, 2>::zero() {
-    m_storage[0] = m_storage[1] = T{0};
+    m_storage[0] = m_storage[1] = ValueType{0};
 }
 
 template <typename T>
 template <VectorExpressionConvertibleTo<typename Vec<T, 2>::ValueType> Expr>
 inline constexpr auto Vec<T, 2>::operator+=(const Expr& expr) -> Vec& {
+#ifndef NDEBUG
+    if (size() != expr.size()) {
+        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "expr",
+            .size2 = expr.size()}};
+    }
+#endif  // NDEBUG
+
     m_storage[0] += expr[0];
     m_storage[1] += expr[1];
     return *this;
@@ -218,6 +232,13 @@ inline constexpr auto Vec<T, 2>::operator+=(const Expr& expr) -> Vec& {
 template <typename T>
 template <VectorExpressionConvertibleTo<typename Vec<T, 2>::ValueType> Expr>
 inline constexpr auto Vec<T, 2>::operator-=(const Expr& expr) -> Vec& {
+#ifndef NDEBUG
+    if (size() != expr.size()) {
+        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "expr",
+            .size2 = expr.size()}};
+    }
+#endif  // NDEBUG
+
     m_storage[0] -= expr[0];
     m_storage[1] -= expr[1];
     return *this;
@@ -226,6 +247,13 @@ inline constexpr auto Vec<T, 2>::operator-=(const Expr& expr) -> Vec& {
 template <typename T>
 template <VectorExpressionConvertibleTo<typename Vec<T, 2>::ValueType> Expr>
 inline constexpr auto Vec<T, 2>::operator*=(const Expr& expr) -> Vec& {
+#ifndef NDEBUG
+    if (size() != expr.size()) {
+        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "expr",
+            .size2 = expr.size()}};
+    }
+#endif  // NDEBUG
+
     m_storage[0] *= expr[0];
     m_storage[1] *= expr[1];
     return *this;
@@ -234,6 +262,13 @@ inline constexpr auto Vec<T, 2>::operator*=(const Expr& expr) -> Vec& {
 template <typename T>
 template <VectorExpressionConvertibleTo<typename Vec<T, 2>::ValueType> Expr>
 inline constexpr auto Vec<T, 2>::operator/=(const Expr& expr) -> Vec& {
+#ifndef NDEBUG
+    if (size() != expr.size()) {
+        throw RuntimeError{Mismatch1DError{.size1 = size(), .name2 = "expr",
+            .size2 = expr.size()}};
+    }
+#endif  // NDEBUG
+
     m_storage[0] /= expr[0];
     m_storage[1] /= expr[1];
     return *this;
