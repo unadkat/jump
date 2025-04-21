@@ -38,6 +38,8 @@ class Vec<T, 2> {
         template <VectorExpressionConvertibleTo<ValueType> Expr>
         constexpr auto operator=(const Expr& expr) -> Vec&;
 
+        constexpr auto operator<=>(const Vec&) const = default;
+
         constexpr auto operator[](std::size_t index) const -> const ValueType&;
         constexpr auto operator[](std::size_t index) -> ValueType&;
 
