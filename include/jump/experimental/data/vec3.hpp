@@ -89,14 +89,6 @@ class Vec<T, 3> {
         std::array<ValueType, 3> m_storage;
 };
 
-template <typename T, typename U>
-constexpr auto dot(const Vec<T, 3>& lhs, const Vec<U, 3>& rhs)
-        -> std::common_type_t<T, U>;
-
-template <typename T, typename U>
-constexpr auto cross(const Vec<T, 3>& lhs, const Vec<U, 3>& rhs)
-        -> Vec<std::common_type_t<T, U>, 3>;
-
 // ========================================================================
 // Aliases
 // ========================================================================
@@ -361,19 +353,6 @@ inline constexpr auto Vec<T, 3>::data() const -> const ValueType* {
 template <typename T>
 inline constexpr auto Vec<T, 3>::data() -> ValueType* {
     return m_storage.data();
-}
-
-template <typename T, typename U>
-inline constexpr auto dot(const Vec<T, 3>& lhs, const Vec<U, 3>& rhs)
-        -> std::common_type_t<T, U> {
-    return lhs[0]*rhs[0] + lhs[1]*rhs[1] + lhs[2]*rhs[2];
-}
-
-template <typename T, typename U>
-inline constexpr auto cross(const Vec<T, 3>& lhs, const Vec<U, 3>& rhs)
-        -> Vec<std::common_type_t<T, U>, 3> {
-    return {lhs[1]*rhs[2] - lhs[2]*rhs[1], lhs[2]*rhs[0] - lhs[0]*rhs[2],
-        lhs[0]*rhs[1] - lhs[1]*rhs[0]};
 }
 }   // namespace jump
 

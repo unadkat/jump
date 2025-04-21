@@ -66,6 +66,10 @@ template <VectorExpression Left, VectorExpression Right,
          typename Left::ValueType, typename Right::ValueType>>
 constexpr auto dot(const Left& lhs, const Right& rhs) -> R;
 
+template <VectorExpression Left, VectorExpression Right>
+constexpr auto cross(const Left& lhs, const Right& rhs)
+        -> VectorCross<Left, Right>;
+
 // ========================================================================
 // Exponentiation
 // ========================================================================
@@ -214,6 +218,12 @@ inline constexpr auto dot(const Left& lhs, const Right& rhs) -> R {
         result += lhs[i]*rhs[i];
     }
     return result;
+}
+
+template <VectorExpression Left, VectorExpression Right>
+constexpr auto cross(const Left& lhs, const Right& rhs)
+        -> VectorCross<Left, Right> {
+    return {lhs, rhs};
 }
 
 template <VectorExpression Expr>

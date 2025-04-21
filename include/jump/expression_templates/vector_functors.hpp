@@ -7,9 +7,12 @@
 #ifndef JUMP_EXPRESSION_TEMPLATE_VECTOR_FUNCTORS_HPP
 #define JUMP_EXPRESSION_TEMPLATE_VECTOR_FUNCTORS_HPP
 
+#include "jump/debug/error_data.hpp"
+#include "jump/debug/exception.hpp"
 #include "jump/expression_templates/functional.hpp"
 #include "jump/expression_templates/vector_expressions.hpp"
 
+#include <format>
 #include <functional>
 
 namespace jump {
@@ -46,6 +49,83 @@ template <VectorExpression Left, VectorExpression Right>
 struct VectorDivide : BinaryVectorOp<std::divides<>, Left, Right> {
     using BinaryVectorOp<std::divides<>, Left, Right>::BinaryVectorOp;
 };
+
+// Cross product needs special treatment since it's not simply an elementwise
+// operation
+template <VectorExpression Left, VectorExpression Right>
+struct VectorCross {
+    public:
+        using ValueType = std::remove_cvref_t<std::common_type_t<
+            typename Left::ValueType, typename Right::ValueType>>;
+
+        static constexpr bool is_vector_expression_leaf{false};
+
+        constexpr VectorCross(const Left& lhs, const Right& rhs);
+
+        constexpr auto operator[](std::size_t index) const -> ValueType;
+        constexpr auto size() const -> std::size_t;
+
+    protected:
+        typename std::conditional<Left::is_vector_expression_leaf,
+                 const Left&, Left>::type m_lhs;
+        typename std::conditional<Right::is_vector_expression_leaf,
+                 const Right&, Right>::type m_rhs;
+};
+
+template <VectorExpression Left, VectorExpression Right>
+inline constexpr VectorCross<Left, Right>::VectorCross(const Left& lhs,
+        const Right& rhs) :
+    m_lhs{lhs}, m_rhs{rhs} {
+    if constexpr (is_constant_vector_expression_v<Left>
+            && is_constant_vector_expression_v<Right>) {
+        throw RuntimeError{InvalidArgumentError{
+            .argument = "is_constant_vector_expression_v<Left> "
+                "&& is_constant_vector_expression_v<Right>",
+            .value = "true",
+            .expected = "only one of the arguments being constant"}};
+    } else if constexpr (is_constant_vector_expression_v<Left>) {
+        m_lhs.set_size(rhs.size());
+    } else if constexpr (is_constant_vector_expression_v<Right>) {
+        m_rhs.set_size(lhs.size());
+    }
+#ifndef NDEBUG
+    if (m_lhs.size() != m_rhs.size()) {
+        throw RuntimeError{Mismatch1DError{.name1 = "m_lhs",
+            .size1 = m_lhs.size(), .name2 = "m_rhs", .size2 = m_rhs.size()}};
+    }
+    if (m_lhs.size() != 3) {
+        throw RuntimeError{InvalidArgumentError{
+            .argument = "lhs.size()", .value = std::format("{}", m_lhs.size()),
+            .expected = "lhs.size() == 3"}};
+    }
+#endif  // NDEBUG
+}
+
+template <VectorExpression Left, VectorExpression Right>
+inline constexpr auto VectorCross<Left, Right>::operator[](
+        std::size_t index) const -> ValueType {
+#ifndef NDEBUG
+    if (index >= size()) {
+        throw RuntimeError{Range1DError{.index = index, .size = size()}};
+    }
+#endif  // NDEBUG
+
+    switch (index) {
+        case 0:
+            return m_lhs[1]*m_rhs[2] - m_lhs[2]*m_rhs[1];
+        case 1:
+            return m_lhs[2]*m_rhs[0] - m_lhs[0]*m_rhs[2];
+        case 2:
+            return m_lhs[0]*m_rhs[1] - m_lhs[1]*m_rhs[0];
+        default:
+            return ValueType{0};
+    }
+}
+
+template <VectorExpression Left, VectorExpression Right>
+inline constexpr auto VectorCross<Left, Right>::size() const -> std::size_t {
+    return m_lhs.size();
+}
 
 // ========================================================================
 // Exponentiation
