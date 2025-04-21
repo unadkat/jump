@@ -8,6 +8,7 @@
 
 #ifdef JUMP_ENABLE_SMALL_VEC
 #include "jump/experimental/data/vec2.hpp"
+#include "jump/experimental/data/vec3.hpp"
 #endif  // JUMP_ENABLE_SMALL_VEC
 
 #include <iostream>
@@ -136,9 +137,24 @@ int small_vector_test(int argc, char** argv) {
     CommandLineArgs args(argc, argv);
 
 #ifdef JUMP_ENABLE_SMALL_VEC
-    Vec<float, 2> test{42};
+    Vec3f test{42};
+    auto expr{test*(test + test)};
+    Vec3f test2{sin(test)};
 
     std::cout << test << std::endl;
+    std::cout << typeid(expr).name() << std::endl;
+    std::cout << test2 << std::endl;
+
+    Vec3f test3{2.f, 3.f, 2.f};
+    Vec3i test4{3, -3, 1};
+    std::cout << dot(test3, test4) << std::endl;
+    Vec3f test5{1.f, 2.f, 0.f};
+    Vec3f test6{2.f, -1.f, 0.f};
+    auto expr2{5.f*cross(test5, test6)};
+    std::cout << typeid(expr2).name() << std::endl;
+
+    Vec3f result{expr2};
+    std::cout << result << std::endl;
 #endif  // JUMP_ENABLE_SMALL_VEC
 
     return 0;
