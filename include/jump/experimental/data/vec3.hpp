@@ -105,7 +105,7 @@ using Vec3z = Vec<std::size_t, 3>;
 
 template <typename T>
 inline constexpr Vec<T, 3>::Vec(const ValueType& value) :
-    m_storage{value, value} {
+    m_storage{value, value, value} {
 }
 
 template <typename T>
