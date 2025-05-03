@@ -10,6 +10,7 @@
 #include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
 #include "jump/expression_templates/concepts.hpp"
+#include "jump/expression_templates/vector_operators.hpp"
 
 #include "jump/experimental/data/vec.hpp"
 

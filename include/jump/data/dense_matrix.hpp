@@ -12,6 +12,7 @@
 #include "jump/data/vector.hpp"
 #include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
+#include "jump/expression_templates/concepts.hpp"
 #include "jump/expression_templates/dense_matrix_operators.hpp"
 #include "jump/utility/types.hpp"
 

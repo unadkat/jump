@@ -17,10 +17,10 @@ endif()
 
 set(default_build_type "Debug")
 if(NOT CMAKE_BUILD_TYPE)
-    message(STATUS "Defaulting build type to ${default_build_type}")
+    message(STATUS "Defaulting ${PROJECT_NAME} build type to ${default_build_type}")
     set(CMAKE_BUILD_TYPE ${default_build_type})
 else()
-    message(STATUS "Build type is ${CMAKE_BUILD_TYPE}")
+    message(STATUS "${PROJECT_NAME} build type is ${CMAKE_BUILD_TYPE}")
 endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)

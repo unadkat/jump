@@ -11,6 +11,7 @@
 #include "jump/data/vector.hpp"
 #include "jump/debug/error_data.hpp"
 #include "jump/debug/exception.hpp"
+#include "jump/expression_templates/concepts.hpp"
 #include "jump/expression_templates/banded_matrix_operators.hpp"
 
 #include <format>
