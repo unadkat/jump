@@ -12,9 +12,9 @@
 #include "jump/expression_templates/concepts.hpp"
 #include "jump/expression_templates/vector_operators.hpp"
 
+#include "jump/experimental/data/storage.hpp"
 #include "jump/experimental/data/vec.hpp"
 
-#include <array>
 #include <cmath>
 #include <concepts>
 #include <type_traits>
@@ -92,7 +92,7 @@ class Vec<T, 4> {
         constexpr auto data() -> ValueType*;
 
     private:
-        std::array<ValueType, 4> m_storage;
+        Storage<ValueType, 4> m_storage;
 };
 
 // ========================================================================

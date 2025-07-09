@@ -21,12 +21,12 @@ struct Storage {
     using ValueType = std::remove_cvref_t<T>;
     static constexpr bool is_vector_expression_leaf{true};
 
-    std::array<ValueType, N> storage;
-
     constexpr auto operator[](std::size_t index) const -> const ValueType&;
     constexpr auto operator[](std::size_t index) -> ValueType&;
 
     constexpr auto size() const -> std::size_t;
+
+    std::array<ValueType, N> storage;
 };
 
 // ========================================================================
