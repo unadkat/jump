@@ -17,7 +17,13 @@ struct Mat {
 template <typename T, std::size_t N>
 inline auto operator<<(std::ostream& out, const Mat<T, N>& rhs)
         -> std::ostream& {
-    return out << rhs.as_string();
+    for (std::size_t column{0}; column < N; ++column) {
+        for (std::size_t row{0}; row < N; ++row) {
+            out << rhs[row, column] << ' ';
+        }
+        out << '\n';
+    }
+    return out;
 }
 }   // namespace jump
 
