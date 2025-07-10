@@ -223,8 +223,8 @@ inline constexpr auto Mat<T, 2>::operator+=(const Expr& expr) -> Mat& {
 
     m_storage[0] += expr[0];
     m_storage[1] += expr[1];
-    m_storage[2] += expr[1];
-    m_storage[3] += expr[1];
+    m_storage[2] += expr[2];
+    m_storage[3] += expr[3];
     return *this;
 }
 
@@ -241,8 +241,8 @@ inline constexpr auto Mat<T, 2>::operator-=(const Expr& expr) -> Mat& {
 
     m_storage[0] -= expr[0];
     m_storage[1] -= expr[1];
-    m_storage[2] -= expr[1];
-    m_storage[3] -= expr[1];
+    m_storage[2] -= expr[2];
+    m_storage[3] -= expr[3];
     return *this;
 }
 
@@ -259,8 +259,8 @@ inline constexpr auto Mat<T, 2>::operator*=(const Expr& expr) -> Mat& {
 
     m_storage[0] *= expr[0];
     m_storage[1] *= expr[1];
-    m_storage[2] *= expr[1];
-    m_storage[3] *= expr[1];
+    m_storage[2] *= expr[2];
+    m_storage[3] *= expr[3];
     return *this;
 }
 
@@ -277,8 +277,8 @@ inline constexpr auto Mat<T, 2>::operator/=(const Expr& expr) -> Mat& {
 
     m_storage[0] /= expr[0];
     m_storage[1] /= expr[1];
-    m_storage[2] /= expr[1];
-    m_storage[3] /= expr[1];
+    m_storage[2] /= expr[2];
+    m_storage[3] /= expr[3];
     return *this;
 }
 
