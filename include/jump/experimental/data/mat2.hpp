@@ -56,6 +56,7 @@ class Mat<T, 2> {
         constexpr auto operator[](std::size_t row, std::size_t column)
                 -> ValueType&;
 
+        constexpr auto num_elements() const -> std::size_t;
         constexpr auto size() const
                 -> const std::pair<std::size_t, std::size_t>&;
 
@@ -192,6 +193,11 @@ inline constexpr auto Mat<T, 2>::operator[](std::size_t row, std::size_t column)
 #endif  // NDEBUG
 
     return m_storage[2*column + row];
+}
+
+template <typename T>
+inline constexpr auto Mat<T, 2>::num_elements() const -> std::size_t {
+    return 4;
 }
 
 template <typename T>
