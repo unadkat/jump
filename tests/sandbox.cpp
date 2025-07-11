@@ -9,6 +9,7 @@
 #ifdef JUMP_ENABLE_SMALL_VEC
 #include "jump/experimental/data/vec2.hpp"
 #include "jump/experimental/data/vec3.hpp"
+#include "jump/experimental/data/mat2.hpp"
 #endif  // JUMP_ENABLE_SMALL_VEC
 
 #include <iostream>
@@ -23,6 +24,7 @@ void f(const Expr& M) {
 int banded_matrix_test(int argc, char** argv);
 int vector_test(int argc, char** argv);
 int small_vector_test(int argc, char** argv);
+int small_matrix_test(int argc, char** argv);
 
 int main(int argc, char** argv) {
     CommandLineArgs args(argc, argv);
@@ -30,11 +32,13 @@ int main(int argc, char** argv) {
     bool do_vector_test{false};
     bool do_banded_matrix_test{false};
     bool do_small_vector_test{false};
+    bool do_small_matrix_test{false};
     int sum_return_vals{0};
 
     args.get("vector", do_vector_test);
     args.get("banded_matrix", do_banded_matrix_test);
     args.get("small_vector", do_small_vector_test);
+    args.get("small_matrix", do_small_matrix_test);
 
     if (do_vector_test) {
         sum_return_vals += vector_test(argc, argv);
@@ -44,6 +48,9 @@ int main(int argc, char** argv) {
     }
     if (do_small_vector_test) {
         sum_return_vals += small_vector_test(argc, argv);
+    }
+    if (do_small_matrix_test) {
+        sum_return_vals += small_matrix_test(argc, argv);
     }
 
     return sum_return_vals;
@@ -155,6 +162,36 @@ int small_vector_test(int argc, char** argv) {
 
     Vec3f result{expr2};
     std::cout << result << std::endl;
+
+#endif  // JUMP_ENABLE_SMALL_VEC
+
+    return 0;
+}
+
+int small_matrix_test(int argc, char** argv) {
+    CommandLineArgs args(argc, argv);
+
+#ifdef JUMP_ENABLE_SMALL_VEC
+    Mat2f matrix_test{1.f, 2.f, 3.f, 4.f};
+    std::cout << matrix_test << std::endl;
+
+    matrix_test += matrix_test;
+    std::cout << matrix_test << std::endl;
+    matrix_test *= matrix_test;
+    std::cout << matrix_test << std::endl;
+    matrix_test /= matrix_test;
+    std::cout << matrix_test << std::endl;
+    matrix_test -= matrix_test;
+    std::cout << matrix_test << std::endl;
+
+    Vec2f replacement{69.f, 42.f};
+    matrix_test[0] = replacement;
+    std::cout << matrix_test << std::endl;
+    matrix_test[1] = replacement;
+    std::cout << matrix_test << std::endl;
+
+    matrix_test += matrix_test;
+    std::cout << matrix_test << std::endl;
 #endif  // JUMP_ENABLE_SMALL_VEC
 
     return 0;
