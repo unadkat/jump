@@ -235,15 +235,15 @@ inline constexpr auto Mat<T, 3>::operator+=(const Expr& expr) -> Mat& {
     }
 #endif  // NDEBUG
 
-    m_storage[0] += expr[0, 0];
-    m_storage[1] += expr[1, 0];
-    m_storage[2] += expr[2, 0];
-    m_storage[3] += expr[0, 1];
-    m_storage[4] += expr[1, 1];
-    m_storage[5] += expr[2, 1];
-    m_storage[6] += expr[0, 2];
-    m_storage[7] += expr[1, 2];
-    m_storage[8] += expr[2, 2];
+    m_storage[0] += expr.as_vector()[0];
+    m_storage[1] += expr.as_vector()[1];
+    m_storage[2] += expr.as_vector()[2];
+    m_storage[3] += expr.as_vector()[3];
+    m_storage[4] += expr.as_vector()[4];
+    m_storage[5] += expr.as_vector()[5];
+    m_storage[6] += expr.as_vector()[6];
+    m_storage[7] += expr.as_vector()[7];
+    m_storage[8] += expr.as_vector()[8];
     return *this;
 }
 
@@ -258,15 +258,15 @@ inline constexpr auto Mat<T, 3>::operator-=(const Expr& expr) -> Mat& {
     }
 #endif  // NDEBUG
 
-    m_storage[0] -= expr[0, 0];
-    m_storage[1] -= expr[1, 0];
-    m_storage[2] -= expr[2, 0];
-    m_storage[3] -= expr[0, 1];
-    m_storage[4] -= expr[1, 1];
-    m_storage[5] -= expr[2, 1];
-    m_storage[6] -= expr[0, 2];
-    m_storage[7] -= expr[1, 2];
-    m_storage[8] -= expr[2, 2];
+    m_storage[0] -= expr.as_vector()[0];
+    m_storage[1] -= expr.as_vector()[1];
+    m_storage[2] -= expr.as_vector()[2];
+    m_storage[3] -= expr.as_vector()[3];
+    m_storage[4] -= expr.as_vector()[4];
+    m_storage[5] -= expr.as_vector()[5];
+    m_storage[6] -= expr.as_vector()[6];
+    m_storage[7] -= expr.as_vector()[7];
+    m_storage[8] -= expr.as_vector()[8];
     return *this;
 }
 
@@ -281,15 +281,15 @@ inline constexpr auto Mat<T, 3>::operator*=(const Expr& expr) -> Mat& {
     }
 #endif  // NDEBUG
 
-    m_storage[0] *= expr[0, 0];
-    m_storage[1] *= expr[1, 0];
-    m_storage[2] *= expr[2, 0];
-    m_storage[3] *= expr[0, 1];
-    m_storage[4] *= expr[1, 1];
-    m_storage[5] *= expr[2, 1];
-    m_storage[6] *= expr[0, 2];
-    m_storage[7] *= expr[1, 2];
-    m_storage[8] *= expr[2, 2];
+    m_storage[0] *= expr.as_vector()[0];
+    m_storage[1] *= expr.as_vector()[1];
+    m_storage[2] *= expr.as_vector()[2];
+    m_storage[3] *= expr.as_vector()[3];
+    m_storage[4] *= expr.as_vector()[4];
+    m_storage[5] *= expr.as_vector()[5];
+    m_storage[6] *= expr.as_vector()[6];
+    m_storage[7] *= expr.as_vector()[7];
+    m_storage[8] *= expr.as_vector()[8];
     return *this;
 }
 
@@ -304,15 +304,15 @@ inline constexpr auto Mat<T, 3>::operator/=(const Expr& expr) -> Mat& {
     }
 #endif  // NDEBUG
 
-    m_storage[0] /= expr[0, 0];
-    m_storage[1] /= expr[1, 0];
-    m_storage[2] /= expr[2, 0];
-    m_storage[3] /= expr[0, 1];
-    m_storage[4] /= expr[1, 1];
-    m_storage[5] /= expr[2, 1];
-    m_storage[6] /= expr[0, 2];
-    m_storage[7] /= expr[1, 2];
-    m_storage[8] /= expr[2, 2];
+    m_storage[0] /= expr.as_vector()[0];
+    m_storage[1] /= expr.as_vector()[1];
+    m_storage[2] /= expr.as_vector()[2];
+    m_storage[3] /= expr.as_vector()[3];
+    m_storage[4] /= expr.as_vector()[4];
+    m_storage[5] /= expr.as_vector()[5];
+    m_storage[6] /= expr.as_vector()[6];
+    m_storage[7] /= expr.as_vector()[7];
+    m_storage[8] /= expr.as_vector()[8];
     return *this;
 }
 
