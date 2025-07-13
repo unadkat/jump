@@ -14,6 +14,7 @@ template <typename T, std::size_t N>
 struct Mat {
 };
 
+// Outputs transpose of matrix
 template <typename T, std::size_t N>
 inline auto operator<<(std::ostream& out, const Mat<T, N>& rhs)
         -> std::ostream& {

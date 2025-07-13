@@ -1,0 +1,366 @@
+// This file forms part of Jump (Jay's Utilities and Mathematical Primitives)
+// Copyright (C) Jay Unadkat 2024--2025. SPDX-Licence-Identifier: MPL-2.0
+// This Source Code Form is subject to the terms of the Mozilla Public Licence,
+// v. 2.0. If a copy of the MPL was not distributed with this file, you can
+// obtain one at https://mozilla.org/MPL/2.0/
+
+#ifndef JUMP_MAT3_HPP
+#define JUMP_MAT3_HPP
+
+#include "jump/debug/error_data.hpp"
+#include "jump/debug/exception.hpp"
+#include "jump/expression_templates/concepts.hpp"
+#include "jump/expression_templates/dense_matrix_operators.hpp"
+
+#include "jump/experimental/data/mat.hpp"
+#include "jump/experimental/data/storage.hpp"
+#include "jump/experimental/data/vec3.hpp"
+
+#include <cmath>
+#include <concepts>
+#include <type_traits>
+#include <utility>
+
+namespace jump {
+template <typename T>
+class Mat<T, 3> {
+    public:
+        using ValueType = std::remove_cvref_t<T>;
+        /// \brief To satisfy DenseMatrixExpression concept
+        using InnerExpressionType = Storage<ValueType, 9>;
+        /// \brief To satisfy DenseMatrixExpression concept (and signal that
+        /// this data structure can be referenced in evaluations).
+        static constexpr bool is_dense_matrix_expression_leaf{true};
+
+        constexpr Mat(const ValueType& value = ValueType{0});
+        constexpr Mat(const ValueType& a11, const ValueType& a22,
+                const ValueType& a33);
+        constexpr Mat(const ValueType& a11, const ValueType& a21,
+                const ValueType& a31, const ValueType& a12,
+                const ValueType& a22, const ValueType& a32,
+                const ValueType& a13, const ValueType& a23,
+                const ValueType& a33);
+        constexpr Mat(const Mat& other) = default;
+        template <std::convertible_to<ValueType> U>
+        constexpr Mat(const Mat<U, 3>& other);
+        /// \brief Construct from a MatrixExpression.
+        template <DenseMatrixExpressionConvertibleTo<ValueType> Expr>
+        constexpr Mat(const Expr& expr);
+
+        constexpr auto operator=(const Mat& other) -> Mat& = default;
+        template <DenseMatrixExpressionConvertibleTo<ValueType> Expr>
+        constexpr auto operator=(const Expr& expr) -> Mat&;
+
+        constexpr auto operator<=>(const Mat&) const = default;
+
+        constexpr auto operator[](std::size_t column) const -> const Vec<T, 3>&;
+        constexpr auto operator[](std::size_t column) -> Vec<T, 3>&;
+        constexpr auto operator[](std::size_t row, std::size_t column) const
+                -> const ValueType&;
+        constexpr auto operator[](std::size_t row, std::size_t column)
+                -> ValueType&;
+
+        constexpr auto num_elements() const -> std::size_t;
+        constexpr auto size() const
+                -> const std::pair<std::size_t, std::size_t>&;
+
+        constexpr void fill(const T& value);
+        constexpr void zero();
+
+        template <DenseMatrixExpressionConvertibleTo<ValueType> Expr>
+        constexpr auto operator+=(const Expr& expr) -> Mat&;
+        template <DenseMatrixExpressionConvertibleTo<ValueType> Expr>
+        constexpr auto operator-=(const Expr& expr) -> Mat&;
+        template <DenseMatrixExpressionConvertibleTo<ValueType> Expr>
+        constexpr auto operator*=(const Expr& expr) -> Mat&;
+        template <DenseMatrixExpressionConvertibleTo<ValueType> Expr>
+        constexpr auto operator/=(const Expr& expr) -> Mat&;
+        template <std::convertible_to<ValueType> U>
+        constexpr auto operator*=(const U& rhs) -> Mat&;
+        template <std::convertible_to<ValueType> U>
+        constexpr auto operator/=(const U& rhs) -> Mat&;
+
+        constexpr auto data() const -> const ValueType*;
+        constexpr auto data() -> ValueType*;
+        /// \brief Const reference to underlying storage (column-major).
+        constexpr auto as_vector() const -> const Storage<T, 9>&;
+
+    private:
+        Storage<ValueType, 9> m_storage;
+        static constexpr std::pair<std::size_t, std::size_t> m_size{3, 3};
+};
+
+// ========================================================================
+// Aliases
+// ========================================================================
+
+using Mat3f = Mat<float, 3>;
+using Mat3d = Mat<double, 3>;
+using Mat3i = Mat<int, 3>;
+using Mat3u = Mat<unsigned int, 3>;
+using Mat3z = Mat<std::size_t, 3>;
+
+// ========================================================================
+// Implementation
+// ========================================================================
+
+template <typename T>
+inline constexpr Mat<T, 3>::Mat(const ValueType& value) :
+    m_storage{value, 0, 0, 0, value, 0, 0, 0, value} {
+}
+
+template <typename T>
+inline constexpr Mat<T, 3>::Mat(const ValueType& a11, const ValueType& a22,
+                const ValueType& a33) :
+    m_storage{a11, 0, 0, 0, a22, 0, 0, 0, a33} {
+}
+
+template <typename T>
+inline constexpr Mat<T, 3>::Mat(const ValueType& a11, const ValueType& a21,
+                const ValueType& a31, const ValueType& a12,
+                const ValueType& a22, const ValueType& a32,
+                const ValueType& a13, const ValueType& a23,
+                const ValueType& a33) :
+    m_storage{a11, a21, a31, a12, a22, a32, a13, a23, a33} {
+}
+
+template <typename T>
+template <std::convertible_to<typename Mat<T, 3>::ValueType> U>
+inline constexpr Mat<T, 3>::Mat(const Mat<U, 3>& other) :
+    m_storage{other.as_vector()} {
+}
+
+template <typename T>
+template <DenseMatrixExpressionConvertibleTo<
+    typename Mat<T, 3>::ValueType> Expr>
+inline constexpr Mat<T, 3>::Mat(const Expr& expr) :
+    m_storage{expr.as_vector()} {
+}
+
+template <typename T>
+template <DenseMatrixExpressionConvertibleTo<
+    typename Mat<T, 3>::ValueType> Expr>
+inline constexpr auto Mat<T, 3>::operator=(const Expr& expr) -> Mat& {
+#ifndef NDEBUG
+    if (size() != expr.size()) {
+        throw RuntimeError{Mismatch2DError{.size1 = size(), .name2 = "expr",
+            .size2 = expr.size()}};
+    }
+#endif  // NDEBUG
+
+    m_storage = expr.as_vector();
+    return *this;
+}
+
+template <typename T>
+inline constexpr auto Mat<T, 3>::operator[](std::size_t column) const
+        -> const Vec<T, 3>& {
+#ifndef NDEBUG
+    if (column >= size().second) {
+        throw RuntimeError{Range2DError{.indices = {0, column},
+            .size = size()}};
+    }
+#endif  // NDEBUG
+
+    return *reinterpret_cast<const Vec<T, 3>*>(&m_storage[3*column]);
+}
+
+template <typename T>
+inline constexpr auto Mat<T, 3>::operator[](std::size_t column) -> Vec<T, 3>& {
+#ifndef NDEBUG
+    if (column >= size().second) {
+        throw RuntimeError{Range2DError{.indices = {0, column},
+            .size = size()}};
+    }
+#endif  // NDEBUG
+
+    return *reinterpret_cast<Vec<T, 3>*>(&m_storage[3*column]);
+}
+
+template <typename T>
+inline constexpr auto Mat<T, 3>::operator[](std::size_t row,
+        std::size_t column) const -> const ValueType& {
+#ifndef NDEBUG
+    if (row >= size().first || column >= size().second) {
+        throw RuntimeError{Range2DError{.indices = {row, column},
+            .size = size()}};
+    }
+#endif  // NDEBUG
+
+    return m_storage[3*column + row];
+}
+
+template <typename T>
+inline constexpr auto Mat<T, 3>::operator[](std::size_t row, std::size_t column)
+        -> ValueType& {
+#ifndef NDEBUG
+    if (row >= size().first || column >= size().second) {
+        throw RuntimeError{Range2DError{.indices = {row, column},
+            .size = size()}};
+    }
+#endif  // NDEBUG
+
+    return m_storage[3*column + row];
+}
+
+template <typename T>
+inline constexpr auto Mat<T, 3>::num_elements() const -> std::size_t {
+    return 9;
+}
+
+template <typename T>
+inline constexpr auto Mat<T, 3>::size() const
+        -> const std::pair<std::size_t, std::size_t>& {
+    return m_size;
+}
+
+template <typename T>
+inline constexpr void Mat<T, 3>::fill(const T& value) {
+    m_storage.storage.fill(value);
+}
+
+template <typename T>
+inline constexpr void Mat<T, 3>::zero() {
+    m_storage.storage.fill(0);
+}
+
+template <typename T>
+template <DenseMatrixExpressionConvertibleTo<
+    typename Mat<T, 3>::ValueType> Expr>
+inline constexpr auto Mat<T, 3>::operator+=(const Expr& expr) -> Mat& {
+#ifndef NDEBUG
+    if (size() != expr.size()) {
+        throw RuntimeError{Mismatch2DError{.size1 = size(), .name2 = "expr",
+            .size2 = expr.size()}};
+    }
+#endif  // NDEBUG
+
+    m_storage[0] += expr[0, 0];
+    m_storage[1] += expr[1, 0];
+    m_storage[2] += expr[2, 0];
+    m_storage[3] += expr[0, 1];
+    m_storage[4] += expr[1, 1];
+    m_storage[5] += expr[2, 1];
+    m_storage[6] += expr[0, 2];
+    m_storage[7] += expr[1, 2];
+    m_storage[8] += expr[2, 2];
+    return *this;
+}
+
+template <typename T>
+template <DenseMatrixExpressionConvertibleTo<
+    typename Mat<T, 3>::ValueType> Expr>
+inline constexpr auto Mat<T, 3>::operator-=(const Expr& expr) -> Mat& {
+#ifndef NDEBUG
+    if (size() != expr.size()) {
+        throw RuntimeError{Mismatch2DError{.size1 = size(), .name2 = "expr",
+            .size2 = expr.size()}};
+    }
+#endif  // NDEBUG
+
+    m_storage[0] -= expr[0, 0];
+    m_storage[1] -= expr[1, 0];
+    m_storage[2] -= expr[2, 0];
+    m_storage[3] -= expr[0, 1];
+    m_storage[4] -= expr[1, 1];
+    m_storage[5] -= expr[2, 1];
+    m_storage[6] -= expr[0, 2];
+    m_storage[7] -= expr[1, 2];
+    m_storage[8] -= expr[2, 2];
+    return *this;
+}
+
+template <typename T>
+template <DenseMatrixExpressionConvertibleTo<
+    typename Mat<T, 3>::ValueType> Expr>
+inline constexpr auto Mat<T, 3>::operator*=(const Expr& expr) -> Mat& {
+#ifndef NDEBUG
+    if (size() != expr.size()) {
+        throw RuntimeError{Mismatch2DError{.size1 = size(), .name2 = "expr",
+            .size2 = expr.size()}};
+    }
+#endif  // NDEBUG
+
+    m_storage[0] *= expr[0, 0];
+    m_storage[1] *= expr[1, 0];
+    m_storage[2] *= expr[2, 0];
+    m_storage[3] *= expr[0, 1];
+    m_storage[4] *= expr[1, 1];
+    m_storage[5] *= expr[2, 1];
+    m_storage[6] *= expr[0, 2];
+    m_storage[7] *= expr[1, 2];
+    m_storage[8] *= expr[2, 2];
+    return *this;
+}
+
+template <typename T>
+template <DenseMatrixExpressionConvertibleTo<
+    typename Mat<T, 3>::ValueType> Expr>
+inline constexpr auto Mat<T, 3>::operator/=(const Expr& expr) -> Mat& {
+#ifndef NDEBUG
+    if (size() != expr.size()) {
+        throw RuntimeError{Mismatch2DError{.size1 = size(), .name2 = "expr",
+            .size2 = expr.size()}};
+    }
+#endif  // NDEBUG
+
+    m_storage[0] /= expr[0, 0];
+    m_storage[1] /= expr[1, 0];
+    m_storage[2] /= expr[2, 0];
+    m_storage[3] /= expr[0, 1];
+    m_storage[4] /= expr[1, 1];
+    m_storage[5] /= expr[2, 1];
+    m_storage[6] /= expr[0, 2];
+    m_storage[7] /= expr[1, 2];
+    m_storage[8] /= expr[2, 2];
+    return *this;
+}
+
+template <typename T>
+template <std::convertible_to<typename Mat<T, 3>::ValueType> U>
+inline constexpr auto Mat<T, 3>::operator*=(const U& rhs) -> Mat& {
+    m_storage[0] *= rhs;
+    m_storage[1] *= rhs;
+    m_storage[2] *= rhs;
+    m_storage[3] *= rhs;
+    m_storage[4] *= rhs;
+    m_storage[5] *= rhs;
+    m_storage[6] *= rhs;
+    m_storage[7] *= rhs;
+    m_storage[8] *= rhs;
+    return *this;
+}
+
+template <typename T>
+template <std::convertible_to<typename Mat<T, 3>::ValueType> U>
+inline constexpr auto Mat<T, 3>::operator/=(const U& rhs) -> Mat& {
+    m_storage[0] /= rhs;
+    m_storage[1] /= rhs;
+    m_storage[2] /= rhs;
+    m_storage[3] /= rhs;
+    m_storage[4] /= rhs;
+    m_storage[5] /= rhs;
+    m_storage[6] /= rhs;
+    m_storage[7] /= rhs;
+    m_storage[8] /= rhs;
+    return *this;
+}
+
+template <typename T>
+inline constexpr auto Mat<T, 3>::data() const -> const ValueType* {
+    return m_storage.storage.data();
+}
+
+template <typename T>
+inline constexpr auto Mat<T, 3>::data() -> ValueType* {
+    return m_storage.storage.data();
+}
+
+template <typename T>
+inline constexpr auto Mat<T, 3>::as_vector() const -> const Storage<T, 9>& {
+    return m_storage;
+}
+}   // namespace jump
+
+#endif  // JUMP_MAT3_HPP
+
