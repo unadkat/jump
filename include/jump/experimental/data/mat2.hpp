@@ -24,10 +24,13 @@
 namespace jump {
 template <typename T>
 class Mat<T, 2> {
+    private:
+        static constexpr std::size_t N{2};
+
     public:
         using ValueType = std::remove_cvref_t<T>;
         /// \brief To satisfy DenseMatrixExpression concept
-        using InnerExpressionType = Storage<ValueType, 4>;
+        using InnerExpressionType = Storage<ValueType, N*N>;
         /// \brief To satisfy DenseMatrixExpression concept (and signal that
         /// this data structure can be referenced in evaluations).
         static constexpr bool is_dense_matrix_expression_leaf{true};
@@ -38,7 +41,7 @@ class Mat<T, 2> {
                 const ValueType& a12, const ValueType& a22);
         constexpr Mat(const Mat& other) = default;
         template <std::convertible_to<ValueType> U>
-        constexpr Mat(const Mat<U, 2>& other);
+        constexpr Mat(const Mat<U, N>& other);
         /// \brief Construct from a MatrixExpression.
         template <DenseMatrixExpressionConvertibleTo<ValueType> Expr>
         constexpr Mat(const Expr& expr);
@@ -49,8 +52,8 @@ class Mat<T, 2> {
 
         constexpr auto operator<=>(const Mat&) const = default;
 
-        constexpr auto operator[](std::size_t column) const -> const Vec<T, 2>&;
-        constexpr auto operator[](std::size_t column) -> Vec<T, 2>&;
+        constexpr auto operator[](std::size_t column) const -> const Vec<T, N>&;
+        constexpr auto operator[](std::size_t column) -> Vec<T, N>&;
         constexpr auto operator[](std::size_t row, std::size_t column) const
                 -> const ValueType&;
         constexpr auto operator[](std::size_t row, std::size_t column)
@@ -79,11 +82,11 @@ class Mat<T, 2> {
         constexpr auto data() const -> const ValueType*;
         constexpr auto data() -> ValueType*;
         /// \brief Const reference to underlying storage (column-major).
-        constexpr auto as_vector() const -> const Storage<T, 4>&;
+        constexpr auto as_vector() const -> const Storage<ValueType, N*N>&;
 
     private:
-        Storage<ValueType, 4> m_storage;
-        static constexpr std::pair<std::size_t, std::size_t> m_size{2, 2};
+        Storage<ValueType, N*N> m_storage;
+        static constexpr std::pair<std::size_t, std::size_t> m_size{N, N};
 };
 
 // ========================================================================
@@ -118,7 +121,7 @@ inline constexpr Mat<T, 2>::Mat(const ValueType& a11, const ValueType& a21,
 
 template <typename T>
 template <std::convertible_to<typename Mat<T, 2>::ValueType> U>
-inline constexpr Mat<T, 2>::Mat(const Mat<U, 2>& other) :
+inline constexpr Mat<T, 2>::Mat(const Mat<U, N>& other) :
     m_storage{other.as_vector()} {
 }
 
@@ -146,7 +149,7 @@ inline constexpr auto Mat<T, 2>::operator=(const Expr& expr) -> Mat& {
 
 template <typename T>
 inline constexpr auto Mat<T, 2>::operator[](std::size_t column) const
-        -> const Vec<T, 2>& {
+        -> const Vec<T, N>& {
 #ifndef NDEBUG
     if (column >= size().second) {
         throw RuntimeError{Range2DError{.indices = {0, column},
@@ -154,11 +157,11 @@ inline constexpr auto Mat<T, 2>::operator[](std::size_t column) const
     }
 #endif  // NDEBUG
 
-    return *reinterpret_cast<const Vec<T, 2>*>(&m_storage[2*column]);
+    return *reinterpret_cast<const Vec<T, N>*>(&m_storage[N*column]);
 }
 
 template <typename T>
-inline constexpr auto Mat<T, 2>::operator[](std::size_t column) -> Vec<T, 2>& {
+inline constexpr auto Mat<T, 2>::operator[](std::size_t column) -> Vec<T, N>& {
 #ifndef NDEBUG
     if (column >= size().second) {
         throw RuntimeError{Range2DError{.indices = {0, column},
@@ -166,7 +169,7 @@ inline constexpr auto Mat<T, 2>::operator[](std::size_t column) -> Vec<T, 2>& {
     }
 #endif  // NDEBUG
 
-    return *reinterpret_cast<Vec<T, 2>*>(&m_storage[2*column]);
+    return *reinterpret_cast<Vec<T, N>*>(&m_storage[N*column]);
 }
 
 template <typename T>
@@ -179,7 +182,7 @@ inline constexpr auto Mat<T, 2>::operator[](std::size_t row,
     }
 #endif  // NDEBUG
 
-    return m_storage[2*column + row];
+    return m_storage[N*column + row];
 }
 
 template <typename T>
@@ -192,12 +195,12 @@ inline constexpr auto Mat<T, 2>::operator[](std::size_t row, std::size_t column)
     }
 #endif  // NDEBUG
 
-    return m_storage[2*column + row];
+    return m_storage[N*column + row];
 }
 
 template <typename T>
 inline constexpr auto Mat<T, 2>::num_elements() const -> std::size_t {
-    return 4;
+    return N*N;
 }
 
 template <typename T>
@@ -227,10 +230,9 @@ inline constexpr auto Mat<T, 2>::operator+=(const Expr& expr) -> Mat& {
     }
 #endif  // NDEBUG
 
-    m_storage[0] += expr.as_vector()[0];
-    m_storage[1] += expr.as_vector()[1];
-    m_storage[2] += expr.as_vector()[2];
-    m_storage[3] += expr.as_vector()[3];
+    for (std::size_t i{0}; i < N*N; ++i) {
+        m_storage[i] += expr.as_vector()[i];
+    }
     return *this;
 }
 
@@ -245,10 +247,9 @@ inline constexpr auto Mat<T, 2>::operator-=(const Expr& expr) -> Mat& {
     }
 #endif  // NDEBUG
 
-    m_storage[0] -= expr.as_vector()[0];
-    m_storage[1] -= expr.as_vector()[1];
-    m_storage[2] -= expr.as_vector()[2];
-    m_storage[3] -= expr.as_vector()[3];
+    for (std::size_t i{0}; i < N*N; ++i) {
+        m_storage[i] -= expr.as_vector()[i];
+    }
     return *this;
 }
 
@@ -263,10 +264,9 @@ inline constexpr auto Mat<T, 2>::operator*=(const Expr& expr) -> Mat& {
     }
 #endif  // NDEBUG
 
-    m_storage[0] *= expr.as_vector()[0];
-    m_storage[1] *= expr.as_vector()[1];
-    m_storage[2] *= expr.as_vector()[2];
-    m_storage[3] *= expr.as_vector()[3];
+    for (std::size_t i{0}; i < N*N; ++i) {
+        m_storage[i] *= expr.as_vector()[i];
+    }
     return *this;
 }
 
@@ -281,30 +281,27 @@ inline constexpr auto Mat<T, 2>::operator/=(const Expr& expr) -> Mat& {
     }
 #endif  // NDEBUG
 
-    m_storage[0] /= expr.as_vector()[0];
-    m_storage[1] /= expr.as_vector()[1];
-    m_storage[2] /= expr.as_vector()[2];
-    m_storage[3] /= expr.as_vector()[3];
+    for (std::size_t i{0}; i < N*N; ++i) {
+        m_storage[i] /= expr.as_vector()[i];
+    }
     return *this;
 }
 
 template <typename T>
 template <std::convertible_to<typename Mat<T, 2>::ValueType> U>
 inline constexpr auto Mat<T, 2>::operator*=(const U& rhs) -> Mat& {
-    m_storage[0] *= rhs;
-    m_storage[1] *= rhs;
-    m_storage[2] *= rhs;
-    m_storage[3] *= rhs;
+    for (std::size_t i{0}; i < N*N; ++i) {
+        m_storage[i] *= rhs;
+    }
     return *this;
 }
 
 template <typename T>
 template <std::convertible_to<typename Mat<T, 2>::ValueType> U>
 inline constexpr auto Mat<T, 2>::operator/=(const U& rhs) -> Mat& {
-    m_storage[0] /= rhs;
-    m_storage[1] /= rhs;
-    m_storage[2] /= rhs;
-    m_storage[3] /= rhs;
+    for (std::size_t i{0}; i < N*N; ++i) {
+        m_storage[i] /= rhs;
+    }
     return *this;
 }
 
@@ -319,7 +316,8 @@ inline constexpr auto Mat<T, 2>::data() -> ValueType* {
 }
 
 template <typename T>
-inline constexpr auto Mat<T, 2>::as_vector() const -> const Storage<T, 4>& {
+inline constexpr auto Mat<T, 2>::as_vector() const
+        -> const Storage<ValueType, N*N>& {
     return m_storage;
 }
 }   // namespace jump
