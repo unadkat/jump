@@ -10,6 +10,7 @@
 #include "jump/experimental/data/vec2.hpp"
 #include "jump/experimental/data/vec3.hpp"
 #include "jump/experimental/data/mat2.hpp"
+#include "jump/experimental/data/mat3.hpp"
 #endif  // JUMP_ENABLE_SMALL_VEC
 
 #include <iostream>
@@ -192,6 +193,29 @@ int small_matrix_test(int argc, char** argv) {
 
     matrix_test += matrix_test;
     std::cout << matrix_test << std::endl;
+
+    Mat3f matrix_test2{1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f};
+    std::cout << matrix_test2 << std::endl;
+
+    matrix_test2 += matrix_test2;
+    std::cout << matrix_test2 << std::endl;
+    matrix_test2 *= matrix_test2;
+    std::cout << matrix_test2 << std::endl;
+    matrix_test2 /= matrix_test2;
+    std::cout << matrix_test2 << std::endl;
+    matrix_test2 -= matrix_test2;
+    std::cout << matrix_test2 << std::endl;
+
+    Vec3f replacement2{69.f, 42.f, 3.14f};
+    matrix_test2[0] = replacement2;
+    std::cout << matrix_test2 << std::endl;
+    matrix_test2[1] = replacement2;
+    std::cout << matrix_test2 << std::endl;
+    matrix_test2[2] = replacement2;
+    std::cout << matrix_test2 << std::endl;
+
+    matrix_test2 += matrix_test2;
+    std::cout << matrix_test2 << std::endl;
 #endif  // JUMP_ENABLE_SMALL_VEC
 
     return 0;
