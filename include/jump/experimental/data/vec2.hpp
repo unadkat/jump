@@ -22,6 +22,9 @@
 namespace jump {
 template <typename T>
 class Vec<T, 2> {
+    private:
+        static constexpr std::size_t N{2};
+
     public:
         using ValueType = std::remove_cvref_t<T>;
         static constexpr bool is_vector_expression_leaf{true};
@@ -30,7 +33,7 @@ class Vec<T, 2> {
         constexpr Vec(const ValueType& x, const ValueType& y);
         constexpr Vec(const Vec& other) = default;
         template <std::convertible_to<ValueType> U>
-        constexpr Vec(const Vec<U, 2>& other);
+        constexpr Vec(const Vec<U, N>& other);
         /// \brief Construct from a VectorExpression.
         template <VectorExpressionConvertibleTo<ValueType> Expr>
         constexpr Vec(const Expr& expr);
@@ -81,7 +84,7 @@ class Vec<T, 2> {
         constexpr auto data() -> ValueType*;
 
     private:
-        Storage<ValueType, 2> m_storage;
+        Storage<ValueType, N> m_storage;
 };
 
 // ========================================================================
@@ -110,7 +113,7 @@ inline constexpr Vec<T, 2>::Vec(const ValueType& x, const ValueType& y) :
 
 template <typename T>
 template <std::convertible_to<typename Vec<T, 2>::ValueType> U>
-inline constexpr Vec<T, 2>::Vec(const Vec<U, 2>& other) :
+inline constexpr Vec<T, 2>::Vec(const Vec<U, N>& other) :
     m_storage{other[0], other[1]} {
 }
 
@@ -130,8 +133,9 @@ inline constexpr auto Vec<T, 2>::operator=(const Expr& expr) -> Vec& {
     }
 #endif  // NDEBUG
 
-    m_storage[0] = expr[0];
-    m_storage[1] = expr[1];
+    for (std::size_t i{0}; i < N; ++i) {
+        m_storage[i] = expr[i];
+    }
     return *this;
 }
 
@@ -223,8 +227,9 @@ inline constexpr auto Vec<T, 2>::operator+=(const Expr& expr) -> Vec& {
     }
 #endif  // NDEBUG
 
-    m_storage[0] += expr[0];
-    m_storage[1] += expr[1];
+    for (std::size_t i{0}; i < N; ++i) {
+        m_storage[i] += expr[i];
+    }
     return *this;
 }
 
@@ -238,8 +243,9 @@ inline constexpr auto Vec<T, 2>::operator-=(const Expr& expr) -> Vec& {
     }
 #endif  // NDEBUG
 
-    m_storage[0] -= expr[0];
-    m_storage[1] -= expr[1];
+    for (std::size_t i{0}; i < N; ++i) {
+        m_storage[i] -= expr[i];
+    }
     return *this;
 }
 
@@ -253,8 +259,9 @@ inline constexpr auto Vec<T, 2>::operator*=(const Expr& expr) -> Vec& {
     }
 #endif  // NDEBUG
 
-    m_storage[0] *= expr[0];
-    m_storage[1] *= expr[1];
+    for (std::size_t i{0}; i < N; ++i) {
+        m_storage[i] *= expr[i];
+    }
     return *this;
 }
 
@@ -268,24 +275,27 @@ inline constexpr auto Vec<T, 2>::operator/=(const Expr& expr) -> Vec& {
     }
 #endif  // NDEBUG
 
-    m_storage[0] /= expr[0];
-    m_storage[1] /= expr[1];
+    for (std::size_t i{0}; i < N; ++i) {
+        m_storage[i] /= expr[i];
+    }
     return *this;
 }
 
 template <typename T>
 template <std::convertible_to<typename Vec<T, 2>::ValueType> U>
 inline constexpr auto Vec<T, 2>::operator*=(const U& rhs) -> Vec& {
-    m_storage[0] *= rhs;
-    m_storage[1] *= rhs;
+    for (std::size_t i{0}; i < N; ++i) {
+        m_storage[i] *= rhs;
+    }
     return *this;
 }
 
 template <typename T>
 template <std::convertible_to<typename Vec<T, 2>::ValueType> U>
 inline constexpr auto Vec<T, 2>::operator/=(const U& rhs) -> Vec& {
-    m_storage[0] /= rhs;
-    m_storage[1] /= rhs;
+    for (std::size_t i{0}; i < N; ++i) {
+        m_storage[i] /= rhs;
+    }
     return *this;
 }
 
