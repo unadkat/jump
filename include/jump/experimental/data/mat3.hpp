@@ -124,7 +124,11 @@ inline constexpr Mat<T, 3>::Mat(const ValueType& a11, const ValueType& a21,
                 const ValueType& a22, const ValueType& a32,
                 const ValueType& a13, const ValueType& a23,
                 const ValueType& a33) :
-    m_storage{a11, a21, a31, a12, a22, a32, a13, a23, a33} {
+    m_storage{
+        a11, a21, a31,
+        a12, a22, a32,
+        a13, a23, a33
+    } {
 }
 
 template <typename T>

@@ -116,7 +116,10 @@ inline constexpr Mat<T, 2>::Mat(const ValueType& a11, const ValueType& a22) :
 template <typename T>
 inline constexpr Mat<T, 2>::Mat(const ValueType& a11, const ValueType& a21,
         const ValueType& a12, const ValueType& a22) :
-    m_storage{a11, a21, a12, a22} {
+    m_storage{
+        a11, a21,
+        a12, a22
+    } {
 }
 
 template <typename T>
