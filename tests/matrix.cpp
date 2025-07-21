@@ -1263,7 +1263,8 @@ auto test_matrix_access_fail() -> TestResult {
     caught1 = caught2 = false;
 
     try {
-        B[-1, 0] = 1.;
+        volatile int index{-1};
+        B[index, 0] = 1.;
     } catch (RuntimeError<Range2DError>& e) {
         caught1 = true;
     }
